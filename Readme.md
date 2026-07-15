@@ -6,14 +6,15 @@
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=nodedotjs&logoColor=white)
 
-SmartDevApp is a full-stack portfolio website for Franco Diaz Licham. It presents professional experience, personal projects, contact information, and portfolio detail pages through a Vite-powered static frontend.
+SmartDevApp is my full-stack portfolio website. It presents my professional experience, personal projects, contact information, and portfolio detail pages through a deliberately framework-free frontend built with plain HTML, CSS, and TypeScript. Vite is used as the build tool, not as an application framework.
 
-The backend is an Azure Functions app that supports the contact form by sending email through Azure Communication Services. The project is deployed with GitHub Actions to Azure Static Web Apps and Azure Functions.
+The backend is an Azure Functions app that supports the contact form by sending email through Azure Communication Services. The project is deployed with GitHub Actions to Azure services including Static Web Apps and Azure Functions.
 
 ---
 
 ## ✨ Features
 
+- No Frameworks, pure HTML, CSS and TS.
 - Responsive portfolio landing page
 - Professional work and personal project detail pages
 - JSON-backed portfolio content
@@ -89,121 +90,3 @@ frontend/
     ├── backend.yml   # Build and deploy Azure Functions
     └── frontend.yml  # Build and deploy Static Web Apps
 ```
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 20+
-- npm
-- Azure Functions Core Tools v4
-- Azure CLI
-- PowerShell 7+
-
----
-
-## ⚙️ Backend Setup
-
-From the backend directory:
-
-```powershell
-cd backend
-npm install
-npm run build
-npm start
-```
-
-The contact function expects these environment variables:
-
-```text
-COMMUNICATION_SERVICES_CONNECTION_STRING=
-CONTACT_TO_EMAIL=
-CONTACT_SENDER_ADDRESS=
-```
-
-Useful commands:
-
-```powershell
-npm run build
-npm run watch
-npm run clean
-npm start
-```
-
----
-
-## 🖥️ Frontend Setup
-
-From the frontend directory:
-
-```powershell
-cd frontend
-npm install
-npm run dev
-```
-
-For production builds, Vite reads the API base URL from:
-
-```text
-VITE_API_BASE=
-```
-
-Useful commands:
-
-```powershell
-npm run build
-npm run preview
-```
-
----
-
-## 🚢 Deployment
-
-The repository contains separate GitHub Actions workflows for frontend and backend deployments.
-
-### 🖥️ Frontend Workflow Secrets
-
-```text
-AZURE_CREDENTIALS
-SWA_NAME
-SWA_RESOURCE_GROUP
-API_BASE_URL
-```
-
-### ⚙️ Backend Workflow Secrets
-
-```text
-AZURE_CREDENTIALS
-FUNCTION_APP_NAME
-FUNCTION_RESOURCE_GROUP
-```
-
-The frontend workflow builds the Vite app, writes the production API base URL, includes the Static Web Apps config file, and deploys the `frontend/dist` output to Azure Static Web Apps.
-
-The backend workflow builds the TypeScript Azure Functions app, prunes development dependencies, creates a zip deployment package, and deploys it to Azure Functions with `az functionapp deployment source config-zip`.
-
----
-
-## 🧪 Local Build
-
-Build the backend:
-
-```powershell
-cd backend
-npm run build
-```
-
-Build the frontend:
-
-```powershell
-cd frontend
-npm run build
-```
-
----
-
-## 📌 About
-
-SmartDevApp is a personal portfolio and contact platform focused on presenting software development experience, project work, and a simple way to get in touch.
