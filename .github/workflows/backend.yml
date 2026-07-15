@@ -1,0 +1,117 @@
+name: Backend
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - master
+        paths:
+            - "backend/**"
+            - ".github/workflows/backend.yml"
+
+env:
+    BUILD_DIR: backend
+    PACKAGE_DIR: app
+    PACKAGE_NAME: backend.zip
+    NODE_VERSION: 20.x
+    FUNCTION_APP_NAME: ${{ secrets.FUNCTION_APP_NAME }}
+    FUNCTION_RESOURCE_GROUP: ${{ secrets.FUNCTION_RESOURCE_GROUP }}
+
+jobs:
+    build-and-deploy:
+        name: Build and Deploy Backend
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                shell: pwsh
+
+        steps:
+            # Checkout, install Node.js, and restore backend dependencies from package-lock.json.
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+                  cache-dependency-path: ${{ env.BUILD_DIR }}/package-lock.json
+
+            # Install clean dependencies before compiling the Azure Functions app.
+            - name: Install dependencies
+              working-directory: ${{ env.BUILD_DIR }}
+              run: npm ci
+
+            # Compile TypeScript into the backend/dist output folder.
+            - name: Build backend
+              working-directory: ${{ env.BUILD_DIR }}
+              run: npm run build
+
+            # Remove development dependencies so the deployed package contains only runtime files.
+            - name: Prune development dependencies
+              working-directory: ${{ env.BUILD_DIR }}
+              run: npm prune --omit=dev
+
+            # Build the Azure Functions zip package expected by config-zip deployment.
+            - name: Create deployment package
+              run: |
+                  $packageRoot = Join-Path $env:GITHUB_WORKSPACE "$env:BUILD_DIR/$env:PACKAGE_DIR"
+                  $packagePath = Join-Path $env:RUNNER_TEMP $env:PACKAGE_NAME
+
+                  New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
+                  Copy-Item "$env:BUILD_DIR/host.json" $packageRoot -Force
+                  Copy-Item "$env:BUILD_DIR/package.json" $packageRoot -Force
+                  Copy-Item "$env:BUILD_DIR/package-lock.json" $packageRoot -Force
+                  Copy-Item "$env:BUILD_DIR/dist" $packageRoot -Recurse -Force
+                  Copy-Item "$env:BUILD_DIR/node_modules" $packageRoot -Recurse -Force
+
+                  if (Test-Path $packagePath) {
+                    Remove-Item $packagePath -Force
+                  }
+
+                  Compress-Archive -Path "$packageRoot/*" -DestinationPath $packagePath -Force
+
+            # Fail early if the expected deployment package is missing.
+            - name: Check deployment package
+              run: |
+                  $packagePath = Join-Path $env:RUNNER_TEMP $env:PACKAGE_NAME
+
+                  if (-not (Test-Path $packagePath)) {
+                    throw "Missing deployment package: $packagePath"
+                  }
+
+                  Get-Item $packagePath
+
+            # Log in with the repository service principal so the workflow can deploy the Function App.
+            - name: Azure login
+              uses: azure/login@v2
+              with:
+                  creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+            # Deploy the pre-built Azure Functions package to production.
+            - name: Deploy to Azure Functions
+              run: |
+                  if ([string]::IsNullOrWhiteSpace($env:FUNCTION_APP_NAME)) {
+                    throw "Missing FUNCTION_APP_NAME repository secret."
+                  }
+
+                  if ([string]::IsNullOrWhiteSpace($env:FUNCTION_RESOURCE_GROUP)) {
+                    throw "Missing FUNCTION_RESOURCE_GROUP repository secret."
+                  }
+
+                  $packagePath = Join-Path $env:RUNNER_TEMP $env:PACKAGE_NAME
+
+                  az webapp update `
+                    --resource-group $env:FUNCTION_RESOURCE_GROUP `
+                    --name $env:FUNCTION_APP_NAME `
+                    --set httpsOnly=true
+
+                  az functionapp deployment source config-zip `
+                    --resource-group $env:FUNCTION_RESOURCE_GROUP `
+                    --name $env:FUNCTION_APP_NAME `
+                    --src $packagePath
+
+                  az functionapp function list `
+                    --resource-group $env:FUNCTION_RESOURCE_GROUP `
+                    --name $env:FUNCTION_APP_NAME `
+                    --output table
