@@ -1,0 +1,7 @@
+{
+    "routes": [
+        { "route": "/", "rewrite": "/index.html" },
+        { "route": "/professional-work", "rewrite": "/pages/professionalWorkItem.html" },
+        { "route": "/personal-project", "rewrite": "/pages/personalProjectItem.html" }
+    ]
+}

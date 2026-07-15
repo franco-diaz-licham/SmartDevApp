@@ -1,0 +1,58 @@
+[
+    {
+        "companyName": "Bulk Chemical Cartage",
+        "roleTitle": "Operations Portal",
+        "image": "/images/item1.png",
+        "roleSummary": "This work involved creating a custom full-stack software solution for BCC Transport's internal paperwork processes, including timesheets, compliance and safety checks, staff onboarding, single sign on (SSO), and more. It includes a website created with .NET Web API server, MSSQL as the database, and a Blazor Client, authenticating against the company's Azure AD, so staff can login using their work email. This solution allows all branches across Australia to have a central source of information, enable easier payroll processing and allow managers to better monitor company performance.",
+        "keyContributions": [
+            "Staff timesheet tracking removed the need of paperwork and saved over 15 hours of administration for office staff and drivers per fortnight company-wide",
+            "Creation of vehicle compliance checklist to comply with NSW safety regulations allows for detailed, accurate reports for auditing purposes and efficient flagging of safety and compliance issues",
+            "New company website allows potential customers to easily contact for services",
+            "Automation and schedule of tasks, as well as automated emails, allows users to have a list of tasks to be completed, saving office staff 4-6 hours weekly in administrative work"
+        ],
+        "skillsAndPractices": {
+            "backend": ".NET, ASP.NET Core Web API, MVC controllers, Coravel, task scheduling",
+            "frontend": "Blazor, Razor components, MudBlazor, Microsoft Fabric",
+            "cloudAndData": "Azure DevOps, Azure Key Vault, Azure Container Apps, Azure Static Web Apps, Entra ID, Docker, MSSQL, Azure Storage, Azure Application Insights",
+            "engineeringPractices": "Full-stack monolithic application, DDD, EDA, Clean Architecture"
+        }
+    },
+    {
+        "companyName": "Norwest Christian College",
+        "roleTitle": "Online Business Platform",
+        "image": "/images/item2.jpg",
+        "roleSummary": "Norwest Connect is a self-contained system composed of multiple applications that centralizes online operations for Norwest Christian College. It provides Single Sign-On (SSO) and permissions management across applications, making development and maintenance more efficient while ensuring a seamless user experience. The platform represents a transition from fragmented online and offline processes to a streamlined digital ecosystem, supporting workflows such as purchase order approvals, leave requests, and a Student Management System (SMS) for students with additional learning or medical needs. Built with modern technologies, it includes .NET Web API services backed by MSSQL databases, client applications developed in React and Vue. The system also integrates Power BI for data visualization and analysis, giving staff valuable insights to support informed decision-making.",
+        "keyContributions": [
+            "Staff timesheet tracking saves payroll staff 5 hours per fortnight in administration",
+            "Streamlined staff approval processes (leave applications, professional development forms, etc.) result in better data workflows and detailed, accurate compliance reports for auditing purposes",
+            "Creation of Student Management System resulted in efficient online platform that saved College staff over 15 hours per week in administration, printing, reporting and management of data",
+            "A complex web application securely manages all student-related data including medical, learning, and personal information to enable parents, teachers and external professionals to easily access and filter relevant data from one secure location",
+            "Automated submission process for referral forms saves a total of 5 hours of manual administration per week"
+        ],
+        "skillsAndPractices": {
+            "backend": ".NET, ASP.NET Core Web API, MVC controllers, application services, authorization services, REST APIs",
+            "frontend": "React, TypeScript, component-based UI, shared frontend patterns",
+            "cloudAndData": "Azure DevOps, Azure Key Vault, Azure Container Apps, Azure Static Web Apps, Entra ID, Docker, MSSQL, Azure Storage, Azure Application Insights",
+            "engineeringPractices": "Modular monoliths, microservices, shared authentication, role-based authorization, EDA, Clean Architecture, DDD"
+        }
+    },
+    {
+        "companyName": "PropertyMe",
+        "roleTitle": "Software Developer",
+        "image": "/images/item5.jpg",
+        "roleSummary": "This role involved delivering cloud-based features for a national property management platform in collaboration with Product Managers and business stakeholders. The work included developing .NET solutions using DDD, Clean Architecture, SOLID principles, and modern engineering practices; maintaining software quality through automated unit and integration testing; conducting code reviews; mentoring junior developers; building responsive customer-facing applications with TypeScript, JavaScript, and Vue; working with CI/CD workflows including GitHub Actions; and contributing to Agile delivery through sprint planning, backlog refinement, and continuous improvement initiatives.",
+        "keyContributions": [
+            "Architected and implemented a high-performance PDF and image processing background worker using RabbitMQ for asynchronous workloads, reducing PDF generation times by 75% from 60 seconds to 15 seconds",
+            "Proposed and drove the adoption of a vertical feature-slice architecture for a major frontend codebase, improving maintainability, scalability, and developer experience",
+            "Delivered cloud-based product features in collaboration with Product Managers and business stakeholders",
+            "Maintained software quality through automated unit and integration testing",
+            "Supported engineering standards through code reviews and mentoring junior developers"
+        ],
+        "skillsAndPractices": {
+            "backend": ".NET, DDD, Clean Architecture, SOLID principles, cloud-based application patterns",
+            "frontend": "Vue, TypeScript, JavaScript, customer-facing applications, frontend architecture",
+            "cloudAndData": "AWS, MySQL Aurora / RDS, Secrets Manager, ElastiCache, Amazon MQ, S3, CloudWatch, GitHub Actions",
+            "engineeringPractices": "Microservices, DDD, TDD, Unit-integration-e2e testing, mentoring, vertical feature-slice architecture"
+        }
+    }
+]

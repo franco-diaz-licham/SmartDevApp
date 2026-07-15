@@ -1,0 +1,44 @@
+[
+    {
+        "projectName": "Alumno360",
+        "subtitle": "Student Plans Platform",
+        "image": "/images/item3.png",
+        "demoUrl": "https://www.youtube.com/embed/S8zOrtmbxTs",
+        "overview": "Alumno360 is a specialist student plans product for Australian schools. The platform is designed to help staff create, manage, review, report on, and evidence student plans with the depth required for learning support and compliance work. It focuses on student planning rather than broad school operations, bringing plan families, school data, identity, permissions, files, audit history, templates, reporting, CSV exports, PDF rendering, dashboard building, and Edumate integration into one staff workspace.",
+        "impact": [
+            "Creates a focused workspace for education plans, medical plans, health support plans, behaviour and safety plans, transition plans, reviews, sign-offs, files, and audit history",
+            "Supports Australian school planning and NCCD workflows with stronger compliance confidence and less administrative scatter",
+            "Reduces repeated data entry by using school source-system data for students, staff, carers, classes, grades, enrolments, and contact records",
+            "Integrates with Edumate to support school data sync and reduce manual maintenance of core student and staff information",
+            "Supports CSV exporting and PDF rendering for plan documentation, evidence, reporting, and compliance workflows",
+            "Includes a dashboard visual builder for focused student-plan reporting and operational views",
+            "Keeps reporting, exports, saved views, search, dashboards, templates, files, and plan evidence connected to the student planning workflow",
+            "Maintains a clear product boundary so the platform stays focused on student plans rather than becoming a broad school operations tool"
+        ],
+        "tech": {
+            "backend": ".NET, ASP.NET Core Web API, MVC controllers, Entity Framework Core, PostgreSQL, Clean Architecture, DDD boundaries, domain services, application services, Swagger / OpenAPI",
+            "frontend": "Vue, Vite, TypeScript, TanStack Query, Vue Router, Pinia, Vuelidate, Vitest, Vue Testing Library",
+            "cicdCloud": "GitHub Actions, Azure Container Apps, Azure Static Web Apps, Entra ID, PostgreSQL, Azure Storage, Azure Service Bus, Azure Key Vault, Azure Application Insights",
+            "architecture": "Event-driven architecture with modular domains, asynchronous processing, audit history, compliance-focused workflows, templates, reporting and permission-aware access"
+        }
+    },
+    {
+        "projectName": "EarlyLearner",
+        "subtitle": "Early Childhood Learning Record",
+        "image": "/images/item4.png",
+        "overview": "EarlyLearner is a full-stack early childhood learning record and school-readiness application. It helps carers manage households and children, capture daily learning moments, attach file evidence, and track school-readiness outcomes. The project is built as a technical showcase for event-driven and microservice-based architecture, combining a .NET API, background worker, Azure-native services, and a modern React frontend.",
+        "impact": [
+            "Supports household and child profiles, readiness outcome catalogues, child readiness profiles, and progress tracking",
+            "Captures daily logs, learning moments, readiness evidence, files, and portfolio-style records",
+            "Uses event-driven integration between API and worker processes for asynchronous workflows",
+            "Includes household invitation email workflows with realtime delivery status notifications",
+            "Provides dashboard query slices for household summary data and school-readiness visibility"
+        ],
+        "tech": {
+            "backend": ".NET 10, ASP.NET Core Minimal APIs, Entity Framework Core, PostgreSQL, Npgsql, Clean Architecture, DDD entities and value objects, CQRS-style commands and queries, Serilog, Swagger / OpenAPI",
+            "frontend": "React 19, Vite, TypeScript, Tailwind CSS 4, PrimeReact, TanStack Query, React Router, Zustand, React Hook Form, Zod, Vitest, React Testing Library",
+            "cicdCloud": "GitHub Actions, Azure Key Vault, Azure Container Apps, Azure Static Web Apps, Entra ID, Docker, PostgreSQL 17, Azure Service Bus, Azure Storage, Azure Application Insights",
+            "architecture": "Microservice architecture with decoupled API and worker services, asynchronous processing, message-driven workflows, Clean Architecture boundaries, Dockerized local infrastructure and seeded demo data"
+        }
+    }
+]

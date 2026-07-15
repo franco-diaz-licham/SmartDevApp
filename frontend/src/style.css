@@ -1,0 +1,390 @@
+/* place your styles here or remove the import in TS */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css");
+@import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
+
+html {
+    font-size: 20px;
+}
+
+body {
+    font-family: "Raleway";
+}
+
+footer {
+    background-color: #000000;
+    color: #ffffff;
+    text-align: center;
+    padding: 2rem;
+}
+
+.logo {
+    width: 4.5rem;
+    height: 4.5rem;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav {
+    display: flex;
+}
+
+nav div {
+    justify-content: end;
+}
+
+nav ul li a {
+    color: black !important;
+}
+
+h1 {
+    font-weight: bolder;
+    font-size: 3rem;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+p,
+li,
+label {
+    color: black;
+}
+
+#about-me h1,
+#services h1,
+#portfolio h1,
+#contact-me h1 {
+    color: rgb(0, 0, 0);
+}
+
+.nav-item :hover {
+    text-decoration: underline;
+}
+
+.nav-item a {
+    font-weight: 700;
+}
+
+h5 {
+    text-transform: uppercase;
+}
+
+.container-xxxl {
+    max-width: 1920px;
+    margin: auto;
+}
+
+.about-me-highlight {
+    color: #008afc;
+    font-weight: 600;
+}
+
+#hero {
+    color: #ffffff;
+    background-color: #008afc;
+    background: linear-gradient(rgba(110, 0, 110, 0.8), rgba(0, 68, 255, 0.8)), url("/images/hero.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 70vh;
+}
+
+.hero-container {
+    position: relative;
+    height: 100%;
+}
+
+.hero-text,
+.portfolio-text {
+    position: absolute;
+    top: calc(70vh - 70%);
+    text-transform: capitalize;
+}
+
+.hero-text h1,
+.portfolio-text h1 {
+    font-size: 4rem;
+}
+
+#portfolio-hero {
+    position: relative;
+    color: #ffffff;
+    background-color: #008afc;
+    background: linear-gradient(rgba(110, 0, 110, 0.8), rgba(0, 68, 255, 0.8)), url("/images/portfolio.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 70vh;
+}
+
+.benefits {
+    background-color: #f3f3f3;
+}
+
+#benefitsList li {
+    margin-top: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+
+#hide-small-photo {
+    display: none;
+}
+
+#hide-big-photo {
+    display: initial;
+}
+
+#services {
+    scroll-margin-top: calc(4rem * 1);
+    background-color: #f3f3f3;
+}
+
+#services .content {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+.services-list {
+    display: grid;
+    grid-template-columns: 13rem auto;
+    row-gap: 3rem;
+    column-gap: 1rem;
+    max-width: 50rem;
+    margin: auto;
+}
+
+.services-list h5 {
+    color: rgba(110, 0, 110, 1);
+    font-weight: bold;
+}
+
+.border-line {
+    border-bottom: 1px solid black;
+}
+
+.services-list img {
+    width: 40%;
+    height: 40%;
+}
+
+#about-me {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    scroll-margin-top: calc(4rem * 2);
+}
+
+#about-me img {
+    border: 1px solid #9e9e9e;
+    box-shadow: 0 10px 15px rgb(160, 160, 160);
+}
+
+#portfolio {
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+    scroll-margin-top: calc(4rem * 2);
+}
+
+.portfolio-item-img {
+    overflow: hidden;
+    max-height: 60%;
+}
+
+#portfolio img {
+    width: 100%;
+    object-fit: fill;
+}
+
+.card {
+    max-width: 540px;
+    overflow: hidden;
+    box-shadow: 0 10px 15px rgb(160, 160, 160);
+    background-color: rgba(176, 176, 176, 0.5);
+}
+
+.card h5 {
+    color: rgba(110, 0, 110, 1);
+    font-weight: bold;
+}
+
+.card:hover img {
+    transform: scale(1.2, 1.2);
+    transition-duration: 500ms;
+    transition-timing-function: ease-in;
+    opacity: 0.7;
+}
+
+.card:hover {
+    cursor: pointer;
+    background-color: rgba(0, 68, 255, 0.4);
+}
+
+form div {
+    padding: 0 15%;
+    display: grid;
+    grid-template-columns: auto;
+}
+
+button {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+#contact-me {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    scroll-margin-top: calc(4rem * 2);
+    background-color: #f3f3f3;
+}
+
+.icons {
+    font-size: 1.8rem;
+    color: #ffffff;
+}
+
+.icons:hover {
+    color: #adadad;
+}
+
+.carousel {
+    overflow: hidden;
+    max-height: 40rem;
+}
+
+#project,
+#benefits,
+#snapshot {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+#projectDemo {
+    padding-bottom: 4rem;
+}
+
+.work-summary {
+    display: grid;
+    grid-template-columns: 14rem 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.work-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 10rem;
+    padding: 1rem;
+    border: 1px solid #d4d4d4;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px rgb(210, 210, 210);
+}
+
+.work-logo img {
+    max-width: 100%;
+    max-height: 8rem;
+    object-fit: contain;
+}
+
+.work-summary p {
+    margin-bottom: 0;
+}
+
+.snapshot-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.snapshot-grid div {
+    border-left: 4px solid #008afc;
+    background-color: #f3f3f3;
+    padding: 1.2rem;
+}
+
+.snapshot-grid h5 {
+    color: rgba(110, 0, 110, 1);
+    font-weight: bold;
+}
+
+.snapshot-grid p {
+    margin-bottom: 0;
+}
+
+.demo-video {
+    aspect-ratio: 16 / 9;
+    background-color: #000000;
+}
+
+.demo-video iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+@media screen and (max-width: 600px) {
+    html {
+        font-size: 14px;
+    }
+
+    .card {
+        max-width: 340px;
+    }
+
+    #hero .hero-text h1 {
+        font-size: 3rem;
+    }
+
+    .services-list {
+        grid-template-columns: 7rem auto;
+        padding-right: 1rem;
+    }
+
+    .services-list img {
+        width: 60%;
+    }
+
+    #hide-small-photo {
+        display: inherit;
+        width: 55%;
+        justify-self: center;
+    }
+
+    #hide-big-photo {
+        display: none;
+    }
+
+    .carousel {
+        max-height: 15rem;
+    }
+
+    .snapshot-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .work-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (min-width: 601px) and (max-width: 767px) {
+    html {
+        font-size: 20px;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+    html {
+        font-size: 26px;
+    }
+}
+
+@media screen and (min-width: 992px) and (max-width: 1199px) {
+    html {
+        font-size: 30px;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+}
