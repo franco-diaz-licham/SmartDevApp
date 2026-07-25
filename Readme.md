@@ -6,7 +6,9 @@
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=nodedotjs&logoColor=white)
 
-SmartDevApp is my full-stack portfolio website. It presents my professional experience, personal projects, contact information, and portfolio detail pages through a deliberately framework-free frontend built with plain HTML, CSS, and TypeScript. Vite is used as the build tool, not as an application framework.
+SmartDevApp is my full-stack developer portfolio and contact platform. It helps visitors explore my professional experience, technical skills, featured work, personal projects, portfolio case studies, and contact details.
+
+The frontend is deliberately framework-free and built with plain HTML, CSS, and TypeScript. Vite is used as the build tool, not as an application framework.
 
 The backend is an Azure Functions app that supports the contact form by sending email through Azure Communication Services. The project is deployed with GitHub Actions to Azure services including Static Web Apps and Azure Functions.
 

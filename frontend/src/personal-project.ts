@@ -27,7 +27,7 @@ const DATA_URL = "/portfolio-personal-work-data.json";
  * Session cache version for personal project data.
  * Bump this when the JSON changes and existing browser sessions should refetch it.
  */
-const CACHE_KEY = "portfolio-personal-work-v1";
+const CACHE_KEY = "portfolio-personal-work-v3";
 
 /**
  * Loads personal project data from sessionStorage first, then from the JSON file.
