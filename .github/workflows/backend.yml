@@ -16,6 +16,7 @@ env:
     NODE_VERSION: 20.x
     FUNCTION_APP_NAME: ${{ secrets.FUNCTION_APP_NAME }}
     FUNCTION_RESOURCE_GROUP: ${{ secrets.FUNCTION_RESOURCE_GROUP }}
+    AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
 jobs:
     build-and-deploy:
@@ -86,7 +87,7 @@ jobs:
             - name: Azure login
               uses: azure/login@v2
               with:
-                  creds: ${{ secrets.AZURE_CREDENTIALS }}
+                  creds: ${{ env.AZURE_CREDENTIALS }}
 
             # Deploy the pre-built Azure Functions package to production.
             - name: Deploy to Azure Functions
