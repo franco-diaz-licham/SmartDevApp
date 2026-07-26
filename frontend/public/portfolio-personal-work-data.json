@@ -26,7 +26,7 @@
         "projectName": "EarlyLearner",
         "subtitle": "Early Childhood Learning Record",
         "image": "/images/item4.png",
-        "demoUrl": "https://www.youtube.com/embed/Uig0mlf_3aI",
+        "demoUrl": "https://www.youtube.com/embed/MLcxa0VT7Ro",
         "overview": "EarlyLearner is a full-stack early childhood learning record and school-readiness application. It helps carers manage households and children, capture daily learning moments, attach file evidence, and track school-readiness outcomes. The project is built as a technical showcase for event-driven and microservice-based architecture, combining a .NET API, background worker, Azure-native services, and a modern React frontend.",
         "impact": [
             "Supports household and child profiles, readiness outcome catalogues, child readiness profiles, and progress tracking",
