@@ -2,10 +2,10 @@ using SmartDev.Domain.Common;
 
 namespace SmartDev.Domain.Contact;
 
-public sealed class ContactMessage : Entity<Guid>
+public sealed class ContactMessage : Entity<ContactMessageId>
 {
     private ContactMessage(
-        Guid id,
+        ContactMessageId id,
         string senderName,
         string senderEmail,
         string message,
@@ -40,16 +40,23 @@ public sealed class ContactMessage : Entity<Guid>
         DateTimeOffset submittedAt)
     {
         var email = Guard.Required(senderEmail, nameof(senderEmail), 320);
-        if (!email.Contains('@', StringComparison.Ordinal)) {
-            throw new ArgumentException("senderEmail must be a valid email address.", nameof(senderEmail));
-        }
+        if (!email.Contains('@', StringComparison.Ordinal)) throw new ArgumentException("senderEmail must be a valid email address.", nameof(senderEmail));
 
-        return new ContactMessage(
-            Guid.NewGuid(),
+        var contactMessage = new ContactMessage(
+            ContactMessageId.New(),
             Guard.Required(senderName, nameof(senderName), 120),
             email,
             Guard.Required(message, nameof(message), 4000),
             submittedAt);
+
+        contactMessage.RaiseDomainEvent(new ContactMessageCreated(
+            contactMessage.Id,
+            contactMessage.SenderName,
+            contactMessage.SenderEmail,
+            contactMessage.Message,
+            submittedAt));
+
+        return contactMessage;
     }
 
     public void MarkEmailSent(DateTimeOffset sentAt)

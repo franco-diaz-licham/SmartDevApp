@@ -1,3 +1,7 @@
 <Solution>
   <Project Path="SmartDev.Api.Functions/SmartDev.Api.Functions.csproj" />
+  <Project Path="SmartDev.Application/SmartDev.Application.csproj" Id="1522d75a-3695-490e-bee5-3e6fe4d9d746" />
+  <Project Path="SmartDev.Domain/SmartDev.Domain.csproj" Id="bbb0c0fb-2a43-4aca-9e7e-44ddf23e20c7" />
+  <Project Path="SmartDev.Infrastructure/SmartDev.Infrastructure.csproj" Id="1911ba9c-f3a1-4c33-97c0-cf6ac87fcb7a" />
+  <Project Path="SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj" Id="a1a48766-034c-4c0a-b4a6-d6ff89465771" />
 </Solution>

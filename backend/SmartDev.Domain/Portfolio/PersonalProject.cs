@@ -2,10 +2,10 @@ using SmartDev.Domain.Common;
 
 namespace SmartDev.Domain.Portfolio;
 
-public sealed class PersonalProject : Entity<Guid>
+public sealed class PersonalProject : Entity<PersonalProjectId>
 {
     private PersonalProject(
-        Guid id,
+        PersonalProjectId id,
         string projectName,
         string subtitle,
         string imagePath,
@@ -39,7 +39,7 @@ public sealed class PersonalProject : Entity<Guid>
     public ProjectTechnologyProfile Technology { get; private set; }
 
     public static PersonalProject Create(
-        Guid id,
+        PersonalProjectId id,
         string projectName,
         string subtitle,
         string imagePath,

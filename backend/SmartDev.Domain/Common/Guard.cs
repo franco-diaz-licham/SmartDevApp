@@ -27,4 +27,11 @@ internal static class Guard
         if (items.Length == 0) throw new ArgumentException($"{parameterName} must contain at least one item.", parameterName);
         return items;
     }
+
+    public static IReadOnlyList<T> EnsureAny<T>(IEnumerable<T> values, string parameterName)
+    {
+        var items = values.ToArray();
+        if (items.Length == 0) throw new ArgumentException($"{parameterName} must contain at least one item.", parameterName);
+        return items;
+    }
 }

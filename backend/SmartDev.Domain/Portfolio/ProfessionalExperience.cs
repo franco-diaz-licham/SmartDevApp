@@ -2,10 +2,10 @@ using SmartDev.Domain.Common;
 
 namespace SmartDev.Domain.Portfolio;
 
-public sealed class ProfessionalExperience : Entity<Guid>
+public sealed class ProfessionalExperience : Entity<ProfessionalExperienceId>
 {
     private ProfessionalExperience(
-        Guid id,
+        ProfessionalExperienceId id,
         string companyName,
         string roleTitle,
         string imagePath,
@@ -35,7 +35,7 @@ public sealed class ProfessionalExperience : Entity<Guid>
     public ProfessionalSkills SkillsAndPractices { get; private set; }
 
     public static ProfessionalExperience Create(
-        Guid id,
+        ProfessionalExperienceId id,
         string companyName,
         string roleTitle,
         string imagePath,

@@ -3,12 +3,10 @@ using SmartDev.Domain.Portfolio;
 
 namespace SmartDev.Domain.Content;
 
-public sealed class WebsiteContent : Entity<Guid>
+public sealed class WebsiteContent : Entity<WebsiteContentId>
 {
-    public static readonly Guid DefaultId = Guid.Parse("3c1a9e6f-3f86-4f03-97fd-91a3df9cb5a1");
-
     private WebsiteContent(
-        Guid id,
+        WebsiteContentId id,
         IReadOnlyList<PersonalProject> personalProjects,
         IReadOnlyList<ProfessionalExperience> professionalExperiences,
         DateTimeOffset updatedAt)
@@ -27,14 +25,15 @@ public sealed class WebsiteContent : Entity<Guid>
 
 
     public static WebsiteContent Create(
+        WebsiteContentId id,
         IEnumerable<PersonalProject> personalProjects,
         IEnumerable<ProfessionalExperience> professionalExperiences,
         DateTimeOffset updatedAt)
     {
         return new WebsiteContent(
-            DefaultId,
-            EnsureAny(personalProjects, nameof(personalProjects)),
-            EnsureAny(professionalExperiences, nameof(professionalExperiences)),
+            id,
+            Guard.EnsureAny(personalProjects, nameof(personalProjects)),
+            Guard.EnsureAny(professionalExperiences, nameof(professionalExperiences)),
             updatedAt);
     }
 
@@ -43,16 +42,8 @@ public sealed class WebsiteContent : Entity<Guid>
         IEnumerable<ProfessionalExperience> professionalExperiences,
         DateTimeOffset updatedAt)
     {
-        PersonalProjects = EnsureAny(personalProjects, nameof(personalProjects));
-        ProfessionalExperiences = EnsureAny(professionalExperiences, nameof(professionalExperiences));
+        PersonalProjects = Guard.EnsureAny(personalProjects, nameof(personalProjects));
+        ProfessionalExperiences = Guard.EnsureAny(professionalExperiences, nameof(professionalExperiences));
         UpdatedAt = updatedAt;
-    }
-
-    private static IReadOnlyList<T> EnsureAny<T>(IEnumerable<T> values, string parameterName)
-    {
-        var items = values.ToArray();
-        if (items.Length == 0) throw new ArgumentException($"{parameterName} must contain at least one item.", parameterName);
-
-        return items;
     }
 }
