@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "SmartDev.Api.Functions": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7084",
+      "launchBrowser": false
+    }
+  }
+}

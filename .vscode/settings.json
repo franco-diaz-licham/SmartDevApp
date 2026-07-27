@@ -1,0 +1,36 @@
+{
+  // Disable global Bootstrap IntelliSense for this workspace
+  "bootstrapIntelliSense.enable": false,
+
+  // Tailwind CSS IntelliSense settings
+  "tailwindCSS.includeLanguages": {
+    "vue-html": "html",
+    "vue": "html",
+    "html": "html",
+    "javascript": "javascript",
+    "typescript": "javascript",
+    "plaintext": "html"
+  },
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.classFunctions": ["mergeClassNames", "clsx"],
+  "tailwindCSS.experimental.classRegex": [
+    ["class\\s*=\\s*\"([^\"]*)\"", 1],
+    ["className\\s*=\\s*\"([^\"]*)\"", 1],
+    [":class=\\\"\\{([^}]*)\\}\"", 1],
+    ["class=\\{`([^`]*)`\\}", 1]
+  ],
+  "editor.quickSuggestions": { "strings": true },
+  "editor.suggest.snippetsPreventQuickSuggestions": false,
+  "workbench.tree.indent": 12,
+  "eslint.workingDirectories": [{ "directory": "frontend", "changeProcessCWD": true }],
+
+  // Prettier
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode", "editor.tabSize": 2 },
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode", "editor.tabSize": 2 },
+  "[vue]": { "editor.defaultFormatter": "esbenp.prettier-vscode", "editor.tabSize": 2 },
+  "[html]": { "editor.defaultFormatter": "esbenp.prettier-vscode", "editor.tabSize": 2 },
+  "[css]": { "editor.defaultFormatter": "esbenp.prettier-vscode", "editor.tabSize": 2 },
+  "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode", "editor.tabSize": 2 }
+}
