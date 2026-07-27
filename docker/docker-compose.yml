@@ -1,0 +1,141 @@
+name: earlylearner
+
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.127.0
+    container_name: otel-collector
+    command: ["--config=/etc/otelcol-contrib/config.yml"]
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - ./otel-collector-config.yml:/etc/otelcol-contrib/config.yml:ro
+
+  cosmos-db:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
+    container_name: cosmos-db
+    hostname: cosmos-db
+    environment:
+      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: "3"
+      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"
+    ports:
+      - "8081:8081"
+      - "10250-10255:10250-10255"
+    volumes:
+      - cosmos-data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k -sS https://localhost:8081/ >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  servicebus-mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: servicebus-mssql
+    hostname: servicebus-mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "ServiceBus_dev_password_123"
+
+  servicebus-emulator:
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    container_name: servicebus-emulator
+    hostname: servicebus-emulator
+    ports:
+      - "5672:5672"
+      - "5300:5300"
+    volumes:
+      - ./serviceBusConfig.json:/ServiceBus_Emulator/ConfigFiles/Config.json:ro
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "ServiceBus_dev_password_123"
+      SQL_SERVER: "servicebus-mssql"
+      EMULATOR_HTTP_PORT: "5300"
+      SQL_WAIT_INTERVAL: "15"
+    depends_on:
+      - servicebus-mssql
+
+  api-functions:
+    build:
+      context: ..
+      dockerfile: docker/api-functions.dockerfile
+    image: api-functions:local
+    container_name: api-functions
+    ports:
+      - "5136:80"
+    depends_on:
+      azurite:
+        condition: service_healthy
+      cosmos-db:
+        condition: service_healthy
+      smartdev_local_db:
+        condition: service_healthy
+      servicebus-emulator:
+        condition: service_started
+      otel-collector:
+        condition: service_started
+    environment:
+      CosmosDb__ConnectionString: "AccountEndpoint=https://cosmos-db:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;"
+      AzureServiceBus__ConnectionString: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      AzureServiceBus__AdministrationConnectionString: "Endpoint=sb://servicebus-emulator:5300;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      Observability__OtlpEndpoint: "http://otel-collector:4317"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/health/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend.dockerfile
+    image: frontend:local
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      api-functions:
+        condition: service_healthy
+    environment:
+      VITE_API_BASE_URL: "http://localhost:5136"
+      VITE_API_VERSION: "v1"
+      VITE_APP_NAME: "EarlyLearner"
+      VITE_ENTRA_CLIENT_ID: "a08163b9-bc2e-4783-bda2-a04287d216ec"
+      VITE_ENTRA_AUTHORITY: "https://earlylearnerapp.ciamlogin.com/3a8a1443-0b3e-4de5-9e59-03bf8c3bd514"
+      VITE_ENTRA_API_SCOPE: "api://1953e0fa-dafc-480c-b2bf-faa4fb5aa694/access_as_user"
+
+  worker-functions:
+    build:
+      context: ..
+      dockerfile: docker/worker-functions.dockerfile
+    image: worker-functions:local
+    container_name: worker-functions
+    depends_on:
+      azurite:
+        condition: service_healthy
+      cosmos-db:
+        condition: service_healthy
+      smartdev_local_db:
+        condition: service_healthy
+      servicebus-emulator:
+        condition: service_started
+      otel-collector:
+        condition: service_started
+    environment:
+      AzureServiceBus__ConnectionString: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      AzureServiceBus__AdministrationConnectionString: "Endpoint=sb://servicebus-emulator:5300;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      DOTNET_ENVIRONMENT: "Development"
+      Observability__OtlpEndpoint: "http://otel-collector:4317"
+
+volumes:
+  azurite-data:
+    driver: local
+  cosmos-data:
+    name: smartdev_cosmos-data
+    driver: local
+  postgres-data:
+    name: smartdev_postgres-data
+    driver: local
