@@ -3,6 +3,7 @@ using MassTransit;
 using Microsoft.Azure.Functions.Worker;
 using SmartDev.Infrastructure.Messaging;
 using SmartDev.Infrastructure.Options;
+using SmartDev.Worker.Functions.Messaging.Consumers;
 
 namespace SmartDev.Worker.Functions.Functions;
 
@@ -10,16 +11,12 @@ public sealed class SendContactEmailFunction(IMessageReceiver receiver)
 {
     [Function(nameof(SendContactEmailFunction))]
     public async Task Run(
-        [ServiceBusTrigger(
-            ContactMessagingTopology.ContactMessageCreatedTopic,
-            ContactMessagingTopology.EmailWorkerSubscription,
-            Connection = AzureServiceBusOptions.ConnectionStringConfigurationKey)]
+        [ServiceBusTrigger(ContactMessagingTopology.ContactMessageCreatedQueue, Connection = AzureServiceBusOptions.ConnectionStringConfigurationKey)]
         ServiceBusReceivedMessage message,
         CancellationToken cancellationToken)
     {
-        await receiver.Handle(
-            ContactMessagingTopology.ContactMessageCreatedTopic,
-            ContactMessagingTopology.EmailWorkerSubscription,
+        await receiver.HandleConsumer<SendContactEmailConsumer>(
+            ContactMessagingTopology.ContactMessageCreatedQueue,
             message,
             cancellationToken);
     }

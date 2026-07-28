@@ -18,7 +18,7 @@ public static class ApiAppServices
         services
             .AddCosmosServices(configuration)
             .AddDomainEventServices()
-            .AddMessagingServices(configuration);
+            .AddApiMessagingServices(configuration);
 
         return services;
     }
@@ -50,7 +50,7 @@ public static class ApiAppServices
         return services;
     }
 
-    private static IServiceCollection AddMessagingServices(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddApiMessagingServices(this IServiceCollection services, IConfiguration configuration)
     {
         services
             .AddOptions<AzureServiceBusOptions>()
@@ -64,8 +64,6 @@ public static class ApiAppServices
 
                 busFactoryConfigurator.Host(options.ConnectionString);
                 busFactoryConfigurator.DeployPublishTopology = false;
-                busFactoryConfigurator.Message<ContactMessageCreatedModel>(messageConfigurator =>
-                    messageConfigurator.SetEntityName(ContactMessagingTopology.ContactMessageCreatedTopic));
             });
         });
 

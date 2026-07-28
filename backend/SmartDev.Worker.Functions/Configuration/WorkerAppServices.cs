@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MassTransit;
 using SmartDev.Application.Ports;
-using SmartDev.Infrastructure.Messaging;
 using SmartDev.Infrastructure.Options;
 using SmartDev.Infrastructure.Ports;
 using SmartDev.Worker.Functions.Messaging;
@@ -64,8 +63,6 @@ public static class WorkerAppServices
                 var options = context.GetRequiredService<IOptions<AzureServiceBusOptions>>().Value;
 
                 busFactoryConfigurator.DeployPublishTopology = false;
-                busFactoryConfigurator.Message<ContactMessageCreatedModel>(messageConfigurator =>
-                    messageConfigurator.SetEntityName(ContactMessagingTopology.ContactMessageCreatedTopic));
                 busFactoryConfigurator.PrefetchCount = options.PrefetchCount ?? 1;
                 busFactoryConfigurator.ConcurrentMessageLimit = options.ConcurrentMessageLimit ?? 1;
                 busFactoryConfigurator.UseMessageRetry(retryConfigurator => retryConfigurator.None());

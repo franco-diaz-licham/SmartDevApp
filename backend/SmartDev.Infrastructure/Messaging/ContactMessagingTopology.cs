@@ -2,6 +2,7 @@ namespace SmartDev.Infrastructure.Messaging;
 
 public static class ContactMessagingTopology
 {
-    public const string ContactMessageCreatedTopic = "contact-message-created";
-    public const string EmailWorkerSubscription = "email-worker";
+    public const string ContactMessageCreatedQueue = "contact-message-created";
+
+    public static readonly Uri ContactMessageCreatedQueueUri = new($"queue:{ContactMessageCreatedQueue}");
 }
