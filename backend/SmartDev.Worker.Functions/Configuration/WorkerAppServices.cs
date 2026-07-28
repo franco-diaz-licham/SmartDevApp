@@ -2,11 +2,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MassTransit;
-using SmartDev.Application.Ports;
-using SmartDev.Infrastructure.Options;
-using SmartDev.Infrastructure.Ports;
-using SmartDev.Worker.Functions.Messaging;
-using SmartDev.Worker.Functions.Configuration.Options;
+using SmartDev.Shared.Options;
+using SmartDev.Worker.Functions.Application.Messaging;
+using SmartDev.Worker.Functions.Application.Ports;
+using SmartDev.Worker.Functions.Infrastructure.Email;
+using SmartDev.Worker.Functions.Infrastructure.Messaging;
+using SmartDev.Worker.Functions.Infrastructure.Options;
 
 namespace SmartDev.Worker.Functions.Configuration;
 
@@ -15,9 +16,17 @@ public static class WorkerAppServices
     public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration)
     {
         services
+            .AddApplicationServices()
             .AddEmailServices(configuration)
             .AddContactEmailServices(configuration)
             .AddMessagingServices(configuration);
+
+        return services;
+    }
+
+    private static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    {
+        services.AddScoped<SendContactEmailHandler>();
 
         return services;
     }

@@ -3,11 +3,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Azure.Cosmos;
 using MassTransit;
-using SmartDev.Application.Ports;
-using SmartDev.Infrastructure.Messaging;
-using SmartDev.Infrastructure.Messaging.Handlers;
-using SmartDev.Infrastructure.Options;
-using SmartDev.Infrastructure.Ports;
+using SmartDev.Api.Functions.Application.Messaging;
+using SmartDev.Api.Functions.Application.Ports;
+using SmartDev.Shared.Messaging;
+using SmartDev.Api.Functions.Application.Messaging.Handlers;
+using SmartDev.Api.Functions.Infrastructure.Options;
+using SmartDev.Api.Functions.Infrastructure.Persistence;
+using SmartDev.Shared.Options;
 
 namespace SmartDev.Api.Functions.Configuration;
 

@@ -1,9 +1,9 @@
 using Azure.Messaging.ServiceBus;
 using MassTransit;
 using Microsoft.Azure.Functions.Worker;
-using SmartDev.Infrastructure.Messaging;
-using SmartDev.Infrastructure.Options;
-using SmartDev.Worker.Functions.Messaging.Consumers;
+using SmartDev.Shared.Messaging;
+using SmartDev.Shared.Options;
+using SmartDev.Worker.Functions.Infrastructure.Messaging;
 
 namespace SmartDev.Worker.Functions.Functions;
 
