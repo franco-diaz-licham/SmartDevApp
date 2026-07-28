@@ -1,4 +1,8 @@
 {
-    "version": "2.0",
-    "telemetryMode": "OpenTelemetry"
+  "version": "2.0",
+  "AzureCommunicationService": {
+    "ConnectionString": "",
+    "SenderAddress": ""
+  },
+  "telemetryMode": "OpenTelemetry"
 }
