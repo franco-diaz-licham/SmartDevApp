@@ -33,9 +33,8 @@ function wireUpContactForm() {
             const message = (document.getElementById("message") as HTMLTextAreaElement).value.trim();
 
             try {
-                // Use build-time env (see .env below). In prod, set this during your build or just call '/api/...'
-                const base = import.meta.env.VITE_API_BASE ?? "";
-                const res = await fetch(`${base}/sendEmail`, {
+                const base = import.meta.env.VITE_API_BASE_URL ?? "";
+                const res = await fetch(`${base}/api/contactEmail`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ name, email, message }),
