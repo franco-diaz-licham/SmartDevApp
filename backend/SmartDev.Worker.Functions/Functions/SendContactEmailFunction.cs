@@ -1,30 +1,26 @@
-using System;
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using MassTransit;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Logging;
+using SmartDev.Infrastructure.Messaging;
+using SmartDev.Infrastructure.Options;
 
 namespace SmartDev.Worker.Functions.Functions;
 
-public sealed class SendContactEmailFunction
+public sealed class SendContactEmailFunction(IMessageReceiver receiver)
 {
-    private readonly ILogger<SendContactEmailFunction> _logger;
-
-    public SendContactEmailFunction(ILogger<SendContactEmailFunction> logger)
-    {
-        _logger = logger;
-    }
-
     [Function(nameof(SendContactEmailFunction))]
     public async Task Run(
-        [ServiceBusTrigger("send-contact-email", Connection = "")]
+        [ServiceBusTrigger(
+            ContactMessagingTopology.ContactMessageCreatedTopic,
+            ContactMessagingTopology.EmailWorkerSubscription,
+            Connection = AzureServiceBusOptions.ConnectionStringConfigurationKey)]
         ServiceBusReceivedMessage message,
-        ServiceBusMessageActions messageActions)
+        CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Message ID: {MessageId}", message.MessageId);
-        _logger.LogInformation("Message Body: {MessageBody}", message.Body);
-        _logger.LogInformation("Message Content-Type: {ContentType}", message.ContentType);
-
-        await messageActions.CompleteMessageAsync(message);
+        await receiver.Handle(
+            ContactMessagingTopology.ContactMessageCreatedTopic,
+            ContactMessagingTopology.EmailWorkerSubscription,
+            message,
+            cancellationToken);
     }
 }

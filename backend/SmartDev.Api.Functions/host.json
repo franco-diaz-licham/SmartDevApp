@@ -6,6 +6,12 @@
     "DefaultTimeToLiveSeconds": 86400,
     "Throughput": 1000
   },
+  "AzureServiceBus": {
+    "ConnectionString": "",
+    "PrefetchCount": 1,
+    "ConcurrentMessageLimit": 1,
+    "TimeoutSeconds": 60
+  },
   "logging": {
     "applicationInsights": {
       "samplingSettings": {

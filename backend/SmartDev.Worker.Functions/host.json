@@ -4,5 +4,15 @@
     "ConnectionString": "",
     "SenderAddress": ""
   },
+  "AzureServiceBus": {
+    "ConnectionString": "",
+    "PrefetchCount": 1,
+    "ConcurrentMessageLimit": 1,
+    "TimeoutSeconds": 60
+  },
+  "ContactEmail": {
+    "RecipientAddress": "",
+    "SubjectPrefix": "New portfolio contact message"
+  },
   "telemetryMode": "OpenTelemetry"
 }

@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SmartDev.Application\SmartDev.Application.csproj" />
+    <ProjectReference Include="..\SmartDev.Domain\SmartDev.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Communication.Email" Version="1.0.1" />
+    <PackageReference Include="MassTransit.Abstractions" Version="8.4.1" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.47.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
