@@ -5,11 +5,14 @@ using Microsoft.Azure.Cosmos;
 using MassTransit;
 using SmartDev.Api.Functions.Application.Messaging;
 using SmartDev.Api.Functions.Application.Ports;
+using SmartDev.Api.Functions.Configuration.Options;
+using SmartDev.Api.Functions.Functions;
 using SmartDev.Shared.Messaging;
 using SmartDev.Api.Functions.Application.Messaging.Handlers;
 using SmartDev.Api.Functions.Infrastructure.Options;
 using SmartDev.Api.Functions.Infrastructure.Persistence;
 using SmartDev.Shared.Options;
+using SmartDev.Api.Functions.Application.UsesCases;
 
 namespace SmartDev.Api.Functions.Configuration;
 
@@ -18,9 +21,30 @@ public static class ApiAppServices
     public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration)
     {
         services
+            .AddCorsServices(configuration)
+            .AddApplicationServices()
             .AddCosmosServices(configuration)
             .AddDomainEventServices()
             .AddApiMessagingServices(configuration);
+
+        return services;
+    }
+
+    private static IServiceCollection AddCorsServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddOptions<CorsOptions>()
+            .Bind(configuration.GetSection(CorsOptions.SectionName))
+            .ValidateOnStart();
+
+        services.AddSingleton<HttpCorsHeaders>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    {
+        services.AddScoped<CreateContactEmailHandler>();
 
         return services;
     }
@@ -39,6 +63,7 @@ public static class ApiAppServices
         });
 
         services.AddSingleton<IDocumentStore, CosmosDocumentStore>();
+        services.AddScoped<IContactMessageStore, CosmosContactMessageStore>();
 
         return services;
     }

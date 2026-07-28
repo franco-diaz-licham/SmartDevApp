@@ -3,9 +3,9 @@ name: smartdev
 services:
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite:3.34.0
-    container_name: azurite
+    container_name: smartdev-azurite
     hostname: azurite
-    command: ["azurite", "--blobHost", "0.0.0.0", "--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0"]
+    command: ["azurite", "--skipApiVersionCheck", "--blobHost", "0.0.0.0", "--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0"]
     ports:
       - "10000:10000"
       - "10001:10001"
@@ -13,15 +13,18 @@ services:
     volumes:
       - azurite-data:/data
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 10000"]
-      interval: 10s
+      test:
+        [
+          "CMD-SHELL",
+          'node -e "require(''http'').get(''http://127.0.0.1:10000/devstoreaccount1?comp=list'', res => process.exit(0)).on(''error'', () => process.exit(1))"',
+        ]
+      interval: 5s
       timeout: 5s
-      retries: 10
-      start_period: 5s
+      retries: 5
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.127.0
-    container_name: otel-collector
+    container_name: smartdev-otel-collector
     command: ["--config=/etc/otelcol-contrib/config.yml"]
     ports:
       - "4317:4317"
@@ -31,7 +34,7 @@ services:
 
   cosmos-db:
     image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
-    container_name: cosmos-db
+    container_name: smartdev-cosmos-db
     hostname: cosmos-db
     environment:
       AZURE_COSMOS_EMULATOR_PARTITION_COUNT: "3"
@@ -50,7 +53,7 @@ services:
 
   servicebus-mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: servicebus-mssql
+    container_name: smartdev-servicebus-mssql
     hostname: servicebus-mssql
     environment:
       ACCEPT_EULA: "Y"
@@ -58,7 +61,7 @@ services:
 
   servicebus-emulator:
     image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
-    container_name: servicebus-emulator
+    container_name: smartdev-servicebus-emulator
     hostname: servicebus-emulator
     ports:
       - "5672:5672"
@@ -79,7 +82,7 @@ services:
       context: ..
       dockerfile: docker/api-functions.dockerfile
     image: api-functions:local
-    container_name: api-functions
+    container_name: smartdev-api-functions
     ports:
       - "5136:80"
     depends_on:
@@ -92,7 +95,7 @@ services:
       otel-collector:
         condition: service_started
     environment:
-      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNo3GJbLVC8W23e3p8h44wJ7zvSW9WnQ1GEeXtGaCw/hZ3bUjMG7VZaIxw7Ue4r4rGmCMygNf1qg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;"
       FUNCTIONS_WORKER_RUNTIME: "dotnet-isolated"
       CosmosDb__ConnectionString: "AccountEndpoint=https://cosmos-db:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;"
       AzureServiceBus__ConnectionString: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
@@ -104,7 +107,7 @@ services:
       context: ..
       dockerfile: docker/frontend.dockerfile
     image: frontend:local
-    container_name: frontend
+    container_name: smartdev-frontend
     ports:
       - "5173:5173"
     depends_on:
@@ -123,7 +126,7 @@ services:
       context: ..
       dockerfile: docker/worker-functions.dockerfile
     image: worker-functions:local
-    container_name: worker-functions
+    container_name: smartdev-worker-functions
     depends_on:
       azurite:
         condition: service_healthy
@@ -132,7 +135,7 @@ services:
       otel-collector:
         condition: service_started
     environment:
-      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNo3GJbLVC8W23e3p8h44wJ7zvSW9WnQ1GEeXtGaCw/hZ3bUjMG7VZaIxw7Ue4r4rGmCMygNf1qg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;"
       FUNCTIONS_WORKER_RUNTIME: "dotnet-isolated"
       AzureServiceBus__ConnectionString: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       AzureServiceBus__AdministrationConnectionString: "Endpoint=sb://servicebus-emulator:5300;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"

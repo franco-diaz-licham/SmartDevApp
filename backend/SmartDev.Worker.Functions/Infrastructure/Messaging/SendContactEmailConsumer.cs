@@ -1,6 +1,6 @@
 using MassTransit;
 using SmartDev.Shared.Messaging;
-using SmartDev.Worker.Functions.Application.Messaging;
+using SmartDev.Worker.Functions.Application.UsesCases;
 
 namespace SmartDev.Worker.Functions.Infrastructure.Messaging;
 

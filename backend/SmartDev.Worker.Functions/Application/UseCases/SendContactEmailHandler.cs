@@ -5,7 +5,7 @@ using SmartDev.Shared.Messaging;
 using SmartDev.Worker.Functions.Application.Ports;
 using SmartDev.Worker.Functions.Infrastructure.Options;
 
-namespace SmartDev.Worker.Functions.Application.Messaging;
+namespace SmartDev.Worker.Functions.Application.UsesCases;
 
 public sealed class SendContactEmailHandler(
     IEmailSender emailSender,

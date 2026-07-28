@@ -14,7 +14,7 @@ public sealed class AzureCommunicationEmailSender(IOptions<AzureCommunicationSer
     public async Task SendAsync(EmailMessageModel message, CancellationToken cancellationToken = default)
     {
         var emailClient = new EmailClient(options.ConnectionString);
-        var emailMessage = new Azure.Communication.Email.EmailMessage(
+        var emailMessage = new EmailMessage(
             senderAddress: options.SenderAddress,
             recipientAddress: message.To,
             content: new EmailContent(message.Subject) {

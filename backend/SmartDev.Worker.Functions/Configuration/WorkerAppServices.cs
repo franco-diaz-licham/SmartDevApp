@@ -3,11 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MassTransit;
 using SmartDev.Shared.Options;
-using SmartDev.Worker.Functions.Application.Messaging;
 using SmartDev.Worker.Functions.Application.Ports;
 using SmartDev.Worker.Functions.Infrastructure.Email;
 using SmartDev.Worker.Functions.Infrastructure.Messaging;
 using SmartDev.Worker.Functions.Infrastructure.Options;
+using SmartDev.Worker.Functions.Application.UsesCases;
 
 namespace SmartDev.Worker.Functions.Configuration;
 
