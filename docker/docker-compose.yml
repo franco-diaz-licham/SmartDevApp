@@ -1,6 +1,24 @@
-name: earlylearner
+name: smartdev
 
 services:
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:3.34.0
+    container_name: azurite
+    hostname: azurite
+    command: ["azurite", "--blobHost", "0.0.0.0", "--queueHost", "0.0.0.0", "--tableHost", "0.0.0.0"]
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - azurite-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 10000"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.127.0
     container_name: otel-collector
@@ -69,25 +87,18 @@ services:
         condition: service_healthy
       cosmos-db:
         condition: service_healthy
-      smartdev_local_db:
-        condition: service_healthy
       servicebus-emulator:
         condition: service_started
       otel-collector:
         condition: service_started
     environment:
+      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNo3GJbLVC8W23e3p8h44wJ7zvSW9WnQ1GEeXtGaCw/hZ3bUjMG7VZaIxw7Ue4r4rGmCMygNf1qg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+      FUNCTIONS_WORKER_RUNTIME: "dotnet-isolated"
       CosmosDb__ConnectionString: "AccountEndpoint=https://cosmos-db:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;"
       AzureServiceBus__ConnectionString: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       AzureServiceBus__AdministrationConnectionString: "Endpoint=sb://servicebus-emulator:5300;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       ASPNETCORE_ENVIRONMENT: "Development"
       Observability__OtlpEndpoint: "http://otel-collector:4317"
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost/health/ready"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-
   frontend:
     build:
       context: ..
@@ -98,13 +109,13 @@ services:
       - "5173:5173"
     depends_on:
       api-functions:
-        condition: service_healthy
+        condition: service_started
     environment:
       VITE_API_BASE_URL: "http://localhost:5136"
       VITE_API_VERSION: "v1"
-      VITE_APP_NAME: "EarlyLearner"
+      VITE_APP_NAME: "SmartDev"
       VITE_ENTRA_CLIENT_ID: "a08163b9-bc2e-4783-bda2-a04287d216ec"
-      VITE_ENTRA_AUTHORITY: "https://earlylearnerapp.ciamlogin.com/3a8a1443-0b3e-4de5-9e59-03bf8c3bd514"
+      VITE_ENTRA_AUTHORITY: "https://smartdevapp.ciamlogin.com/3a8a1443-0b3e-4de5-9e59-03bf8c3bd514"
       VITE_ENTRA_API_SCOPE: "api://1953e0fa-dafc-480c-b2bf-faa4fb5aa694/access_as_user"
 
   worker-functions:
@@ -116,17 +127,19 @@ services:
     depends_on:
       azurite:
         condition: service_healthy
-      cosmos-db:
-        condition: service_healthy
-      smartdev_local_db:
-        condition: service_healthy
       servicebus-emulator:
         condition: service_started
       otel-collector:
         condition: service_started
     environment:
+      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNo3GJbLVC8W23e3p8h44wJ7zvSW9WnQ1GEeXtGaCw/hZ3bUjMG7VZaIxw7Ue4r4rGmCMygNf1qg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+      FUNCTIONS_WORKER_RUNTIME: "dotnet-isolated"
       AzureServiceBus__ConnectionString: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       AzureServiceBus__AdministrationConnectionString: "Endpoint=sb://servicebus-emulator:5300;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
+      AzureCommunicationService__ConnectionString: "endpoint=https://localhost/;accesskey=fake"
+      AzureCommunicationService__SenderAddress: "DoNotReply@localhost"
+      ContactEmail__RecipientAddress: "developer@localhost"
+      ContactEmail__SubjectPrefix: "New portfolio contact message"
       DOTNET_ENVIRONMENT: "Development"
       Observability__OtlpEndpoint: "http://otel-collector:4317"
 
@@ -135,7 +148,4 @@ volumes:
     driver: local
   cosmos-data:
     name: smartdev_cosmos-data
-    driver: local
-  postgres-data:
-    name: smartdev_postgres-data
     driver: local
