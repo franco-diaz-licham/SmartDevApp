@@ -44,7 +44,7 @@ public static class WorkerHostServices
     }
 
     /// <summary>
-    /// Configures Serilog console and rolling file logging for the Worker Functions host.
+    /// Configures Serilog console logging for the Worker Functions host.
     /// </summary>
     private static FunctionsApplicationBuilder AddSerilog(this FunctionsApplicationBuilder builder, LoggingOptions loggingOptions)
     {
@@ -53,9 +53,6 @@ public static class WorkerHostServices
             .Bind(builder.Configuration.GetSection(LoggingOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
-
-        var logFile = Path.Combine(builder.Environment.ContentRootPath, loggingOptions.LogFilePath);
-        Directory.CreateDirectory(Path.GetDirectoryName(logFile)!);
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -66,13 +63,9 @@ public static class WorkerHostServices
             .Enrich.WithProperty("ServiceName", loggingOptions.ServiceName)
             .Enrich.WithProperty("EnvironmentName", builder.Environment.EnvironmentName)
             .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}")
-            .WriteTo.File(logFile, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 14, shared: true)
             .CreateLogger();
 
-        Serilog.Debugging.SelfLog.Enable(message => {
-            File.AppendAllText(Path.Combine(Path.GetDirectoryName(logFile)!, "serilog-selflog.txt"), message);
-        });
-
+        Serilog.Debugging.SelfLog.Enable(message => Console.Error.WriteLine(message));
         builder.Logging.ClearProviders();
         builder.Logging.SetMinimumLevel(LogLevel.Information);
         builder.Logging.AddSerilog(Log.Logger);

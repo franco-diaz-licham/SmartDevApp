@@ -18,9 +18,4 @@ public sealed class LoggingOptions
     [Required]
     public string ServiceName { get; init; } = "SmartDev.Worker.Functions";
 
-    /// <summary>
-    /// Gets the file path where application logs should be written.
-    /// </summary>
-    [Required]
-    public string LogFilePath { get; init; } = "Logs/worker-functions.log";
 }

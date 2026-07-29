@@ -18,9 +18,4 @@ public sealed class LoggingOptions
     [Required]
     public string ServiceName { get; init; } = "SmartDev.Api.Functions";
 
-    /// <summary>
-    /// Gets the file path where application logs should be written.
-    /// </summary>
-    [Required]
-    public string LogFilePath { get; init; } = "Logs/api-functions.log";
 }

@@ -103,8 +103,6 @@ services:
       DOTNET_ENVIRONMENT: "Development"
       AZURE_FUNCTIONS_ENVIRONMENT: "Development"
       Observability__OtlpEndpoint: "http://otel-collector:4317"
-    volumes:
-      - ../.tmp/logs/api-functions:/home/site/wwwroot/Logs
 
   frontend:
     build:
@@ -144,8 +142,6 @@ services:
       AzureServiceBus: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       DOTNET_ENVIRONMENT: "Development"
       Observability__OtlpEndpoint: "http://otel-collector:4317"
-    volumes:
-      - ../.tmp/logs/worker-functions:/home/site/wwwroot/Logs
 
 volumes:
   azurite-data:
