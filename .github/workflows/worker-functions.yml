@@ -16,7 +16,7 @@ env:
   PROJECT_PATH: backend/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj
   PACKAGE_NAME: worker-functions.zip
   WORKER_FUNCTION_APP_NAME: ${{ secrets.WORKER_FUNCTION_APP_NAME }}
-  WORKER_FUNCTION_RESOURCE_GROUP: ${{ secrets.WORKER_FUNCTION_RESOURCE_GROUP }}
+  WORKER_FUNCTION_RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
 jobs:

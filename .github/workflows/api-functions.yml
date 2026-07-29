@@ -16,7 +16,7 @@ env:
   PROJECT_PATH: backend/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj
   PACKAGE_NAME: api-functions.zip
   API_FUNCTION_APP_NAME: ${{ secrets.API_FUNCTION_APP_NAME }}
-  API_FUNCTION_RESOURCE_GROUP: ${{ secrets.API_FUNCTION_RESOURCE_GROUP }}
+  API_FUNCTION_RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
 jobs:
