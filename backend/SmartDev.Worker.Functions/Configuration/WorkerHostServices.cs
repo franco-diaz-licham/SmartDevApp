@@ -112,7 +112,7 @@ public static class WorkerHostServices
             .WithTracing(tracing => {
                 tracing
                     .AddHttpClientInstrumentation()
-                    .AddSource("Azure.*", "MassTransit");
+                    .AddSource("Azure.*");
 
                 if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
                     tracing.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));

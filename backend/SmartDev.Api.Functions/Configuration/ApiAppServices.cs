@@ -1,11 +1,9 @@
 using Azure.Messaging.ServiceBus;
-using Azure.Messaging.ServiceBus.Administration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Azure.Cosmos;
-using MassTransit;
 using SmartDev.Api.Functions.Application.Messaging;
 using SmartDev.Api.Functions.Application.Ports;
 using SmartDev.Api.Functions.Configuration.Options;
@@ -13,7 +11,6 @@ using SmartDev.Api.Functions.Functions;
 using SmartDev.Shared.Messaging;
 using SmartDev.Api.Functions.Application.Messaging.Handlers;
 using SmartDev.Api.Functions.Infrastructure.Options;
-using SmartDev.Api.Functions.Infrastructure.Messaging;
 using SmartDev.Api.Functions.Infrastructure.Persistence;
 using SmartDev.Shared.Options;
 using SmartDev.Api.Functions.Application.UsesCases;
@@ -101,38 +98,11 @@ public static class ApiAppServices
 
     private static IServiceCollection AddApiMessagingServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services
-            .AddOptions<AzureServiceBusOptions>()
-            .Bind(configuration.GetSection(AzureServiceBusOptions.SectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        services.AddMassTransitForAzureFunctions(
-            configurator => {
-                configurator.AddConsumersFromNamespaceContaining<ConsumerAnchor>();
-            },
-            AzureServiceBusOptions.ConnectionStringAppSettingName,
-            (context, busFactoryConfigurator) => {
-                var options = context.GetRequiredService<IOptions<AzureServiceBusOptions>>().Value;
-                var administrationConnectionString = string.IsNullOrWhiteSpace(options.AdministrationConnectionString)
-                    ? options.ConnectionString
-                    : options.AdministrationConnectionString;
-
-                var serviceBusClient = new ServiceBusClient(options.ConnectionString);
-                var administrationClient = new ServiceBusAdministrationClient(administrationConnectionString);
-
-                busFactoryConfigurator.Host(
-                    ServiceBusConnectionStringProperties.Parse(options.ConnectionString).Endpoint,
-                    serviceBusClient,
-                    administrationClient);
-                busFactoryConfigurator.DeployPublishTopology = false;
-                busFactoryConfigurator.PrefetchCount = options.PrefetchCount ?? 1;
-                busFactoryConfigurator.ConcurrentMessageLimit = options.ConcurrentMessageLimit ?? 1;
-                busFactoryConfigurator.UseMessageRetry(retryConfigurator => retryConfigurator.None());
-                busFactoryConfigurator.UseTimeout(timeoutConfigurator => {
-                    timeoutConfigurator.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds ?? 60);
-                });
-            });
+        services.AddSingleton(_ => new ServiceBusClient(
+            configuration[AzureServiceBusOptions.SectionName]
+                ?? throw new ArgumentNullException(
+                    AzureServiceBusOptions.SectionName,
+                    "The service bus connection string was not configured.")));
 
         return services;
     }

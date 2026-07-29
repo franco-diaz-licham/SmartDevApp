@@ -13,16 +13,16 @@ public sealed class SendContactEmailHandler(
     IIntegrationEventPublisher integrationEventPublisher,
     ILogger<SendContactEmailHandler> logger)
 {
-    private readonly ContactEmailOptions options = options.Value;
+    private readonly ContactEmailOptions _options = options.Value;
 
     public async Task HandleAsync(ContactMessageCreatedModel message, CancellationToken cancellationToken)
     {
-        var subject = $"{options.SubjectPrefix}: {message.SenderName}";
+        var subject = $"{_options.SubjectPrefix}: {message.SenderName}";
 
         try {
             await emailSender.SendAsync(
                 new EmailMessageModel(
-                    To: options.RecipientAddress,
+                    To: _options.RecipientAddress,
                     Subject: subject,
                     Body: BuildPlainTextBody(message),
                     HtmlBody: BuildHtmlBody(message)),

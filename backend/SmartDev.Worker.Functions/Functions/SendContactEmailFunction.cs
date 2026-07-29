@@ -1,23 +1,25 @@
+using System.Text.Json;
 using Azure.Messaging.ServiceBus;
-using MassTransit;
 using Microsoft.Azure.Functions.Worker;
 using SmartDev.Shared.Messaging;
 using SmartDev.Shared.Options;
-using SmartDev.Worker.Functions.Infrastructure.Messaging;
+using SmartDev.Worker.Functions.Application.UsesCases;
 
 namespace SmartDev.Worker.Functions.Functions;
 
-public sealed class SendContactEmailFunction(IMessageReceiver receiver)
+public sealed class SendContactEmailFunction(SendContactEmailHandler handler)
 {
+    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
+
     [Function(nameof(SendContactEmailFunction))]
     public async Task Run(
-        [ServiceBusTrigger(ContactMessagingTopology.ContactMessageCreatedQueue, Connection = AzureServiceBusOptions.ConnectionStringAppSettingName)]
+        [ServiceBusTrigger(ContactMessagingTopology.ContactMessageCreatedQueue, Connection = AzureServiceBusOptions.SectionName)]
         ServiceBusReceivedMessage message,
         CancellationToken cancellationToken)
     {
-        await receiver.HandleConsumer<SendContactEmailConsumer>(
-            ContactMessagingTopology.ContactMessageCreatedQueue,
-            message,
-            cancellationToken);
+        var contactMessage = JsonSerializer.Deserialize<ContactMessageCreatedModel>(message.Body.ToString(), SerializerOptions)
+            ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ContactMessageCreatedModel)}.");
+
+        await handler.HandleAsync(contactMessage, cancellationToken);
     }
 }

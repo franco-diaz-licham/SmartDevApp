@@ -6,13 +6,6 @@
     "DefaultTimeToLiveSeconds": 86400,
     "Throughput": 1000
   },
-  "AzureServiceBus": {
-    "ConnectionString": "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;",
-    "AdministrationConnectionString": "Endpoint=sb://localhost:5300;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;",
-    "PrefetchCount": 1,
-    "ConcurrentMessageLimit": 1,
-    "TimeoutSeconds": 60
-  },
   "Cors": {
     "AllowedOrigins": ["http://localhost:5173"]
   },

@@ -114,7 +114,7 @@ public static class ApiHostServices
             .WithTracing(tracing => {
                 tracing
                     .AddHttpClientInstrumentation()
-                    .AddSource("Azure.*", "Azure.Cosmos.Operation", "MassTransit");
+                    .AddSource("Azure.*", "Azure.Cosmos.Operation");
 
                 if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
                     tracing.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
