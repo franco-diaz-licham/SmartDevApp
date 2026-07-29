@@ -1,37 +1,37 @@
 using System.Net;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using SmartDev.Api.Functions.Application.UsesCases;
 
 namespace SmartDev.Api.Functions.Functions;
 
-public sealed class ContactEmailFunction(CreateContactEmailHandler handler, HttpCorsHeaders corsHeaders)
+public sealed class ContactEmailFunction(CreateContactEmailHandler handler)
 {
     [Function(nameof(ContactEmailFunction))]
-    public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", "options", Route = "contactEmail")]
-        HttpRequest request,
-        CancellationToken cancellationToken)
+    public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", "options", Route = "contactEmail")] HttpRequestData request, CancellationToken cancellationToken)
     {
-        if (!corsHeaders.TryApply(request)) return new StatusCodeResult(StatusCodes.Status403Forbidden);
-        if (HttpMethods.IsOptions(request.Method)) return new NoContentResult();
-
         var body = await request.ReadFromJsonAsync<ContactEmailRequest>(cancellationToken);
-        if (body is null) return new BadRequestObjectResult(new ContactEmailErrorResponse("Request body is required."));
+        if (body is null) return await CreateJsonResponseAsync(request, HttpStatusCode.BadRequest, new ContactEmailErrorResponse("Request body is required."), cancellationToken);
 
         try {
             var result = await handler.HandleAsync(new CreateContactEmailCommand(body.Name, body.Email, body.Message), cancellationToken);
-            return new ObjectResult(new ContactEmailAcceptedResponse(result.ContactMessageId)) {
-                StatusCode = StatusCodes.Status202Accepted
-            };
+            return await CreateJsonResponseAsync(request, HttpStatusCode.Accepted, new ContactEmailAcceptedResponse(result.ContactMessageId), cancellationToken);
         } catch (ArgumentException exception) {
-            return new BadRequestObjectResult(new ContactEmailErrorResponse(exception.Message));
+            return await CreateJsonResponseAsync(request, HttpStatusCode.BadRequest, new ContactEmailErrorResponse(exception.Message), cancellationToken);
         } catch (InvalidOperationException exception) {
-            return new ObjectResult(new ContactEmailErrorResponse(exception.Message)) {
-                StatusCode = (int)HttpStatusCode.Conflict
-            };
+            return await CreateJsonResponseAsync(request, HttpStatusCode.Conflict, new ContactEmailErrorResponse(exception.Message), cancellationToken);
         }
+    }
+
+    private static async Task<HttpResponseData> CreateJsonResponseAsync<TResponse>(
+        HttpRequestData request,
+        HttpStatusCode statusCode,
+        TResponse body,
+        CancellationToken cancellationToken)
+    {
+        var response = request.CreateResponse(statusCode);
+        await response.WriteAsJsonAsync(body, cancellationToken);
+        return response;
     }
 }
 

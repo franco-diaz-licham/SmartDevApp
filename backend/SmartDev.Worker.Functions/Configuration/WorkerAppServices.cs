@@ -26,8 +26,9 @@ public static class WorkerAppServices
 
     private static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddScoped<SendContactEmailHandler>();
         services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
+
+        services.AddScoped<SendContactEmailHandler>();
 
         return services;
     }
@@ -63,11 +64,13 @@ public static class WorkerAppServices
 
     private static IServiceCollection AddMessagingServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton(_ => new ServiceBusClient(
-            configuration[AzureServiceBusOptions.SectionName]
-                ?? throw new ArgumentNullException(
-                    AzureServiceBusOptions.SectionName,
-                    "The service bus connection string was not configured.")));
+        services
+            .AddOptions<AzureServiceBusOptions>()
+            .Bind(configuration.GetSection(AzureServiceBusOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddSingleton(_ => new ServiceBusClient(configuration[AzureServiceBusOptions.SectionName]));
 
         return services;
     }

@@ -9,6 +9,21 @@
   "Cors": {
     "AllowedOrigins": ["http://localhost:5173"]
   },
+  "RateLimiting": {
+    "Enabled": true,
+    "DefaultPolicy": {
+      "Enabled": true,
+      "PermitLimit": 60,
+      "WindowSeconds": 60
+    },
+    "Policies": {
+      "ContactEmailFunction": {
+        "Enabled": true,
+        "PermitLimit": 3,
+        "WindowSeconds": 300
+      }
+    }
+  },
   "LoggingOptions": {
     "LogFilePath": "Logs/api-functions.log"
   },

@@ -7,13 +7,13 @@ using Microsoft.Azure.Cosmos;
 using SmartDev.Api.Functions.Application.Messaging;
 using SmartDev.Api.Functions.Application.Ports;
 using SmartDev.Api.Functions.Configuration.Options;
-using SmartDev.Api.Functions.Functions;
 using SmartDev.Shared.Messaging;
 using SmartDev.Api.Functions.Application.Messaging.Handlers;
 using SmartDev.Api.Functions.Infrastructure.Options;
 using SmartDev.Api.Functions.Infrastructure.Persistence;
 using SmartDev.Shared.Options;
 using SmartDev.Api.Functions.Application.UsesCases;
+using SmartDev.Api.Functions.Configuration.Middleware;
 
 namespace SmartDev.Api.Functions.Configuration;
 
@@ -22,29 +22,39 @@ public static class ApiAppServices
     public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         services
-            .AddCorsServices(configuration)
+            .AddMiddlewareServices(configuration)
             .AddApplicationServices()
             .AddCosmosServices(configuration, environment)
-            .AddDomainEventServices()
             .AddApiMessagingServices(configuration);
 
         return services;
     }
 
-    private static IServiceCollection AddCorsServices(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddMiddlewareServices(this IServiceCollection services, IConfiguration configuration)
     {
         services
             .AddOptions<CorsOptions>()
             .Bind(configuration.GetSection(CorsOptions.SectionName))
             .ValidateOnStart();
 
+        services
+            .AddOptions<RateLimitingOptions>()
+            .Bind(configuration.GetSection(RateLimitingOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services.AddSingleton<HttpCorsHeaders>();
+        services.AddSingleton<HttpRateLimiter>();
 
         return services;
     }
 
     private static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+        services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
+        services.AddScoped<IDomainEventHandler, ContactMessageCreatedHandler>();
+
         services.AddScoped<CreateContactEmailHandler>();
         services.AddScoped<UpdateContactEmailStatusHandler>();
 
@@ -87,23 +97,15 @@ public static class ApiAppServices
         return services;
     }
 
-    private static IServiceCollection AddDomainEventServices(this IServiceCollection services)
-    {
-        services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
-        services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
-        services.AddScoped<IDomainEventHandler, ContactMessageCreatedHandler>();
-
-        return services;
-    }
-
     private static IServiceCollection AddApiMessagingServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton(_ => new ServiceBusClient(
-            configuration[AzureServiceBusOptions.SectionName]
-                ?? throw new ArgumentNullException(
-                    AzureServiceBusOptions.SectionName,
-                    "The service bus connection string was not configured.")));
+        services
+            .AddOptions<AzureServiceBusOptions>()
+            .Bind(configuration.GetSection(AzureServiceBusOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
+        services.AddSingleton(_ => new ServiceBusClient(configuration[AzureServiceBusOptions.SectionName]));
         return services;
     }
 }
