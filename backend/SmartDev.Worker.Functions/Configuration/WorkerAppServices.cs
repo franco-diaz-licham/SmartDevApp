@@ -1,6 +1,7 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using SmartDev.Shared.Messaging;
 using SmartDev.Shared.Options;
 using SmartDev.Worker.Functions.Application.Ports;
@@ -12,11 +13,11 @@ namespace SmartDev.Worker.Functions.Configuration;
 
 public static class WorkerAppServices
 {
-    public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         services
             .AddApplicationServices()
-            .AddEmailServices(configuration)
+            .AddEmailServices(configuration, environment)
             .AddContactEmailServices(configuration)
             .AddMessagingServices(configuration);
 
@@ -31,8 +32,13 @@ public static class WorkerAppServices
         return services;
     }
 
-    private static IServiceCollection AddEmailServices(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddEmailServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
+        if (environment.IsDevelopment()) {
+            services.AddSingleton<IEmailSender, LocalEmailSender>();
+            return services;
+        }
+
         services
             .AddOptions<AzureCommunicationServiceOptions>()
             .Bind(configuration.GetSection(AzureCommunicationServiceOptions.SectionName))

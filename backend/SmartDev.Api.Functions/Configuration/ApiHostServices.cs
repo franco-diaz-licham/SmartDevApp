@@ -74,6 +74,7 @@ public static class ApiHostServices
 
         // Plug Serilog into .NET logging as the app initialises.
         builder.Logging.ClearProviders();
+        builder.Logging.SetMinimumLevel(LogLevel.Information);
         builder.Logging.AddSerilog(Log.Logger);
 
         return builder;
@@ -102,7 +103,9 @@ public static class ApiHostServices
                 .AddService(serviceName)
                 .AddAttributes([new KeyValuePair<string, object>("deployment.environment", builder.Environment.EnvironmentName)]));
 
-            if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) logging.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
+            if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
+                logging.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
+            }
         });
 
         var openTelemetry = builder.Services

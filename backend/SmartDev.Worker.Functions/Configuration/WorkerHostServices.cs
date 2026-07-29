@@ -70,6 +70,7 @@ public static class WorkerHostServices
         });
 
         builder.Logging.ClearProviders();
+        builder.Logging.SetMinimumLevel(LogLevel.Information);
         builder.Logging.AddSerilog(Log.Logger);
 
         return builder;

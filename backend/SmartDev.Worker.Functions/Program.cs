@@ -9,7 +9,7 @@ try {
     builder.AddHostServices();
     Log.Information("Starting SmartDev Worker Functions host");
 
-    builder.Services.AddAppServices(builder.Configuration);
+    builder.Services.AddAppServices(builder.Configuration, builder.Environment);
 
     var host = builder.Build();
     Log.Information("SmartDev Worker Functions host built");
