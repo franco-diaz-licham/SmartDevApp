@@ -101,7 +101,10 @@ services:
       AzureServiceBus__ConnectionString: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       AzureServiceBus__AdministrationConnectionString: "Endpoint=sb://servicebus-emulator:5300;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_ENVIRONMENT: "Development"
+      AZURE_FUNCTIONS_ENVIRONMENT: "Development"
       Observability__OtlpEndpoint: "http://otel-collector:4317"
+
   frontend:
     build:
       context: ..

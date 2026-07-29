@@ -24,6 +24,12 @@ public sealed class AzureServiceBusOptions
     public string ConnectionString { get; init; } = string.Empty;
 
     /// <summary>
+    /// Gets the Service Bus administration connection string used for topology operations.
+    /// The local emulator exposes administration operations on port 5300.
+    /// </summary>
+    public string? AdministrationConnectionString { get; init; }
+
+    /// <summary>
     /// Gets the number of messages MassTransit should prefetch from Service Bus.
     /// </summary>
     public int? PrefetchCount { get; init; } = 1;

@@ -1,3 +1,5 @@
+using Azure.Messaging.ServiceBus;
+using Azure.Messaging.ServiceBus.Administration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -70,7 +72,17 @@ public static class WorkerAppServices
             AzureServiceBusOptions.ConnectionStringConfigurationKey,
             (context, busFactoryConfigurator) => {
                 var options = context.GetRequiredService<IOptions<AzureServiceBusOptions>>().Value;
+                var administrationConnectionString = string.IsNullOrWhiteSpace(options.AdministrationConnectionString)
+                    ? options.ConnectionString
+                    : options.AdministrationConnectionString;
 
+                var serviceBusClient = new ServiceBusClient(options.ConnectionString);
+                var administrationClient = new ServiceBusAdministrationClient(administrationConnectionString);
+
+                busFactoryConfigurator.Host(
+                    ServiceBusConnectionStringProperties.Parse(options.ConnectionString).Endpoint,
+                    serviceBusClient,
+                    administrationClient);
                 busFactoryConfigurator.DeployPublishTopology = false;
                 busFactoryConfigurator.PrefetchCount = options.PrefetchCount ?? 1;
                 busFactoryConfigurator.ConcurrentMessageLimit = options.ConcurrentMessageLimit ?? 1;

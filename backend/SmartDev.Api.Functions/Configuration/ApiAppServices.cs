@@ -1,5 +1,8 @@
+using Azure.Messaging.ServiceBus;
+using Azure.Messaging.ServiceBus.Administration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Azure.Cosmos;
 using MassTransit;
@@ -18,12 +21,12 @@ namespace SmartDev.Api.Functions.Configuration;
 
 public static class ApiAppServices
 {
-    public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         services
             .AddCorsServices(configuration)
             .AddApplicationServices()
-            .AddCosmosServices(configuration)
+            .AddCosmosServices(configuration, environment)
             .AddDomainEventServices()
             .AddApiMessagingServices(configuration);
 
@@ -49,7 +52,7 @@ public static class ApiAppServices
         return services;
     }
 
-    private static IServiceCollection AddCosmosServices(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddCosmosServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         services
             .AddOptions<CosmosDbOptions>()
@@ -59,7 +62,21 @@ public static class ApiAppServices
 
         services.AddSingleton(sp => {
             var options = sp.GetRequiredService<IOptions<CosmosDbOptions>>().Value;
-            return new CosmosClient(options.ConnectionString);
+            var clientOptions = new CosmosClientOptions {
+                ConnectionMode = ConnectionMode.Gateway,
+                LimitToEndpoint = environment.IsDevelopment(),
+                SerializerOptions = new CosmosSerializationOptions {
+                    PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
+                }
+            };
+
+            if (environment.IsDevelopment()) {
+                clientOptions.HttpClientFactory = () => new HttpClient(new HttpClientHandler {
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                });
+            }
+
+            return new CosmosClient(options.ConnectionString, clientOptions);
         });
 
         services.AddSingleton<IDocumentStore, CosmosDocumentStore>();
@@ -88,8 +105,17 @@ public static class ApiAppServices
         services.AddMassTransit(configurator => {
             configurator.UsingAzureServiceBus((context, busFactoryConfigurator) => {
                 var options = context.GetRequiredService<IOptions<AzureServiceBusOptions>>().Value;
+                var administrationConnectionString = string.IsNullOrWhiteSpace(options.AdministrationConnectionString)
+                    ? options.ConnectionString
+                    : options.AdministrationConnectionString;
 
-                busFactoryConfigurator.Host(options.ConnectionString);
+                var serviceBusClient = new ServiceBusClient(options.ConnectionString);
+                var administrationClient = new ServiceBusAdministrationClient(administrationConnectionString);
+
+                busFactoryConfigurator.Host(
+                    ServiceBusConnectionStringProperties.Parse(options.ConnectionString).Endpoint,
+                    serviceBusClient,
+                    administrationClient);
                 busFactoryConfigurator.DeployPublishTopology = false;
             });
         });

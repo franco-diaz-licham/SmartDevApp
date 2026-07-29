@@ -5,5 +5,5 @@ using SmartDev.Api.Functions.Configuration;
 var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.AddHostServices();
-builder.Services.AddAppServices(builder.Configuration);
+builder.Services.AddAppServices(builder.Configuration, builder.Environment);
 builder.Build().Run();
