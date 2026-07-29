@@ -1,0 +1,118 @@
+name: Worker Functions
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "backend/SmartDev.Worker.Functions/**"
+      - "backend/SmartDev.Shared/**"
+      - "backend/SmartDev.slnx"
+      - ".github/workflows/worker-functions.yml"
+
+env:
+  DOTNET_VERSION: 8.0.x
+  PROJECT_PATH: backend/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj
+  PACKAGE_NAME: worker-functions.zip
+  WORKER_FUNCTION_APP_NAME: ${{ secrets.WORKER_FUNCTION_APP_NAME }}
+  WORKER_FUNCTION_RESOURCE_GROUP: ${{ secrets.WORKER_FUNCTION_RESOURCE_GROUP }}
+  AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Worker Functions
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      # Checkout the repository so the .NET solution and Function App project can be restored and published.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install the .NET SDK version used by the Azure Functions projects.
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Restore dependencies explicitly so package failures are visible before publish.
+      - name: Restore Worker Functions
+        run: dotnet restore $env:PROJECT_PATH
+
+      # Publish the Worker Functions app into a clean deployment artifact folder.
+      - name: Publish Worker Functions
+        run: |
+          $publishPath = Join-Path $env:RUNNER_TEMP "worker-functions-publish"
+
+          if (Test-Path $publishPath) {
+            Remove-Item $publishPath -Recurse -Force
+          }
+
+          dotnet publish $env:PROJECT_PATH `
+            --configuration Release `
+            --output $publishPath `
+            --no-restore
+
+      # Package the published Function App output for Azure zip deployment.
+      - name: Create deployment package
+        run: |
+          $publishPath = Join-Path $env:RUNNER_TEMP "worker-functions-publish"
+          $packagePath = Join-Path $env:RUNNER_TEMP $env:PACKAGE_NAME
+
+          if (-not (Test-Path $publishPath)) {
+            throw "Missing publish folder: $publishPath"
+          }
+
+          if (Test-Path $packagePath) {
+            Remove-Item $packagePath -Force
+          }
+
+          Compress-Archive -Path "$publishPath/*" -DestinationPath $packagePath -Force
+
+      # Fail early if the deployment package was not created.
+      - name: Check deployment package
+        run: |
+          $packagePath = Join-Path $env:RUNNER_TEMP $env:PACKAGE_NAME
+
+          if (-not (Test-Path $packagePath)) {
+            throw "Missing deployment package: $packagePath"
+          }
+
+          Get-Item $packagePath
+
+      # Log in with the repository service principal so the workflow can deploy the Function App.
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ env.AZURE_CREDENTIALS }}
+
+      # Deploy the Worker Functions package to the configured Azure Function App.
+      - name: Deploy Worker Functions
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:WORKER_FUNCTION_APP_NAME)) {
+            throw "Missing WORKER_FUNCTION_APP_NAME repository secret."
+          }
+
+          if ([string]::IsNullOrWhiteSpace($env:WORKER_FUNCTION_RESOURCE_GROUP)) {
+            throw "Missing WORKER_FUNCTION_RESOURCE_GROUP repository secret."
+          }
+
+          $packagePath = Join-Path $env:RUNNER_TEMP $env:PACKAGE_NAME
+
+          az webapp update `
+            --resource-group $env:WORKER_FUNCTION_RESOURCE_GROUP `
+            --name $env:WORKER_FUNCTION_APP_NAME `
+            --set httpsOnly=true
+
+          az functionapp deployment source config-zip `
+            --resource-group $env:WORKER_FUNCTION_RESOURCE_GROUP `
+            --name $env:WORKER_FUNCTION_APP_NAME `
+            --src $packagePath
+
+          az functionapp function list `
+            --resource-group $env:WORKER_FUNCTION_RESOURCE_GROUP `
+            --name $env:WORKER_FUNCTION_APP_NAME `
+            --output table
