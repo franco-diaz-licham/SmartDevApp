@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MassTransit;
+using SmartDev.Shared.Messaging;
 using SmartDev.Shared.Options;
 using SmartDev.Worker.Functions.Application.Ports;
 using SmartDev.Worker.Functions.Infrastructure.Email;
@@ -29,6 +30,7 @@ public static class WorkerAppServices
     private static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<SendContactEmailHandler>();
+        services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
 
         return services;
     }
@@ -69,7 +71,7 @@ public static class WorkerAppServices
             configurator => {
                 configurator.AddConsumersFromNamespaceContaining<ConsumerAnchor>();
             },
-            AzureServiceBusOptions.ConnectionStringConfigurationKey,
+            AzureServiceBusOptions.ConnectionStringAppSettingName,
             (context, busFactoryConfigurator) => {
                 var options = context.GetRequiredService<IOptions<AzureServiceBusOptions>>().Value;
                 var administrationConnectionString = string.IsNullOrWhiteSpace(options.AdministrationConnectionString)

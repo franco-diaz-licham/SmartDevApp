@@ -15,6 +15,18 @@
               "RequiresDuplicateDetection": true,
               "RequiresSession": false
             }
+          },
+          {
+            "Name": "contact-email-delivery-result",
+            "Properties": {
+              "DeadLetteringOnMessageExpiration": true,
+              "DefaultMessageTimeToLive": "PT1H",
+              "DuplicateDetectionHistoryTimeWindow": "PT5M",
+              "LockDuration": "PT1M",
+              "MaxDeliveryCount": 5,
+              "RequiresDuplicateDetection": true,
+              "RequiresSession": false
+            }
           }
         ],
         "Topics": []

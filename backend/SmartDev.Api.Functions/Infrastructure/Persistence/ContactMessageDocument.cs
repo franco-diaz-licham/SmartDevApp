@@ -23,7 +23,11 @@ public sealed class ContactMessageDocument
 
     public DateTimeOffset SubmittedAt { get; init; }
 
-    public string Status { get; init; } = string.Empty;
+    public ContactMessageStatus Status { get; set; }
+
+    public DateTimeOffset? EmailSentAt { get; set; }
+
+    public string? FailureReason { get; set; }
 
     public static ContactMessageDocument FromDomain(ContactMessage contactMessage)
     {
@@ -33,7 +37,9 @@ public sealed class ContactMessageDocument
             SenderEmail = contactMessage.SenderEmail,
             Message = contactMessage.Message,
             SubmittedAt = contactMessage.SubmittedAt,
-            Status = contactMessage.Status.ToString()
+            Status = contactMessage.Status,
+            EmailSentAt = contactMessage.EmailSentAt,
+            FailureReason = contactMessage.FailureReason
         };
     }
 }

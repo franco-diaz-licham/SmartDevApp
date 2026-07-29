@@ -10,6 +10,7 @@ namespace SmartDev.Worker.Functions.Application.UsesCases;
 public sealed class SendContactEmailHandler(
     IEmailSender emailSender,
     IOptions<ContactEmailOptions> options,
+    IIntegrationEventPublisher integrationEventPublisher,
     ILogger<SendContactEmailHandler> logger)
 {
     private readonly ContactEmailOptions options = options.Value;
@@ -18,12 +19,38 @@ public sealed class SendContactEmailHandler(
     {
         var subject = $"{options.SubjectPrefix}: {message.SenderName}";
 
-        await emailSender.SendAsync(
-            new EmailMessageModel(
-                To: options.RecipientAddress,
-                Subject: subject,
-                Body: BuildPlainTextBody(message),
-                HtmlBody: BuildHtmlBody(message)),
+        try {
+            await emailSender.SendAsync(
+                new EmailMessageModel(
+                    To: options.RecipientAddress,
+                    Subject: subject,
+                    Body: BuildPlainTextBody(message),
+                    HtmlBody: BuildHtmlBody(message)),
+                cancellationToken);
+        } catch (Exception exception) {
+            await integrationEventPublisher.PublishAsync(
+                new ContactEmailDeliveryResultModel(
+                    ContactMessageId: message.ContactMessageId,
+                    Status: ContactEmailDeliveryStatus.Failed,
+                    OccurredAt: DateTimeOffset.UtcNow,
+                    FailureReason: exception.Message),
+                cancellationToken);
+
+            logger.LogError(
+                exception,
+                "Contact message email failed for {ContactMessageId} from {SenderEmail}",
+                message.ContactMessageId,
+                message.SenderEmail);
+
+            return;
+        }
+
+        await integrationEventPublisher.PublishAsync(
+            new ContactEmailDeliveryResultModel(
+                ContactMessageId: message.ContactMessageId,
+                Status: ContactEmailDeliveryStatus.Sent,
+                OccurredAt: DateTimeOffset.UtcNow,
+                FailureReason: null),
             cancellationToken);
 
         logger.LogInformation(

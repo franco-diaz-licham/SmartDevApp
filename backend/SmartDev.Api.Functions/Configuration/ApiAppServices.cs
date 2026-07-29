@@ -13,6 +13,7 @@ using SmartDev.Api.Functions.Functions;
 using SmartDev.Shared.Messaging;
 using SmartDev.Api.Functions.Application.Messaging.Handlers;
 using SmartDev.Api.Functions.Infrastructure.Options;
+using SmartDev.Api.Functions.Infrastructure.Messaging;
 using SmartDev.Api.Functions.Infrastructure.Persistence;
 using SmartDev.Shared.Options;
 using SmartDev.Api.Functions.Application.UsesCases;
@@ -48,6 +49,7 @@ public static class ApiAppServices
     private static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<CreateContactEmailHandler>();
+        services.AddScoped<UpdateContactEmailStatusHandler>();
 
         return services;
     }
@@ -105,8 +107,12 @@ public static class ApiAppServices
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddMassTransit(configurator => {
-            configurator.UsingAzureServiceBus((context, busFactoryConfigurator) => {
+        services.AddMassTransitForAzureFunctions(
+            configurator => {
+                configurator.AddConsumersFromNamespaceContaining<ConsumerAnchor>();
+            },
+            AzureServiceBusOptions.ConnectionStringAppSettingName,
+            (context, busFactoryConfigurator) => {
                 var options = context.GetRequiredService<IOptions<AzureServiceBusOptions>>().Value;
                 var administrationConnectionString = string.IsNullOrWhiteSpace(options.AdministrationConnectionString)
                     ? options.ConnectionString
@@ -120,8 +126,13 @@ public static class ApiAppServices
                     serviceBusClient,
                     administrationClient);
                 busFactoryConfigurator.DeployPublishTopology = false;
+                busFactoryConfigurator.PrefetchCount = options.PrefetchCount ?? 1;
+                busFactoryConfigurator.ConcurrentMessageLimit = options.ConcurrentMessageLimit ?? 1;
+                busFactoryConfigurator.UseMessageRetry(retryConfigurator => retryConfigurator.None());
+                busFactoryConfigurator.UseTimeout(timeoutConfigurator => {
+                    timeoutConfigurator.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds ?? 60);
+                });
             });
-        });
 
         return services;
     }

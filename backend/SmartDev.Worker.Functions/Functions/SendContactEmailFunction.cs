@@ -11,7 +11,7 @@ public sealed class SendContactEmailFunction(IMessageReceiver receiver)
 {
     [Function(nameof(SendContactEmailFunction))]
     public async Task Run(
-        [ServiceBusTrigger(ContactMessagingTopology.ContactMessageCreatedQueue, Connection = AzureServiceBusOptions.ConnectionStringConfigurationKey)]
+        [ServiceBusTrigger(ContactMessagingTopology.ContactMessageCreatedQueue, Connection = AzureServiceBusOptions.ConnectionStringAppSettingName)]
         ServiceBusReceivedMessage message,
         CancellationToken cancellationToken)
     {

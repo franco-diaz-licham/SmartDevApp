@@ -13,9 +13,13 @@ public sealed class AzureServiceBusOptions
     public const string SectionName = "AzureServiceBus";
 
     /// <summary>
-    /// Gets the configuration key used by Azure Functions and MassTransit for the Service Bus connection string.
+    /// Gets the app setting name used by Azure Functions Service Bus bindings.
     /// </summary>
-    public const string ConnectionStringConfigurationKey = SectionName + ":ConnectionString";
+    /// <remarks>
+    /// Azure Functions binding attributes require the name of the app setting that
+    /// contains the connection string, not the connection string value itself.
+    /// </remarks>
+    public const string ConnectionStringAppSettingName = "AzureServiceBus__ConnectionString";
 
     /// <summary>
     /// Gets the Service Bus connection string.
