@@ -1,9 +1,14 @@
+using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry;
 using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Events;
 using SmartDev.Worker.Functions.Configuration.Options;
@@ -71,7 +76,7 @@ public static class WorkerHostServices
     }
 
     /// <summary>
-    /// Configures OpenTelemetry log export for the Worker Functions host.
+    /// Configures OpenTelemetry export for the Worker Functions host.
     /// </summary>
     private static FunctionsApplicationBuilder AddObservability(this FunctionsApplicationBuilder builder, string serviceName)
     {
@@ -82,6 +87,8 @@ public static class WorkerHostServices
 
         var observabilityOptions = new ObservabilityOptions();
         builder.Configuration.GetSection(ObservabilityOptions.SectionName).Bind(observabilityOptions);
+
+        AppContext.SetSwitch("Azure.Experimental.EnableActivitySource", true);
 
         builder.Logging.AddOpenTelemetry(logging => {
             logging.IncludeFormattedMessage = true;
@@ -95,6 +102,36 @@ public static class WorkerHostServices
                 logging.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
             }
         });
+
+        var openTelemetry = builder.Services
+            .AddOpenTelemetry()
+            .UseFunctionsWorkerDefaults()
+            .ConfigureResource(resource => resource
+                .AddService(serviceName)
+                .AddAttributes([new KeyValuePair<string, object>("deployment.environment", builder.Environment.EnvironmentName)]))
+            .WithTracing(tracing => {
+                tracing
+                    .AddHttpClientInstrumentation()
+                    .AddSource("Azure.*", "MassTransit");
+
+                if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
+                    tracing.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
+                }
+            })
+            .WithMetrics(metrics => {
+                metrics.AddRuntimeInstrumentation();
+
+                if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
+                    metrics.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
+                }
+            });
+
+        var useAzureMonitorExporter = !string.IsNullOrWhiteSpace(observabilityOptions.ApplicationInsightsConnectionString);
+        if (useAzureMonitorExporter) {
+            openTelemetry.UseAzureMonitorExporter(options => {
+                options.ConnectionString = observabilityOptions.ApplicationInsightsConnectionString;
+            });
+        }
 
         return builder;
     }

@@ -1,9 +1,14 @@
+using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry;
 using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Events;
 using SmartDev.Api.Functions.Configuration.Options;
@@ -42,6 +47,8 @@ public static class ApiHostServices
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        // Serilog must be configured before the DI container builds, so we resolve
+        // the file path directly here using the bound value from configuration.
         var loggingOptions = new LoggingOptions();
         builder.Configuration.GetSection(LoggingOptions.SectionName).Bind(loggingOptions);
 
@@ -60,10 +67,12 @@ public static class ApiHostServices
             .WriteTo.File(logFile, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 14, shared: true)
             .CreateLogger();
 
+        // Force Serilog to export an error file if problems occur during startup.
         Serilog.Debugging.SelfLog.Enable(message => {
             File.AppendAllText(Path.Combine(Path.GetDirectoryName(logFile)!, "serilog-selflog.txt"), message);
         });
 
+        // Plug Serilog into .NET logging as the app initialises.
         builder.Logging.ClearProviders();
         builder.Logging.AddSerilog(Log.Logger);
 
@@ -71,7 +80,7 @@ public static class ApiHostServices
     }
 
     /// <summary>
-    /// Configures OpenTelemetry log export for the API Functions host.
+    /// Configures OpenTelemetry export for the API Functions host.
     /// </summary>
     private static FunctionsApplicationBuilder AddObservability(this FunctionsApplicationBuilder builder, string serviceName)
     {
@@ -83,6 +92,8 @@ public static class ApiHostServices
         var observabilityOptions = new ObservabilityOptions();
         builder.Configuration.GetSection(ObservabilityOptions.SectionName).Bind(observabilityOptions);
 
+        AppContext.SetSwitch("Azure.Experimental.EnableActivitySource", true);
+
         builder.Logging.AddOpenTelemetry(logging => {
             logging.IncludeFormattedMessage = true;
             logging.IncludeScopes = true;
@@ -91,10 +102,36 @@ public static class ApiHostServices
                 .AddService(serviceName)
                 .AddAttributes([new KeyValuePair<string, object>("deployment.environment", builder.Environment.EnvironmentName)]));
 
-            if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
-                logging.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
-            }
+            if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) logging.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
         });
+
+        var openTelemetry = builder.Services
+            .AddOpenTelemetry()
+            .UseFunctionsWorkerDefaults()
+            .ConfigureResource(resource => resource
+                .AddService(serviceName)
+                .AddAttributes([new KeyValuePair<string, object>("deployment.environment", builder.Environment.EnvironmentName)]))
+            .WithTracing(tracing => {
+                tracing
+                    .AddHttpClientInstrumentation()
+                    .AddSource("Azure.*", "Azure.Cosmos.Operation", "MassTransit");
+
+                if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
+                    tracing.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
+                }
+            })
+            .WithMetrics(metrics => {
+                metrics.AddRuntimeInstrumentation();
+
+                if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) metrics.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
+            });
+
+        var useAzureMonitorExporter = !string.IsNullOrWhiteSpace(observabilityOptions.ApplicationInsightsConnectionString);
+        if (useAzureMonitorExporter) {
+            openTelemetry.UseAzureMonitorExporter(options => {
+                options.ConnectionString = observabilityOptions.ApplicationInsightsConnectionString;
+            });
+        }
 
         return builder;
     }

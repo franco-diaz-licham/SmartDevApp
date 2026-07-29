@@ -19,7 +19,7 @@
     "LogFilePath": "Logs/worker-functions.log"
   },
   "Observability": {
-    "OtlpEndpoint": "http://localhost:4317"
-  },
-  "telemetryMode": "OpenTelemetry"
+    "OtlpEndpoint": "http://localhost:4317",
+    "ApplicationInsightsConnectionString": ""
+  }
 }

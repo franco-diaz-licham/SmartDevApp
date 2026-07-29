@@ -20,7 +20,8 @@
     "LogFilePath": "Logs/api-functions.log"
   },
   "Observability": {
-    "OtlpEndpoint": "http://localhost:4317"
+    "OtlpEndpoint": "http://localhost:4317",
+    "ApplicationInsightsConnectionString": ""
   },
   "logging": {
     "applicationInsights": {

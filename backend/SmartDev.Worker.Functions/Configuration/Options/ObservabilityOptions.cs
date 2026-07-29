@@ -14,4 +14,9 @@ public sealed class ObservabilityOptions
     /// Gets the OpenTelemetry Protocol endpoint used to export telemetry.
     /// </summary>
     public string OtlpEndpoint { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Gets the Application Insights connection string used by Azure Monitor telemetry export.
+    /// </summary>
+    public string ApplicationInsightsConnectionString { get; init; } = string.Empty;
 }

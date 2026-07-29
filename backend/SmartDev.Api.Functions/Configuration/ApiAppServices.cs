@@ -67,6 +67,9 @@ public static class ApiAppServices
                 LimitToEndpoint = environment.IsDevelopment(),
                 SerializerOptions = new CosmosSerializationOptions {
                     PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
+                },
+                CosmosClientTelemetryOptions = new CosmosClientTelemetryOptions {
+                    DisableDistributedTracing = false
                 }
             };
 
