@@ -104,6 +104,8 @@ services:
       DOTNET_ENVIRONMENT: "Development"
       AZURE_FUNCTIONS_ENVIRONMENT: "Development"
       Observability__OtlpEndpoint: "http://otel-collector:4317"
+    volumes:
+      - ../.tmp/logs/api-functions:/home/site/wwwroot/Logs
 
   frontend:
     build:
@@ -142,12 +144,10 @@ services:
       FUNCTIONS_WORKER_RUNTIME: "dotnet-isolated"
       AzureServiceBus__ConnectionString: "Endpoint=sb://servicebus-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
       AzureServiceBus__AdministrationConnectionString: "Endpoint=sb://servicebus-emulator:5300;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"
-      AzureCommunicationService__ConnectionString: "endpoint=https://localhost/;accesskey=fake"
-      AzureCommunicationService__SenderAddress: "DoNotReply@localhost"
-      ContactEmail__RecipientAddress: "developer@localhost"
-      ContactEmail__SubjectPrefix: "New portfolio contact message"
       DOTNET_ENVIRONMENT: "Development"
       Observability__OtlpEndpoint: "http://otel-collector:4317"
+    volumes:
+      - ../.tmp/logs/worker-functions:/home/site/wwwroot/Logs
 
 volumes:
   azurite-data:

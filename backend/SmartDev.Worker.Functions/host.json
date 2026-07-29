@@ -1,8 +1,8 @@
 {
   "version": "2.0",
   "AzureCommunicationService": {
-    "ConnectionString": "",
-    "SenderAddress": ""
+    "ConnectionString": "endpoint=https://localhost/;accesskey=fake",
+    "SenderAddress": "DoNotReply@localhost"
   },
   "AzureServiceBus": {
     "ConnectionString": "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;",
@@ -12,8 +12,14 @@
     "TimeoutSeconds": 60
   },
   "ContactEmail": {
-    "RecipientAddress": "",
+    "RecipientAddress": "developer@localhost",
     "SubjectPrefix": "New portfolio contact message"
+  },
+  "LoggingOptions": {
+    "LogFilePath": "Logs/worker-functions.log"
+  },
+  "Observability": {
+    "OtlpEndpoint": "http://localhost:4317"
   },
   "telemetryMode": "OpenTelemetry"
 }
