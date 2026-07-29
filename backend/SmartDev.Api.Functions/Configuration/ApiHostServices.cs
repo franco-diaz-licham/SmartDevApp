@@ -20,6 +20,9 @@ namespace SmartDev.Api.Functions.Configuration;
 /// </summary>
 public static class ApiHostServices
 {
+    private const string AzureCoreActivitySourceName = "Azure.Core";
+    private const string AzureCosmosActivitySourceName = "Azure.Cosmos.Operation";
+
     public static FunctionsApplicationBuilder AddHostServices(this FunctionsApplicationBuilder builder)
     {
         builder.Configuration
@@ -92,25 +95,20 @@ public static class ApiHostServices
             logging.IncludeFormattedMessage = true;
             logging.IncludeScopes = true;
             logging.ParseStateValues = true;
-            logging.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                .AddService(serviceName)
-                .AddAttributes([new KeyValuePair<string, object>("deployment.environment", builder.Environment.EnvironmentName)]));
-
-            if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
-                logging.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
-            }
+            logging.SetResourceBuilder(CreateResourceBuilder(serviceName, builder.Environment.EnvironmentName));
+            if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) logging.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
         });
 
         var openTelemetry = builder.Services
             .AddOpenTelemetry()
             .UseFunctionsWorkerDefaults()
-            .ConfigureResource(resource => resource
-                .AddService(serviceName)
-                .AddAttributes([new KeyValuePair<string, object>("deployment.environment", builder.Environment.EnvironmentName)]))
+            .ConfigureResource(resource => resource.AddService(serviceName).AddAttributes(CreateResourceAttributes(builder.Environment.EnvironmentName)))
             .WithTracing(tracing => {
                 tracing
                     .AddHttpClientInstrumentation()
-                    .AddSource("Azure.*", "Azure.Cosmos.Operation");
+                    .AddSource(serviceName)
+                    .AddSource(AzureCoreActivitySourceName)
+                    .AddSource(AzureCosmosActivitySourceName);
 
                 if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
                     tracing.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
@@ -118,7 +116,6 @@ public static class ApiHostServices
             })
             .WithMetrics(metrics => {
                 metrics.AddRuntimeInstrumentation();
-
                 if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) metrics.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
             });
 
@@ -130,5 +127,18 @@ public static class ApiHostServices
         }
 
         return builder;
+    }
+
+    private static ResourceBuilder CreateResourceBuilder(string serviceName, string environmentName)
+    {
+        return ResourceBuilder
+            .CreateDefault()
+            .AddService(serviceName)
+            .AddAttributes(CreateResourceAttributes(environmentName));
+    }
+
+    private static KeyValuePair<string, object>[] CreateResourceAttributes(string environmentName)
+    {
+        return [new KeyValuePair<string, object>("deployment.environment", environmentName)];
     }
 }

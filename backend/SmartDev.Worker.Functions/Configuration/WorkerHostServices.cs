@@ -20,6 +20,10 @@ namespace SmartDev.Worker.Functions.Configuration;
 /// </summary>
 public static class WorkerHostServices
 {
+    private const string AzureCommunicationEmailActivitySourceName = "Azure.Communication.Email";
+    private const string AzureCoreActivitySourceName = "Azure.Core";
+    private const string AzureServiceBusActivitySourceName = "Azure.Messaging.ServiceBus";
+
     public static FunctionsApplicationBuilder AddHostServices(this FunctionsApplicationBuilder builder)
     {
         builder.Configuration
@@ -92,36 +96,26 @@ public static class WorkerHostServices
             logging.IncludeFormattedMessage = true;
             logging.IncludeScopes = true;
             logging.ParseStateValues = true;
-            logging.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                .AddService(serviceName)
-                .AddAttributes([new KeyValuePair<string, object>("deployment.environment", builder.Environment.EnvironmentName)]));
-
-            if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
-                logging.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
-            }
+            logging.SetResourceBuilder(CreateResourceBuilder(serviceName, builder.Environment.EnvironmentName));
+            if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) logging.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
         });
 
         var openTelemetry = builder.Services
             .AddOpenTelemetry()
             .UseFunctionsWorkerDefaults()
-            .ConfigureResource(resource => resource
-                .AddService(serviceName)
-                .AddAttributes([new KeyValuePair<string, object>("deployment.environment", builder.Environment.EnvironmentName)]))
+            .ConfigureResource(resource => resource.AddService(serviceName).AddAttributes(CreateResourceAttributes(builder.Environment.EnvironmentName)))
             .WithTracing(tracing => {
                 tracing
                     .AddHttpClientInstrumentation()
-                    .AddSource("Azure.*");
-
-                if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
-                    tracing.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
-                }
+                    .AddSource(serviceName)
+                    .AddSource(AzureCommunicationEmailActivitySourceName)
+                    .AddSource(AzureCoreActivitySourceName)
+                    .AddSource(AzureServiceBusActivitySourceName);
+                if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) tracing.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
             })
             .WithMetrics(metrics => {
                 metrics.AddRuntimeInstrumentation();
-
-                if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) {
-                    metrics.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
-                }
+                if (!string.IsNullOrWhiteSpace(observabilityOptions.OtlpEndpoint)) metrics.AddOtlpExporter(options => options.Endpoint = new Uri(observabilityOptions.OtlpEndpoint));
             });
 
         var useAzureMonitorExporter = !string.IsNullOrWhiteSpace(observabilityOptions.ApplicationInsightsConnectionString);
@@ -132,5 +126,18 @@ public static class WorkerHostServices
         }
 
         return builder;
+    }
+
+    private static ResourceBuilder CreateResourceBuilder(string serviceName, string environmentName)
+    {
+        return ResourceBuilder
+            .CreateDefault()
+            .AddService(serviceName)
+            .AddAttributes(CreateResourceAttributes(environmentName));
+    }
+
+    private static KeyValuePair<string, object>[] CreateResourceAttributes(string environmentName)
+    {
+        return [new KeyValuePair<string, object>("deployment.environment", environmentName)];
     }
 }
