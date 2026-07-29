@@ -31,7 +31,10 @@ public sealed class HttpCorsMiddleware(HttpCorsHeaders corsHeaders) : IFunctions
         await next(context);
 
         if (string.IsNullOrWhiteSpace(allowedOrigin)) return;
-        if (context.GetInvocationResult().Value is not HttpResponseData response) return;
+
+        var invocationResult = context.GetInvocationResult<HttpResponseData>();
+        var response = invocationResult.Value;
+        if (response is null) return;
 
         HttpCorsHeaders.Apply(response, allowedOrigin);
     }

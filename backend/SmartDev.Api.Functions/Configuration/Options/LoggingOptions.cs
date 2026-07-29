@@ -13,6 +13,12 @@ public sealed class LoggingOptions
     public const string SectionName = "LoggingOptions";
 
     /// <summary>
+    /// Gets the service name used to enrich logs and identify the host in telemetry.
+    /// </summary>
+    [Required]
+    public string ServiceName { get; init; } = "SmartDev.Api.Functions";
+
+    /// <summary>
     /// Gets the file path where application logs should be written.
     /// </summary>
     [Required]

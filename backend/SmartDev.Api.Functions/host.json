@@ -25,6 +25,7 @@
     }
   },
   "LoggingOptions": {
+    "ServiceName": "SmartDev.Api.Functions",
     "LogFilePath": "Logs/api-functions.log"
   },
   "Observability": {

@@ -9,6 +9,7 @@
     "SubjectPrefix": "New portfolio contact message"
   },
   "LoggingOptions": {
+    "ServiceName": "SmartDev.Worker.Functions",
     "LogFilePath": "Logs/worker-functions.log"
   },
   "Observability": {

@@ -20,35 +20,39 @@ namespace SmartDev.Worker.Functions.Configuration;
 /// </summary>
 public static class WorkerHostServices
 {
-    private const string ServiceName = "SmartDev.Worker.Functions";
-
     public static FunctionsApplicationBuilder AddHostServices(this FunctionsApplicationBuilder builder)
     {
-        builder.ConfigureFunctionsWebApplication();
         builder.Configuration
             .AddJsonFile("host.json", optional: false, reloadOnChange: false)
             .AddEnvironmentVariables();
 
+        var loggingOptions = GetLoggingOptions(builder);
+
         builder
-            .AddSerilog(ServiceName)
-            .AddObservability(ServiceName);
+            .AddSerilog(loggingOptions)
+            .AddObservability(loggingOptions.ServiceName);
 
         return builder;
+    }
+
+    private static LoggingOptions GetLoggingOptions(FunctionsApplicationBuilder builder)
+    {
+        var loggingOptions = new LoggingOptions();
+        builder.Configuration.GetSection(LoggingOptions.SectionName).Bind(loggingOptions);
+
+        return loggingOptions;
     }
 
     /// <summary>
     /// Configures Serilog console and rolling file logging for the Worker Functions host.
     /// </summary>
-    private static FunctionsApplicationBuilder AddSerilog(this FunctionsApplicationBuilder builder, string serviceName)
+    private static FunctionsApplicationBuilder AddSerilog(this FunctionsApplicationBuilder builder, LoggingOptions loggingOptions)
     {
         builder.Services
             .AddOptions<LoggingOptions>()
             .Bind(builder.Configuration.GetSection(LoggingOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
-
-        var loggingOptions = new LoggingOptions();
-        builder.Configuration.GetSection(LoggingOptions.SectionName).Bind(loggingOptions);
 
         var logFile = Path.Combine(builder.Environment.ContentRootPath, loggingOptions.LogFilePath);
         Directory.CreateDirectory(Path.GetDirectoryName(logFile)!);
@@ -59,7 +63,7 @@ public static class WorkerHostServices
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
             .MinimumLevel.Override("System", LogEventLevel.Warning)
             .Enrich.FromLogContext()
-            .Enrich.WithProperty("ServiceName", serviceName)
+            .Enrich.WithProperty("ServiceName", loggingOptions.ServiceName)
             .Enrich.WithProperty("EnvironmentName", builder.Environment.EnvironmentName)
             .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}")
             .WriteTo.File(logFile, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 14, shared: true)
