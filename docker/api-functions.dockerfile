@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for SmartDev.Api.Functions (builds in the SDK image, runs on Azure Functions isolated runtime)
 
 # ---------- Build stage ----------
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy the solution and project files first so Docker can cache restore layers
@@ -22,7 +22,7 @@ RUN dotnet publish backend/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj 
     --no-restore
 
 # ---------- Runtime stage ----------
-FROM mcr.microsoft.com/azure-functions/dotnet-isolated:4-dotnet-isolated8.0 AS runtime
+FROM mcr.microsoft.com/azure-functions/dotnet-isolated:4-dotnet-isolated10.0 AS runtime
 
 # Configure the Azure Functions host
 ENV AzureWebJobsScriptRoot=/home/site/wwwroot \

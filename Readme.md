@@ -1,6 +1,6 @@
 # 💼 SmartDevApp
 
-![.NET](https://img.shields.io/badge/.NET-8-512BD4?logo=dotnet&logoColor=white)
+![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)
 ![Azure Functions](https://img.shields.io/badge/Azure_Functions-v4-0062AD?logo=azurefunctions&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
@@ -33,7 +33,7 @@ SmartDevApp is split across separately deployable frontend, API Functions, and W
 - Delivery-result event back to the API Functions boundary
 - Azure Communication Services email adapter
 - Local email sender for development
-- Serilog console and file logging
+- Serilog console logging
 - OpenTelemetry export with Application Insights support
 - Docker Compose local cloud emulator stack
 
@@ -52,7 +52,7 @@ SmartDevApp is split across separately deployable frontend, API Functions, and W
 
 ### ⚙️ Backend
 
-- .NET 8
+- .NET 10
 - Azure Functions isolated worker
 - Azure Functions HTTP triggers
 - Azure Functions Service Bus triggers
@@ -176,7 +176,7 @@ The queue names and integration contracts live in `SmartDev.Shared` so both func
 
 ### Prerequisites
 
-- .NET 8 SDK
+- .NET 10 SDK
 - Azure Functions Core Tools v4
 - Node.js 20+
 - Docker Desktop
