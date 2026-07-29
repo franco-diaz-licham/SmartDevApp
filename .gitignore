@@ -266,3 +266,4 @@ __pycache__/
 # folders
 /docs/planning
 *.pem
+.env

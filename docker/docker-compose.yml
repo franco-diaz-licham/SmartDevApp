@@ -84,7 +84,7 @@ services:
     image: api-functions:local
     container_name: smartdev-api-functions
     ports:
-      - "5136:80"
+      - "7084:80"
     depends_on:
       azurite:
         condition: service_healthy
@@ -118,7 +118,7 @@ services:
       api-functions:
         condition: service_started
     environment:
-      VITE_API_BASE_URL: "http://localhost:5136"
+      VITE_API_BASE_URL: "http://localhost:7084"
       VITE_API_VERSION: "v1"
       VITE_APP_NAME: "SmartDev"
       VITE_ENTRA_CLIENT_ID: "a08163b9-bc2e-4783-bda2-a04287d216ec"
