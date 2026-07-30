@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace SmartDev.Worker.Functions.Configuration.Options;
+namespace SmartDev.Shared.Options;
 
 /// <summary>
-/// Configures Serilog logging for the Worker Functions host.
+/// Configures host logging enrichment.
 /// </summary>
 public sealed class LoggingOptions
 {
@@ -16,6 +16,5 @@ public sealed class LoggingOptions
     /// Gets the service name used to enrich logs and identify the host in telemetry.
     /// </summary>
     [Required]
-    public string ServiceName { get; init; } = "SmartDev.Worker.Functions";
-
+    public string ServiceName { get; init; } = string.Empty;
 }

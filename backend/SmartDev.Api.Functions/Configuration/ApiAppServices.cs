@@ -9,7 +9,6 @@ using SmartDev.Api.Functions.Application.Ports;
 using SmartDev.Api.Functions.Configuration.Options;
 using SmartDev.Shared.Messaging;
 using SmartDev.Api.Functions.Application.Messaging.Handlers;
-using SmartDev.Api.Functions.Infrastructure.Options;
 using SmartDev.Api.Functions.Infrastructure.Persistence;
 using SmartDev.Shared.Options;
 using SmartDev.Api.Functions.Application.UsesCases;

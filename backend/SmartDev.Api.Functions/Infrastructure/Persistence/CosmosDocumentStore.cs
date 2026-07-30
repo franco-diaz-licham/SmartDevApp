@@ -3,7 +3,7 @@ using System.Text.Json;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;
 using SmartDev.Api.Functions.Application.Ports;
-using SmartDev.Api.Functions.Infrastructure.Options;
+using SmartDev.Api.Functions.Configuration.Options;
 
 namespace SmartDev.Api.Functions.Infrastructure.Persistence;
 

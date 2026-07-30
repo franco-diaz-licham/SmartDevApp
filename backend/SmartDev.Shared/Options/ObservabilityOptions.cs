@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Configuration;
 
-namespace SmartDev.Api.Functions.Configuration.Options;
+namespace SmartDev.Shared.Options;
 
 /// <summary>
-/// Configures observability exporters for the API Functions host.
+/// Configures observability exporters for Function hosts.
 /// </summary>
 public sealed class ObservabilityOptions
 {
@@ -27,11 +27,14 @@ public sealed class ObservabilityOptions
     /// <summary>
     /// Creates observability options from host configuration.
     /// </summary>
+    /// <param name="configuration">The host configuration source.</param>
+    /// <returns>The configured observability options.</returns>
     public static ObservabilityOptions FromConfiguration(IConfiguration configuration)
     {
         var options = new ObservabilityOptions();
         configuration.GetSection(SectionName).Bind(options);
         options.ApplicationInsightsConnectionString = configuration[ApplicationInsightsConnectionStringConfigurationKey] ?? string.Empty;
+
         return options;
     }
 }

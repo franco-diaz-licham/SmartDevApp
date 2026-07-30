@@ -11,7 +11,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Events;
-using SmartDev.Api.Functions.Configuration.Options;
+using SmartDev.Shared.Options;
 
 namespace SmartDev.Api.Functions.Configuration;
 

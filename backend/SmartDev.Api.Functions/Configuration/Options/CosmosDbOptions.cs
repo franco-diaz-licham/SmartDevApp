@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace SmartDev.Api.Functions.Infrastructure.Options;
+namespace SmartDev.Api.Functions.Configuration.Options;
 
 /// <summary>
 /// Configures the Azure Cosmos DB document store.
