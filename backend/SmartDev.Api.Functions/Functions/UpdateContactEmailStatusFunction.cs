@@ -1,13 +1,16 @@
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
 using SmartDev.Api.Functions.Application.UsesCases;
 using SmartDev.Shared.Messaging;
 using SmartDev.Shared.Options;
 
 namespace SmartDev.Api.Functions.Functions;
 
-public sealed class UpdateContactEmailStatusFunction(UpdateContactEmailStatusHandler handler)
+public sealed class UpdateContactEmailStatusFunction(
+    UpdateContactEmailStatusHandler handler,
+    ILogger<UpdateContactEmailStatusFunction> logger)
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
@@ -17,9 +20,26 @@ public sealed class UpdateContactEmailStatusFunction(UpdateContactEmailStatusHan
         ServiceBusReceivedMessage message,
         CancellationToken cancellationToken)
     {
-        var result = JsonSerializer.Deserialize<ContactEmailDeliveryResultModel>(message.Body.ToString(), SerializerOptions)
-            ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ContactEmailDeliveryResultModel)}.");
+        try {
+            logger.LogInformation(
+                "Received contact email delivery result from {QueueName}. MessageId: {MessageId}. DeliveryCount: {DeliveryCount}.",
+                ContactMessagingTopology.ContactEmailDeliveryResultQueue,
+                message.MessageId,
+                message.DeliveryCount);
 
-        await handler.HandleAsync(result, cancellationToken);
+            var result = JsonSerializer.Deserialize<ContactEmailDeliveryResultModel>(message.Body.ToString(), SerializerOptions)
+                ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ContactEmailDeliveryResultModel)}.");
+
+            await handler.HandleAsync(result, cancellationToken);
+        } catch (Exception exception) {
+            logger.LogError(
+                exception,
+                "Contact email delivery result processing failed. QueueName: {QueueName}. MessageId: {MessageId}. DeliveryCount: {DeliveryCount}.",
+                ContactMessagingTopology.ContactEmailDeliveryResultQueue,
+                message.MessageId,
+                message.DeliveryCount);
+
+            throw;
+        }
     }
 }

@@ -1,13 +1,16 @@
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
 using SmartDev.Shared.Messaging;
 using SmartDev.Shared.Options;
 using SmartDev.Worker.Functions.Application.UsesCases;
 
 namespace SmartDev.Worker.Functions.Functions;
 
-public sealed class SendContactEmailFunction(SendContactEmailHandler handler)
+public sealed class SendContactEmailFunction(
+    SendContactEmailHandler handler,
+    ILogger<SendContactEmailFunction> logger)
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
@@ -17,9 +20,26 @@ public sealed class SendContactEmailFunction(SendContactEmailHandler handler)
         ServiceBusReceivedMessage message,
         CancellationToken cancellationToken)
     {
-        var contactMessage = JsonSerializer.Deserialize<ContactMessageCreatedModel>(message.Body.ToString(), SerializerOptions)
-            ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ContactMessageCreatedModel)}.");
+        try {
+            logger.LogInformation(
+                "Received contact email message from {QueueName}. MessageId: {MessageId}. DeliveryCount: {DeliveryCount}.",
+                ContactMessagingTopology.ContactMessageCreatedQueue,
+                message.MessageId,
+                message.DeliveryCount);
 
-        await handler.HandleAsync(contactMessage, cancellationToken);
+            var contactMessage = JsonSerializer.Deserialize<ContactMessageCreatedModel>(message.Body.ToString(), SerializerOptions)
+                ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ContactMessageCreatedModel)}.");
+
+            await handler.HandleAsync(contactMessage, cancellationToken);
+        } catch (Exception exception) {
+            logger.LogError(
+                exception,
+                "Contact email message processing failed. QueueName: {QueueName}. MessageId: {MessageId}. DeliveryCount: {DeliveryCount}.",
+                ContactMessagingTopology.ContactMessageCreatedQueue,
+                message.MessageId,
+                message.DeliveryCount);
+
+            throw;
+        }
     }
 }

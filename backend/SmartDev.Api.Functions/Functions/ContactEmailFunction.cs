@@ -1,24 +1,31 @@
 using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Logging;
 using SmartDev.Api.Functions.Application.UsesCases;
 
 namespace SmartDev.Api.Functions.Functions;
 
-public sealed class ContactEmailFunction(CreateContactEmailHandler handler)
+public sealed class ContactEmailFunction(
+    CreateContactEmailHandler handler,
+    ILogger<ContactEmailFunction> logger)
 {
     [Function(nameof(ContactEmailFunction))]
     public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", "options", Route = "contactEmail")] HttpRequestData request, CancellationToken cancellationToken)
     {
+        logger.LogInformation("Received contact email HTTP request. Method: {HttpMethod}. Url: {Url}.", request.Method, request.Url);
         var body = await request.ReadFromJsonAsync<ContactEmailRequest>(cancellationToken);
         if (body is null) return await CreateJsonResponseAsync(request, HttpStatusCode.BadRequest, new ContactEmailErrorResponse("Request body is required."), cancellationToken);
 
         try {
             var result = await handler.HandleAsync(new CreateContactEmailCommand(body.Name, body.Email, body.Message), cancellationToken);
+            logger.LogInformation("Accepted contact email request. ContactMessageId: {ContactMessageId}.", result.ContactMessageId);
             return await CreateJsonResponseAsync(request, HttpStatusCode.Accepted, new ContactEmailAcceptedResponse(result.ContactMessageId), cancellationToken);
         } catch (ArgumentException exception) {
+            logger.LogWarning(exception, "Rejected contact email request because the request body was invalid.");
             return await CreateJsonResponseAsync(request, HttpStatusCode.BadRequest, new ContactEmailErrorResponse(exception.Message), cancellationToken);
         } catch (InvalidOperationException exception) {
+            logger.LogWarning(exception, "Rejected contact email request because the operation could not be completed.");
             return await CreateJsonResponseAsync(request, HttpStatusCode.Conflict, new ContactEmailErrorResponse(exception.Message), cancellationToken);
         }
     }
