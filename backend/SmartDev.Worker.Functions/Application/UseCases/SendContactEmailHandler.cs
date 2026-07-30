@@ -1,4 +1,5 @@
 using System.Net;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using SmartDev.Shared.Messaging;
 using SmartDev.Worker.Functions.Application.Ports;
@@ -11,6 +12,7 @@ public sealed class SendContactEmailHandler(
     ILogger<SendContactEmailHandler> logger)
 {
     private const string SubjectPrefix = "New portfolio contact message";
+    private const string ContactEmailTemplateResourceName = "SmartDev.Worker.Functions.Application.Templates.ContactEmail.html";
 
     public async Task HandleAsync(ContactMessageCreatedModel message, CancellationToken cancellationToken)
     {
@@ -62,26 +64,55 @@ public sealed class SendContactEmailHandler(
     private static string BuildPlainTextBody(ContactMessageCreatedModel message)
     {
         return $"""
-            New contact message received.
+            New contact message received
 
             From: {message.SenderName}
             Email: {message.SenderEmail}
             Contact Message Id: {message.ContactMessageId}
-            Occurred At: {message.OccurredAt:O}
+            Occurred At: {FormatOccurredAt(message)}
 
+            Message:
             {message.Message}
             """;
     }
 
     private static string BuildHtmlBody(ContactMessageCreatedModel message)
     {
-        return $"""
-            <h2>New contact message received</h2>
-            <p><strong>From:</strong> {WebUtility.HtmlEncode(message.SenderName)}</p>
-            <p><strong>Email:</strong> {WebUtility.HtmlEncode(message.SenderEmail)}</p>
-            <p><strong>Contact Message Id:</strong> {message.ContactMessageId}</p>
-            <p><strong>Occurred At:</strong> {message.OccurredAt:O}</p>
-            <p>{WebUtility.HtmlEncode(message.Message).Replace("\n", "<br />")}</p>
-            """;
+        var template = LoadContactEmailTemplate();
+
+        return template
+            .Replace("{{SenderName}}", HtmlEncode(message.SenderName), StringComparison.Ordinal)
+            .Replace("{{SenderEmail}}", HtmlEncode(message.SenderEmail), StringComparison.Ordinal)
+            .Replace("{{ContactMessageId}}", message.ContactMessageId.ToString(), StringComparison.Ordinal)
+            .Replace("{{OccurredAt}}", HtmlEncode(FormatOccurredAt(message)), StringComparison.Ordinal)
+            .Replace("{{Message}}", HtmlEncodeMultiline(message.Message), StringComparison.Ordinal);
+    }
+
+    private static string LoadContactEmailTemplate()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        using var stream = assembly.GetManifestResourceStream(ContactEmailTemplateResourceName)
+            ?? throw new InvalidOperationException($"Unable to load embedded resource {ContactEmailTemplateResourceName}.");
+
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
+
+    private static string FormatOccurredAt(ContactMessageCreatedModel message)
+    {
+        return $"{message.OccurredAt:dd MMM yyyy HH:mm:ss zzz} ({message.OccurredAt:O})";
+    }
+
+    private static string HtmlEncode(string value)
+    {
+        return WebUtility.HtmlEncode(value);
+    }
+
+    private static string HtmlEncodeMultiline(string value)
+    {
+        return HtmlEncode(value)
+            .Replace("\r\n", "\n", StringComparison.Ordinal)
+            .Replace("\r", "\n", StringComparison.Ordinal)
+            .Replace("\n", "<br>", StringComparison.Ordinal);
     }
 }
