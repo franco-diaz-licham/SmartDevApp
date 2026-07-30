@@ -21,16 +21,14 @@ public sealed class SendContactEmailFunction(
         CancellationToken cancellationToken)
     {
         try {
-            logger.LogInformation(
-                "Received contact email message from {QueueName}. MessageId: {MessageId}. DeliveryCount: {DeliveryCount}.",
-                ContactMessagingTopology.ContactMessageCreatedQueue,
-                message.MessageId,
-                message.DeliveryCount);
-
             var contactMessage = JsonSerializer.Deserialize<ContactMessageCreatedModel>(message.Body.ToString(), SerializerOptions)
                 ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ContactMessageCreatedModel)}.");
 
             await handler.HandleAsync(contactMessage, cancellationToken);
+
+            logger.LogInformation(
+                "Contact email message processed successfully. ContactMessageId: {ContactMessageId}.",
+                contactMessage.ContactMessageId);
         } catch (Exception exception) {
             logger.LogError(
                 exception,

@@ -13,7 +13,6 @@ public sealed class ContactEmailFunction(
     [Function(nameof(ContactEmailFunction))]
     public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", "options", Route = "contactEmail")] HttpRequestData request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Received contact email HTTP request. Method: {HttpMethod}. Url: {Url}.", request.Method, request.Url);
         var body = await request.ReadFromJsonAsync<ContactEmailRequest>(cancellationToken);
         if (body is null) return await CreateJsonResponseAsync(request, HttpStatusCode.BadRequest, new ContactEmailErrorResponse("Request body is required."), cancellationToken);
 
@@ -42,10 +41,7 @@ public sealed class ContactEmailFunction(
     }
 }
 
-public sealed record ContactEmailRequest(
-    string Name,
-    string Email,
-    string Message);
+public sealed record ContactEmailRequest(string Name, string Email, string Message);
 
 public sealed record ContactEmailAcceptedResponse(Guid ContactMessageId);
 

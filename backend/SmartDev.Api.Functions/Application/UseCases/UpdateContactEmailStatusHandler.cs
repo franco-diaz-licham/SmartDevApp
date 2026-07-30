@@ -14,21 +14,11 @@ public sealed class UpdateContactEmailStatusHandler(IContactMessageStore contact
         switch (result.Status) {
             case ContactEmailDeliveryStatus.Sent:
                 await contactMessageStore.MarkEmailSentAsync(contactMessageId, result.OccurredAt, cancellationToken);
-                logger.LogInformation("Contact message {ContactMessageId} marked as email sent", result.ContactMessageId);
                 return;
-
             case ContactEmailDeliveryStatus.Failed:
-                await contactMessageStore.MarkEmailFailedAsync(
-                    contactMessageId,
-                    result.FailureReason ?? "Email delivery failed.",
-                    cancellationToken);
-
-                logger.LogWarning(
-                    "Contact message {ContactMessageId} marked as email failed. Reason: {FailureReason}",
-                    result.ContactMessageId,
-                    result.FailureReason);
+                await contactMessageStore.MarkEmailFailedAsync(contactMessageId, result.FailureReason ?? "Email delivery failed.", cancellationToken);
+                logger.LogWarning("Contact message {ContactMessageId} marked as email failed. Reason: {FailureReason}", result.ContactMessageId, result.FailureReason);
                 return;
-
             default:
                 throw new InvalidOperationException($"Unsupported contact email delivery status {result.Status}.");
         }

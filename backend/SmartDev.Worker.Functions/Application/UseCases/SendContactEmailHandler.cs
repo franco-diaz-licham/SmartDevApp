@@ -17,49 +17,37 @@ public sealed class SendContactEmailHandler(
     public async Task HandleAsync(ContactMessageCreatedModel message, CancellationToken cancellationToken)
     {
         try {
-            await emailSender.SendAsync(
-                new EmailMessageModel(
-                    To: message.SenderEmail,
-                    Subject: BuildSubject(message),
-                    Body: BuildPlainTextBody(message),
-                    HtmlBody: BuildHtmlBody(message)),
-                cancellationToken);
+            var emailMessage = new EmailMessageModel(
+                To: message.SenderEmail,
+                Subject: BuildSubject(message),
+                Body: BuildPlainTextBody(message),
+                HtmlBody: BuildHtmlBody(message));
+
+            await emailSender.SendAsync(emailMessage, cancellationToken);
         } catch (Exception exception) {
-            await integrationEventPublisher.PublishAsync(
-                new ContactEmailDeliveryResultModel(
-                    ContactMessageId: message.ContactMessageId,
-                    Status: ContactEmailDeliveryStatus.Failed,
-                    OccurredAt: DateTimeOffset.UtcNow,
-                    FailureReason: exception.Message),
-                cancellationToken);
+            var failedDeliveryResult = new ContactEmailDeliveryResultModel(
+                ContactMessageId: message.ContactMessageId,
+                Status: ContactEmailDeliveryStatus.Failed,
+                OccurredAt: DateTimeOffset.UtcNow,
+                FailureReason: exception.Message);
 
-            logger.LogError(
-                exception,
-                "Contact message email failed for {ContactMessageId} from {SenderEmail}",
-                message.ContactMessageId,
-                message.SenderEmail);
+            await integrationEventPublisher.PublishAsync(failedDeliveryResult, cancellationToken);
 
+            logger.LogError(exception, "Contact message email failed for {ContactMessageId} from {SenderEmail}", message.ContactMessageId, message.SenderEmail);
             return;
         }
 
-        await integrationEventPublisher.PublishAsync(
-            new ContactEmailDeliveryResultModel(
-                ContactMessageId: message.ContactMessageId,
-                Status: ContactEmailDeliveryStatus.Sent,
-                OccurredAt: DateTimeOffset.UtcNow,
-                FailureReason: null),
-            cancellationToken);
+        var sentDeliveryResult = new ContactEmailDeliveryResultModel(
+            ContactMessageId: message.ContactMessageId,
+            Status: ContactEmailDeliveryStatus.Sent,
+            OccurredAt: DateTimeOffset.UtcNow,
+            FailureReason: null);
 
-        logger.LogInformation(
-            "Contact message email sent for {ContactMessageId} from {SenderEmail}",
-            message.ContactMessageId,
-            message.SenderEmail);
+        await integrationEventPublisher.PublishAsync(sentDeliveryResult, cancellationToken);
+        logger.LogInformation("Contact message email sent for {ContactMessageId} from {SenderEmail}", message.ContactMessageId, message.SenderEmail);
     }
 
-    private static string BuildSubject(ContactMessageCreatedModel message)
-    {
-        return $"{SubjectPrefix}: {message.SenderName}";
-    }
+    private static string BuildSubject(ContactMessageCreatedModel message) => $"{SubjectPrefix}: {message.SenderName}";
 
     private static string BuildPlainTextBody(ContactMessageCreatedModel message)
     {
@@ -81,36 +69,27 @@ public sealed class SendContactEmailHandler(
         var template = LoadContactEmailTemplate();
 
         return template
-            .Replace("{{SenderName}}", HtmlEncode(message.SenderName), StringComparison.Ordinal)
-            .Replace("{{SenderEmail}}", HtmlEncode(message.SenderEmail), StringComparison.Ordinal)
+            .Replace("{{SenderName}}", WebUtility.HtmlEncode(message.SenderName), StringComparison.Ordinal)
+            .Replace("{{SenderEmail}}", WebUtility.HtmlEncode(message.SenderEmail), StringComparison.Ordinal)
             .Replace("{{ContactMessageId}}", message.ContactMessageId.ToString(), StringComparison.Ordinal)
-            .Replace("{{OccurredAt}}", HtmlEncode(FormatOccurredAt(message)), StringComparison.Ordinal)
+            .Replace("{{OccurredAt}}", WebUtility.HtmlEncode(FormatOccurredAt(message)), StringComparison.Ordinal)
             .Replace("{{Message}}", HtmlEncodeMultiline(message.Message), StringComparison.Ordinal);
     }
 
     private static string LoadContactEmailTemplate()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream(ContactEmailTemplateResourceName)
-            ?? throw new InvalidOperationException($"Unable to load embedded resource {ContactEmailTemplateResourceName}.");
-
+        using var stream = assembly.GetManifestResourceStream(ContactEmailTemplateResourceName) ?? throw new InvalidOperationException($"Unable to load embedded resource {ContactEmailTemplateResourceName}.");
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
     }
 
-    private static string FormatOccurredAt(ContactMessageCreatedModel message)
-    {
-        return $"{message.OccurredAt:dd MMM yyyy HH:mm:ss zzz} ({message.OccurredAt:O})";
-    }
+    private static string FormatOccurredAt(ContactMessageCreatedModel message) => $"{message.OccurredAt:dd MMM yyyy HH:mm:ss zzz} ({message.OccurredAt:O})";
 
-    private static string HtmlEncode(string value)
-    {
-        return WebUtility.HtmlEncode(value);
-    }
 
     private static string HtmlEncodeMultiline(string value)
     {
-        return HtmlEncode(value)
+        return WebUtility.HtmlEncode(value)
             .Replace("\r\n", "\n", StringComparison.Ordinal)
             .Replace("\r", "\n", StringComparison.Ordinal)
             .Replace("\n", "<br>", StringComparison.Ordinal);

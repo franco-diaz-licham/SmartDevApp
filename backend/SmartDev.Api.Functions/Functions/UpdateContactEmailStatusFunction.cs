@@ -21,16 +21,11 @@ public sealed class UpdateContactEmailStatusFunction(
         CancellationToken cancellationToken)
     {
         try {
-            logger.LogInformation(
-                "Received contact email delivery result from {QueueName}. MessageId: {MessageId}. DeliveryCount: {DeliveryCount}.",
-                ContactMessagingTopology.ContactEmailDeliveryResultQueue,
-                message.MessageId,
-                message.DeliveryCount);
-
             var result = JsonSerializer.Deserialize<ContactEmailDeliveryResultModel>(message.Body.ToString(), SerializerOptions)
                 ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ContactEmailDeliveryResultModel)}.");
 
             await handler.HandleAsync(result, cancellationToken);
+            logger.LogInformation("Contact email delivery result processed successfully. ContactMessageId: {ContactMessageId}. Status: {Status}.", result.ContactMessageId, result.Status);
         } catch (Exception exception) {
             logger.LogError(
                 exception,

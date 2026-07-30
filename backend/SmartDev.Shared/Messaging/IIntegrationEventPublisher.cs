@@ -9,6 +9,12 @@ namespace SmartDev.Shared.Messaging;
 /// </remarks>
 public interface IIntegrationEventPublisher
 {
+    /// <summary>
+    /// Publishes an integration event model to its configured message endpoint.
+    /// </summary>
+    /// <typeparam name="TIntegrationEventModel">The integration event model type.</typeparam>
+    /// <param name="integrationEventModel">The integration event model to publish.</param>
+    /// <param name="cancellationToken">The token used to cancel the operation.</param>
     Task PublishAsync<TIntegrationEventModel>(TIntegrationEventModel integrationEventModel, CancellationToken cancellationToken = default)
         where TIntegrationEventModel : class;
 }
@@ -19,5 +25,10 @@ public interface IIntegrationEventPublisher
 public interface IIntegrationEventHandler<TIntegrationEvent>
     where TIntegrationEvent : IIntegrationEvent
 {
+    /// <summary>
+    /// Handles an integration event consumed from the message bus.
+    /// </summary>
+    /// <param name="integrationEvent">The integration event to handle.</param>
+    /// <param name="cancellationToken">The token used to cancel the operation.</param>
     Task HandleAsync(TIntegrationEvent integrationEvent, CancellationToken cancellationToken);
 }
