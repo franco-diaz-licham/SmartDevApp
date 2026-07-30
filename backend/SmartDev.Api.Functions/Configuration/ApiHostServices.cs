@@ -83,11 +83,14 @@ public static class ApiHostServices
     {
         builder.Services
             .AddOptions<ObservabilityOptions>()
-            .Bind(builder.Configuration.GetSection(ObservabilityOptions.SectionName))
+            .Configure(options => {
+                var configuredOptions = ObservabilityOptions.FromConfiguration(builder.Configuration);
+                options.OtlpEndpoint = configuredOptions.OtlpEndpoint;
+                options.ApplicationInsightsConnectionString = configuredOptions.ApplicationInsightsConnectionString;
+            })
             .ValidateOnStart();
 
-        var observabilityOptions = new ObservabilityOptions();
-        builder.Configuration.GetSection(ObservabilityOptions.SectionName).Bind(observabilityOptions);
+        var observabilityOptions = ObservabilityOptions.FromConfiguration(builder.Configuration);
 
         AppContext.SetSwitch("Azure.Experimental.EnableActivitySource", true);
 

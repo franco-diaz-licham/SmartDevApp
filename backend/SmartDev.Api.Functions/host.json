@@ -28,8 +28,7 @@
     "ServiceName": "SmartDev.Api.Functions"
   },
   "Observability": {
-    "OtlpEndpoint": "http://localhost:4317",
-    "ApplicationInsightsConnectionString": ""
+    "OtlpEndpoint": "http://localhost:4317"
   },
   "logging": {
     "applicationInsights": {

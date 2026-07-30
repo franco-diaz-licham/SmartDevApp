@@ -8,7 +8,6 @@
     "ServiceName": "SmartDev.Worker.Functions"
   },
   "Observability": {
-    "OtlpEndpoint": "http://localhost:4317",
-    "ApplicationInsightsConnectionString": ""
+    "OtlpEndpoint": "http://localhost:4317"
   }
 }
