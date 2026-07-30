@@ -1,29 +1,24 @@
 using System.Net;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SmartDev.Shared.Messaging;
 using SmartDev.Worker.Functions.Application.Ports;
-using SmartDev.Worker.Functions.Infrastructure.Options;
 
 namespace SmartDev.Worker.Functions.Application.UsesCases;
 
 public sealed class SendContactEmailHandler(
     IEmailSender emailSender,
-    IOptions<ContactEmailOptions> options,
     IIntegrationEventPublisher integrationEventPublisher,
     ILogger<SendContactEmailHandler> logger)
 {
-    private readonly ContactEmailOptions _options = options.Value;
+    private const string SubjectPrefix = "New portfolio contact message";
 
     public async Task HandleAsync(ContactMessageCreatedModel message, CancellationToken cancellationToken)
     {
-        var subject = $"{_options.SubjectPrefix}: {message.SenderName}";
-
         try {
             await emailSender.SendAsync(
                 new EmailMessageModel(
-                    To: _options.RecipientAddress,
-                    Subject: subject,
+                    To: message.SenderEmail,
+                    Subject: BuildSubject(message),
                     Body: BuildPlainTextBody(message),
                     HtmlBody: BuildHtmlBody(message)),
                 cancellationToken);
@@ -57,6 +52,11 @@ public sealed class SendContactEmailHandler(
             "Contact message email sent for {ContactMessageId} from {SenderEmail}",
             message.ContactMessageId,
             message.SenderEmail);
+    }
+
+    private static string BuildSubject(ContactMessageCreatedModel message)
+    {
+        return $"{SubjectPrefix}: {message.SenderName}";
     }
 
     private static string BuildPlainTextBody(ContactMessageCreatedModel message)

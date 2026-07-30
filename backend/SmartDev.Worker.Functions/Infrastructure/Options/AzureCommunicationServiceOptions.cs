@@ -23,4 +23,5 @@ public sealed class AzureCommunicationServiceOptions
     /// </summary>
     [Required]
     public string SenderAddress { get; init; } = string.Empty;
+
 }

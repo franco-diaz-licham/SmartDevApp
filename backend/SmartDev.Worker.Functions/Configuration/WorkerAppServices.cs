@@ -18,7 +18,6 @@ public static class WorkerAppServices
         services
             .AddApplicationServices()
             .AddEmailServices(configuration, environment)
-            .AddContactEmailServices(configuration)
             .AddMessagingServices(configuration);
 
         return services;
@@ -47,17 +46,6 @@ public static class WorkerAppServices
             .ValidateOnStart();
 
         services.AddSingleton<IEmailSender, AzureCommunicationEmailSender>();
-
-        return services;
-    }
-
-    private static IServiceCollection AddContactEmailServices(this IServiceCollection services, IConfiguration configuration)
-    {
-        services
-            .AddOptions<ContactEmailOptions>()
-            .Bind(configuration.GetSection(ContactEmailOptions.SectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
 
         return services;
     }

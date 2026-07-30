@@ -18,5 +18,5 @@ public sealed class ObservabilityOptions
     /// <summary>
     /// Gets the Application Insights connection string used by Azure Monitor telemetry export.
     /// </summary>
-    public string ApplicationInsightsConnectionString { get; init; } = string.Empty;
+    public string ApplicationInsightsConnectionString { get; set; } = string.Empty;
 }

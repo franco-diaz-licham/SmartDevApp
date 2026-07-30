@@ -4,10 +4,6 @@
     "ConnectionString": "endpoint=https://localhost/;accesskey=fake",
     "SenderAddress": "DoNotReply@localhost"
   },
-  "ContactEmail": {
-    "RecipientAddress": "developer@localhost",
-    "SubjectPrefix": "New portfolio contact message"
-  },
   "LoggingOptions": {
     "ServiceName": "SmartDev.Worker.Functions"
   },
