@@ -127,8 +127,6 @@ jobs:
             throw "Missing API_FUNCTION_RESOURCE_GROUP repository secret."
           }
 
-          $packagePath = Join-Path $env:RUNNER_TEMP $env:PACKAGE_NAME
-
           az functionapp update `
             --resource-group $env:API_FUNCTION_RESOURCE_GROUP `
             --name $env:API_FUNCTION_APP_NAME `

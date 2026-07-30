@@ -14,7 +14,6 @@ on:
 env:
   DOTNET_VERSION: 10.0.x
   PROJECT_PATH: backend/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj
-  PACKAGE_NAME: worker-functions.zip
   WORKER_FUNCTION_APP_NAME: ${{ secrets.WORKER_FUNCTION_APP_NAME }}
   WORKER_FUNCTION_RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
@@ -56,32 +55,31 @@ jobs:
             --output $publishPath `
             --no-restore
 
-      # Package the published Function App output for Azure zip deployment.
-      - name: Create deployment package
+      # Fail early if the published Function App output is missing the files Azure Functions needs for indexing.
+      - name: Check published Worker Functions artifact
         run: |
           $publishPath = Join-Path $env:RUNNER_TEMP "worker-functions-publish"
-          $packagePath = Join-Path $env:RUNNER_TEMP $env:PACKAGE_NAME
 
           if (-not (Test-Path $publishPath)) {
             throw "Missing publish folder: $publishPath"
           }
 
-          if (Test-Path $packagePath) {
-            Remove-Item $packagePath -Force
+          $hostPath = Join-Path $publishPath "host.json"
+          if (-not (Test-Path $hostPath)) {
+            throw "The Worker Functions artifact is missing host.json at the publish root."
           }
 
-          Compress-Archive -Path "$publishPath/*" -DestinationPath $packagePath -Force
-
-      # Fail early if the deployment package was not created.
-      - name: Check deployment package
-        run: |
-          $packagePath = Join-Path $env:RUNNER_TEMP $env:PACKAGE_NAME
-
-          if (-not (Test-Path $packagePath)) {
-            throw "Missing deployment package: $packagePath"
+          $azureFunctionsPath = Join-Path $publishPath ".azurefunctions"
+          if (-not (Test-Path $azureFunctionsPath)) {
+            throw "The Worker Functions artifact is missing .azurefunctions at the publish root."
           }
 
-          Get-Item $packagePath
+          $metadataPath = Join-Path $publishPath "functions.metadata"
+          if (-not (Test-Path $metadataPath)) {
+            throw "The Worker Functions artifact is missing functions.metadata at the publish root."
+          }
+
+          Get-Content $metadataPath
 
       # Log in with the repository service principal so the workflow can deploy the Function App.
       - name: Azure login
@@ -118,8 +116,8 @@ jobs:
               --net-framework-version "v10.0"
           }
 
-      # Deploy the Worker Functions package to the configured Azure Function App.
-      - name: Deploy Worker Functions
+      # Apply simple Function App settings that are owned by the app resource rather than the package.
+      - name: Configure Worker Function App
         run: |
           if ([string]::IsNullOrWhiteSpace($env:WORKER_FUNCTION_APP_NAME)) {
             throw "Missing WORKER_FUNCTION_APP_NAME repository secret."
@@ -129,18 +127,23 @@ jobs:
             throw "Missing WORKER_FUNCTION_RESOURCE_GROUP repository secret."
           }
 
-          $packagePath = Join-Path $env:RUNNER_TEMP $env:PACKAGE_NAME
-
           az functionapp update `
             --resource-group $env:WORKER_FUNCTION_RESOURCE_GROUP `
             --name $env:WORKER_FUNCTION_APP_NAME `
             --set httpsOnly=true
 
-          az functionapp deployment source config-zip `
-            --resource-group $env:WORKER_FUNCTION_RESOURCE_GROUP `
-            --name $env:WORKER_FUNCTION_APP_NAME `
-            --src $packagePath
+      # Deploy the published Worker Functions folder using the Azure Functions action so Flex Consumption uses One Deploy.
+      - name: Deploy Worker Functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.WORKER_FUNCTION_APP_NAME }}
+          package: ${{ runner.temp }}/worker-functions-publish
+          sku: flexconsumption
+          remote-build: false
 
+      # List the functions Azure indexed after deployment.
+      - name: List Worker Functions
+        run: |
           az functionapp function list `
             --resource-group $env:WORKER_FUNCTION_RESOURCE_GROUP `
             --name $env:WORKER_FUNCTION_APP_NAME `
