@@ -51,7 +51,7 @@ jobs:
             throw "Missing API_BASE_URL repository secret."
           }
 
-          "VITE_API_BASE=${{ env.API_BASE_URL }}" | Out-File -FilePath "${{ env.BUILD_DIR }}/.env.production" -Encoding utf8
+          "VITE_API_BASE_URL=${{ env.API_BASE_URL }}" | Out-File -FilePath "${{ env.BUILD_DIR }}/.env.production" -Encoding utf8
 
       # Produce the Static Web Apps artifact in frontend/dist.
       - name: Build frontend
