@@ -105,11 +105,6 @@ jobs:
             --name $env:API_FUNCTION_APP_NAME `
             --output json | ConvertFrom-Json
 
-          az functionapp config appsettings set `
-            --resource-group $env:API_FUNCTION_RESOURCE_GROUP `
-            --name $env:API_FUNCTION_APP_NAME `
-            --settings FUNCTIONS_WORKER_RUNTIME=dotnet-isolated FUNCTIONS_EXTENSION_VERSION=~4 WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED=1
-
           if ($functionApp.reserved -eq $true) {
             az functionapp config set `
               --resource-group $env:API_FUNCTION_RESOURCE_GROUP `
@@ -136,7 +131,7 @@ jobs:
 
           $packagePath = Join-Path $env:RUNNER_TEMP $env:PACKAGE_NAME
 
-          az webapp update `
+          az functionapp update `
             --resource-group $env:API_FUNCTION_RESOURCE_GROUP `
             --name $env:API_FUNCTION_APP_NAME `
             --set httpsOnly=true
