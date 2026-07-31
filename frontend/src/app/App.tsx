@@ -1,13 +1,11 @@
-import { Button } from '../components/ui/AppButton';
+import { PrimeReactProvider } from '@primereact/core/config';
+import { primeReactConfig } from './primeReactConfig';
+import { AppButton } from '@/components/ui/AppButton';
 
-function App() {
-  return (
-    <>
-      <div className="p-40">
-        <Button variant="outline">SmartDev</Button>
-      </div>
-    </>
-  );
-}
+export const App = () => (
+  <PrimeReactProvider {...primeReactConfig}>
+    <AppButton>SmartDev</AppButton>
+  </PrimeReactProvider>
+);
 
 export default App;

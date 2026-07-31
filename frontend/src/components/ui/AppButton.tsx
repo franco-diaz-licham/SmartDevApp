@@ -1,32 +1,33 @@
-import type { ButtonHTMLAttributes } from 'react';
 import { cn } from '@/lib/cn';
+import type { ButtonProps } from '@primereact/types/primitive/button';
+import type { PropsWithChildren } from 'react';
+import { Button } from 'primereact/button';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline';
+type ButtonVariant = 'primary' | 'secondary';
 
-interface AppButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface AppButtonProps extends PropsWithChildren<Omit<ButtonProps, 'variant'>> {
   variant?: ButtonVariant;
 }
 
 export const AppButton = ({ children, className, disabled, variant = 'primary', ...buttonProps }: AppButtonProps) => {
-  const buttonClassName = cn(
-    'inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4',
-    'text-sm font-semibold transition',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-    disabled && 'cursor-not-allowed opacity-60',
-    variant === 'primary' && 'bg-primary text-primary-foreground',
-    variant === 'primary' && !disabled && 'hover:bg-accent',
-    variant === 'secondary' && 'border border-border bg-muted text-foreground',
-    variant === 'secondary' && !disabled && 'hover:bg-card',
-    variant === 'outline' && 'border border-primary bg-background text-primary',
-    variant === 'outline' && !disabled && 'hover:bg-primary hover:text-primary-foreground',
-    className
-  );
-
   return (
-    <button {...buttonProps} disabled={disabled} className={buttonClassName} type="button">
+    <Button
+      {...buttonProps}
+      disabled={disabled}
+      className={cn(
+        'inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4',
+        'text-sm font-semibold transition',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary',
+        disabled && 'cursor-not-allowed opacity-60',
+        variant === 'primary' && 'bg-brand-primary text-white',
+        variant === 'primary' && !disabled && 'hover:bg-brand-primary-hover',
+        variant === 'secondary' && 'border border-brand-border bg-brand-surface text-brand-heading',
+        variant === 'secondary' && !disabled && 'hover:bg-brand-surface-muted',
+        className
+      )}
+      type="button"
+    >
       {children}
-    </button>
+    </Button>
   );
 };
-
-export { AppButton as Button };
