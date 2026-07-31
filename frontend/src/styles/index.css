@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+@import 'tailwindcss';
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+
+  --primary: #008afc;
+  --primary-foreground: #ffffff;
+
+  --secondary: #6e006e;
+  --secondary-foreground: #ffffff;
+
+  --muted: #f3f3f3;
+  --muted-foreground: #4f4f4f;
+
+  --accent: #0044ff;
+  --accent-foreground: #ffffff;
+
+  --destructive: #d32f2f;
+
+  --border: #d4d4d4;
+  --ring: #008afc;
+  --card: rgba(176, 176, 176, 0.5);
+  --card-foreground: #000000;
+  --footer: #000000;
+  --footer-foreground: #ffffff;
+  --shadow: rgb(160 160 160 / 0.75);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-footer: var(--footer);
+  --color-footer-foreground: var(--footer-foreground);
+  --font-sans: 'Raleway', sans-serif;
+}
+
+@layer base {
+  html {
+    font-size: 20px;
+    scroll-behavior: smooth;
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: 'Raleway', sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0;
+    min-width: 320px;
+  }
+
+  h1 {
+    color: var(--foreground);
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--foreground);
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  h5 {
+    color: var(--secondary);
+    text-transform: uppercase;
+  }
+
+  p,
+  li,
+  label {
+    color: var(--foreground);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  input,
+  textarea,
+  select {
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    font-family: inherit;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  html {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 3rem;
+  }
+}
+
+@media screen and (min-width: 601px) and (max-width: 767px) {
+  html {
+    font-size: 20px;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+  html {
+    font-size: 26px;
+  }
+}
+
+@media screen and (min-width: 992px) and (max-width: 1199px) {
+  html {
+    font-size: 30px;
+  }
+}
