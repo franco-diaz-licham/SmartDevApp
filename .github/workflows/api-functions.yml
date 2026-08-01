@@ -2,14 +2,6 @@ name: API Functions
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - "backend/SmartDev.Api.Functions/**"
-      - "backend/SmartDev.Shared/**"
-      - "backend/SmartDev.slnx"
-      - ".github/workflows/api-functions.yml"
 
 env:
   DOTNET_VERSION: 10.0.x
@@ -55,82 +47,11 @@ jobs:
             --output $publishPath `
             --no-restore
 
-      # Fail early if the published Function App output is missing the files Azure Functions needs for indexing.
-      - name: Check published API Functions artifact
-        run: |
-          $publishPath = Join-Path $env:RUNNER_TEMP "api-functions-publish"
-
-          if (-not (Test-Path $publishPath)) {
-            throw "Missing publish folder: $publishPath"
-          }
-
-          $hostPath = Join-Path $publishPath "host.json"
-          if (-not (Test-Path $hostPath)) {
-            throw "The API Functions artifact is missing host.json at the publish root."
-          }
-
-          $azureFunctionsPath = Join-Path $publishPath ".azurefunctions"
-          if (-not (Test-Path $azureFunctionsPath)) {
-            throw "The API Functions artifact is missing .azurefunctions at the publish root."
-          }
-
-          $metadataPath = Join-Path $publishPath "functions.metadata"
-          if (-not (Test-Path $metadataPath)) {
-            throw "The API Functions artifact is missing functions.metadata at the publish root."
-          }
-
-          Get-Content $metadataPath
-
       # Log in with the repository service principal so the workflow can deploy the Function App.
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ env.AZURE_CREDENTIALS }}
-
-      # Configure the API Function App runtime stack before deployment so Azure matches the project target framework.
-      - name: Configure API Function runtime
-        run: |
-          if ([string]::IsNullOrWhiteSpace($env:API_FUNCTION_APP_NAME)) {
-            throw "Missing API_FUNCTION_APP_NAME repository secret."
-          }
-
-          if ([string]::IsNullOrWhiteSpace($env:API_FUNCTION_RESOURCE_GROUP)) {
-            throw "Missing API_FUNCTION_RESOURCE_GROUP repository secret."
-          }
-
-          $functionApp = az functionapp show `
-            --resource-group $env:API_FUNCTION_RESOURCE_GROUP `
-            --name $env:API_FUNCTION_APP_NAME `
-            --output json | ConvertFrom-Json
-
-          if ($functionApp.reserved -eq $true) {
-            az functionapp config set `
-              --resource-group $env:API_FUNCTION_RESOURCE_GROUP `
-              --name $env:API_FUNCTION_APP_NAME `
-              --linux-fx-version "DOTNET-ISOLATED|10.0"
-          }
-          else {
-            az functionapp config set `
-              --resource-group $env:API_FUNCTION_RESOURCE_GROUP `
-              --name $env:API_FUNCTION_APP_NAME `
-              --net-framework-version "v10.0"
-          }
-
-      # Apply simple Function App settings that are owned by the app resource rather than the package.
-      - name: Configure API Function App
-        run: |
-          if ([string]::IsNullOrWhiteSpace($env:API_FUNCTION_APP_NAME)) {
-            throw "Missing API_FUNCTION_APP_NAME repository secret."
-          }
-
-          if ([string]::IsNullOrWhiteSpace($env:API_FUNCTION_RESOURCE_GROUP)) {
-            throw "Missing API_FUNCTION_RESOURCE_GROUP repository secret."
-          }
-
-          az functionapp update `
-            --resource-group $env:API_FUNCTION_RESOURCE_GROUP `
-            --name $env:API_FUNCTION_APP_NAME `
-            --set httpsOnly=true
 
       # Deploy the published API Functions folder using the Azure Functions action so Flex Consumption uses One Deploy.
       - name: Deploy API Functions

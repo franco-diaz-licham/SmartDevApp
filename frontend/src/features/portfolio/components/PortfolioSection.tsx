@@ -15,6 +15,5 @@ export const PortfolioSection = ({ children, shaded = false, title }: PortfolioS
   );
 
   if (shaded) return <section className="bg-muted">{content}</section>;
-
   return <section>{content}</section>;
 };

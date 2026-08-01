@@ -2,35 +2,34 @@ name: Frontend
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - "frontend/**"
-      - ".github/workflows/frontend.yml"
 
 env:
   BUILD_DIR: frontend
   OUTPUT_DIR: dist
-  NODE_VERSION: 20.x
+  NODE_VERSION: 22.x
   SWA_NAME: ${{ secrets.SWA_NAME }}
-  SWA_RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
-  API_BASE_URL: ${{ secrets.API_BASE_URL }}
+  SWA_RESOURCE_GROUP: ${{ secrets.SWA_RESOURCE_GROUP }}
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+  VITE_API_BASE_URL: ${{ secrets.API_BASE_URL }}
+  VITE_ENTRA_CLIENT_ID: ${{ secrets.ENTRA_CLIENT_ID }}
+  VITE_ENTRA_AUTHORITY: ${{ secrets.ENTRA_AUTHORITY }}
+  VITE_ENTRA_API_SCOPE: ${{ secrets.ENTRA_API_SCOPE }}
 
 jobs:
   build-and-deploy:
     name: Build and Deploy Frontend
     runs-on: ubuntu-latest
+
     defaults:
       run:
         shell: pwsh
 
     steps:
-      # Checkout, install Node.js, and restore frontend dependencies from package-lock.json.
+      # Checkout the repository so the React application and package-lock.json are available to the workflow.
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Install the Node.js version used to build the frontend and enable npm dependency caching.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -38,68 +37,42 @@ jobs:
           cache: npm
           cache-dependency-path: ${{ env.BUILD_DIR }}/package-lock.json
 
-      # npm optional dependency handling is kept explicit because Rollup uses native packages on Linux.
-      - name: Install dependencies
+      # Restore the exact dependency versions recorded in package-lock.json, including Rollup's Linux optional packages.
+      - name: Install frontend dependencies
         working-directory: ${{ env.BUILD_DIR }}
-        run: |
-          npm ci --include=optional
+        run: npm ci --include=optional
 
-      # Vite reads this value at build time, so CI writes the production API base URL before building.
-      - name: Create production environment file
-        run: |
-          if ([string]::IsNullOrWhiteSpace($env:API_BASE_URL)) {
-            throw "Missing API_BASE_URL repository secret."
-          }
+      # Run the frontend test suite before producing the deployable artifact.
+      - name: Run frontend tests
+        working-directory: ${{ env.BUILD_DIR }}
+        run: npm run test
 
-          "VITE_API_BASE_URL=${{ env.API_BASE_URL }}" | Out-File -FilePath "${{ env.BUILD_DIR }}/.env.production" -Encoding utf8
-
-      # Produce the Static Web Apps artifact in frontend/dist.
+      # Build the production Vite application into frontend/dist.
+      # Vite reads the VITE_* environment variables above and embeds them into the generated browser bundle.
       - name: Build frontend
         working-directory: ${{ env.BUILD_DIR }}
         run: npm run build
 
-      # Static Web Apps reads its config file from the deployed artifact root.
-      - name: Include Static Web Apps config
-        run: |
-          Copy-Item "${{ env.BUILD_DIR }}/staticwebapp.config.json" "${{ env.BUILD_DIR }}/${{ env.OUTPUT_DIR }}/staticwebapp.config.json" -Force
-
-      # Fail early if the expected build output is missing.
-      - name: Check build artifacts
-        run: |
-          $artifactPath = Join-Path $env:GITHUB_WORKSPACE "$env:BUILD_DIR/$env:OUTPUT_DIR"
-
-          if (-not (Test-Path $artifactPath)) {
-            throw "Missing build folder: $artifactPath"
-          }
-
-          Get-ChildItem $artifactPath
-
-      # Log in with the repository service principal so the workflow can retrieve the SWA deployment token.
+      # Log in with the repository service principal so the workflow can retrieve the Static Web Apps deployment token.
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ env.AZURE_CREDENTIALS }}
 
-      # Deploy the pre-built static artifact to Azure Static Web Apps production.
-      - name: Deploy to Azure Static Web Apps
+      # Deploy the pre-built frontend/dist artifact to the production Azure Static Web Apps environment.
+      - name: Deploy frontend
         run: |
-          if ([string]::IsNullOrWhiteSpace($env:SWA_NAME)) {
-            throw "Missing SWA_NAME repository secret."
-          }
+          $artifactPath = Join-Path `
+            $env:GITHUB_WORKSPACE `
+            "$env:BUILD_DIR/$env:OUTPUT_DIR"
 
-          if ([string]::IsNullOrWhiteSpace($env:SWA_RESOURCE_GROUP)) {
-            throw "Missing SWA_RESOURCE_GROUP repository secret."
-          }
-
-          $artifactPath = Join-Path $env:GITHUB_WORKSPACE "$env:BUILD_DIR/$env:OUTPUT_DIR"
           $deploymentToken = az staticwebapp secrets list `
             --name $env:SWA_NAME `
             --resource-group $env:SWA_RESOURCE_GROUP `
             --query "properties.apiKey" `
-            -o tsv
+            --output tsv
 
-          if ([string]::IsNullOrWhiteSpace($deploymentToken)) {
-            throw "Could not retrieve Azure Static Web Apps deployment token."
-          }
-
-          npx @azure/static-web-apps-cli@2 deploy $artifactPath --env production --deployment-token $deploymentToken
+          npx --yes @azure/static-web-apps-cli@2 deploy `
+            $artifactPath `
+            --env production `
+            --deployment-token $deploymentToken

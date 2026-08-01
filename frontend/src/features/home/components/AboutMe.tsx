@@ -4,7 +4,7 @@ export const AboutMe = () => {
   return (
     <section id="about-me" className="mx-auto grid max-w-[1320px] scroll-mt-32 gap-8 px-4 py-16 md:grid-cols-4">
       <div className="md:col-span-3">
-        <h1 className="pb-4 text-left text-5xl font-bold uppercase leading-[1.1]">About Me</h1>
+        <h1 className="pb-6 text-left text-5xl font-bold uppercase leading-[1.1]">About Me</h1>
         <img src={meImage} className="mx-auto mb-6 block w-1/2 rounded-full border border-[#9e9e9e] shadow-[0_10px_15px_rgb(160_160_160_/_0.75)] md:hidden" alt="Franco Diaz Licham" />
         <p className="mb-4">
           Hi, I'm <strong>Franco Diaz</strong>, a Software Developer based in Western Sydney, Australia. <em>SmartDev</em> began as a personal project I created in my own time - a way to share my passion for building software solutions and to
