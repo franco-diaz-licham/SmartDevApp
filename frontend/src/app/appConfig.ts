@@ -13,5 +13,6 @@ export const appConfig = {
   appName: readEnvValue('VITE_APP_NAME', 'EarlyLearner'),
   entraClientId: readEnvValue('VITE_ENTRA_CLIENT_ID'),
   entraApiScope: readEnvValue('VITE_ENTRA_API_SCOPE'),
-  entraAuthority: readEnvValue('VITE_ENTRA_AUTHORITY')
+  entraAuthority: readEnvValue('VITE_ENTRA_AUTHORITY'),
+  primeReactLicense: readEnvValue('VITE_PRIMEREACT_LICENSE_KEY')
 } as const;

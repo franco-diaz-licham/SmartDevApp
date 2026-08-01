@@ -1,10 +1,10 @@
-import { PrimeReactProvider } from '@primereact/core/config';
+import { PrimeReactProvider } from '@primereact/core';
 import { primeReactConfig } from './primeReactConfig';
 import { AppButton } from '@/components/ui/AppButton';
 
 export const App = () => (
   <PrimeReactProvider {...primeReactConfig}>
-    <AppButton>SmartDev</AppButton>
+    <AppButton appearance="primary">SmartDev</AppButton>
   </PrimeReactProvider>
 );
 

@@ -1,35 +1,38 @@
 import { cn } from '@/lib/cn';
 import { cva, type VariantProps } from 'class-variance-authority';
-import type { ButtonProps } from '@primereact/types/primitive/button';
-import type { PropsWithChildren } from 'react';
 import { Button } from 'primereact/button';
+import type { ButtonHTMLAttributes } from 'react';
 
 const buttonVariants = cva(
   [
     'inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4',
     'text-sm font-semibold transition',
+    'enabled:hover:cursor-pointer',
     'focus-visible:outline-2 focus-visible:outline-offset-2',
-    'focus-visible:outline-brand-primary',
+    'focus-visible:outline-ring',
     'disabled:cursor-not-allowed disabled:opacity-60'
   ],
   {
     variants: {
-      variant: {
-        primary: ['bg-brand-primary text-white', 'enabled:hover:bg-brand-primary-hover'],
-        secondary: ['border border-brand-border', 'bg-brand-surface text-brand-heading', 'enabled:hover:bg-brand-surface-muted']
+      appearance: {
+        primary: 'bg-primary text-primary-foreground enabled:hover:bg-accent',
+        secondary: 'border border-border bg-muted text-foreground enabled:hover:bg-background'
       }
     },
     defaultVariants: {
-      variant: 'primary'
+      appearance: 'primary'
     }
   }
 );
 
-interface AppButtonProps extends PropsWithChildren<Omit<ButtonProps, 'variant'>>, VariantProps<typeof buttonVariants> {}
+type AppButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> &
+  VariantProps<typeof buttonVariants> & {
+    className?: string;
+  };
 
-export const AppButton = ({ children, className, variant, ...buttonProps }: AppButtonProps) => {
+export const AppButton = ({ children, className, appearance, type = 'button', ...buttonProps }: AppButtonProps) => {
   return (
-    <Button {...buttonProps} className={cn(buttonVariants({ variant }), className)} type="button">
+    <Button {...buttonProps} type={type} className={cn(buttonVariants({ appearance }), className)}>
       {children}
     </Button>
   );
