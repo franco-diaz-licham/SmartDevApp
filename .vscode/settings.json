@@ -12,7 +12,7 @@
     "plaintext": "html"
   },
   "tailwindCSS.emmetCompletions": true,
-  "tailwindCSS.classFunctions": ["mergeClassNames", "clsx"],
+  "tailwindCSS.classFunctions": ["cn", "clsx", "cva"],
   "tailwindCSS.experimental.classRegex": [
     ["class\\s*=\\s*\"([^\"]*)\"", 1],
     ["className\\s*=\\s*\"([^\"]*)\"", 1],
