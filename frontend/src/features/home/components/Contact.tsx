@@ -37,7 +37,7 @@ export const Contact = () => {
   return (
     <section id="contact-me" className="scroll-mt-32 bg-muted">
       <div className="mx-auto max-w-[1320px] px-4 py-16">
-        <h1 className="pb-4">Get In Touch</h1>
+        <h1 className="pb-4 text-left text-5xl font-bold uppercase leading-[1.1]">Get In Touch</h1>
         <p className="pb-4">
           Got questions or want to connect? Whether you're curious about my work, have a project idea, or just want to chat about software development, feel free to reach out using the contact form below. I'll get back to you as soon as I can -
           looking forward to connecting!
@@ -51,7 +51,11 @@ export const Contact = () => {
               {status === 'sending' ? 'Sending...' : 'Submit'}
             </AppButton>
           </div>
-          {status === 'sent' && <p role="status">Thanks! Message sent.</p>}
+          {status === 'sent' && (
+            <p role="status">
+              Thanks! Message sent.
+            </p>
+          )}
           {status === 'failed' && (
             <p role="alert" className="text-destructive">
               Message could not be sent. Please try again.

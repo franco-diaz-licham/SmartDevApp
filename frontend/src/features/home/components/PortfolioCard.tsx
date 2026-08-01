@@ -12,7 +12,7 @@ export const PortfolioCard = ({ description, image, imageAlt, title }: Portfolio
         <img src={image} className="h-full w-full object-contain transition duration-500 ease-in hover:scale-110 hover:opacity-70" alt={imageAlt} />
       </div>
       <div className="bg-card p-4 transition hover:bg-accent/40">
-        <h5 className="text-[1.25rem] font-bold leading-tight">{title}</h5>
+        <h5 className="text-[1.25rem] font-bold uppercase leading-tight text-secondary">{title}</h5>
         <p>{description}</p>
       </div>
     </article>

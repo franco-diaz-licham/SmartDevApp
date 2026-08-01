@@ -1,7 +1,7 @@
 import { Navigate, useParams } from 'react-router-dom';
+import { SkillsCard } from '@/components/common/SkillsCard';
 import { PortfolioHero } from '../components/PortfolioHero';
 import { PortfolioSection } from '../components/PortfolioSection';
-import { SnapshotGrid } from '../components/SnapshotGrid';
 import { WorkSummary } from '../components/WorkSummary';
 import { personalProjectItems } from '../data/portfolioData';
 
@@ -42,19 +42,19 @@ export const PersonalProjectPage = () => {
       <PortfolioSection shaded title="Impact">
         <ul className="list-disc pl-6">
           {item.impact.map((impact) => (
-            <li key={impact}>{impact}</li>
+            <li key={impact}>
+              {impact}
+            </li>
           ))}
         </ul>
       </PortfolioSection>
       <PortfolioSection title="Tech">
-        <SnapshotGrid
-          items={[
-            { label: 'Backend', value: item.tech.backend },
-            { label: 'Frontend', value: item.tech.frontend },
-            { label: 'CI/CD & Cloud', value: item.tech.cicdCloud },
-            { label: 'Architecture', value: item.tech.architecture }
-          ]}
-        />
+        <div className="grid gap-4 md:grid-cols-2">
+          <SkillsCard title="Backend" value={item.tech.backend} />
+          <SkillsCard title="Frontend" value={item.tech.frontend} />
+          <SkillsCard title="CI/CD & Cloud" value={item.tech.cicdCloud} />
+          <SkillsCard title="Architecture" value={item.tech.architecture} />
+        </div>
       </PortfolioSection>
     </main>
   );
