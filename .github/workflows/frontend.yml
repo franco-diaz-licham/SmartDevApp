@@ -14,6 +14,7 @@ env:
   VITE_ENTRA_CLIENT_ID: ${{ secrets.ENTRA_CLIENT_ID }}
   VITE_ENTRA_AUTHORITY: ${{ secrets.ENTRA_AUTHORITY }}
   VITE_ENTRA_API_SCOPE: ${{ secrets.ENTRA_API_SCOPE }}
+  VITE_PRIMEREACT_LICENSE_KEY: ${{ secrets.PRIMEREACT_LICENSE_KEY }}
 
 jobs:
   build-and-deploy:
