@@ -1,10 +1,10 @@
 import { PrimeReactProvider } from '@primereact/core';
 import { primeReactConfig } from './primeReactConfig';
-import { AppButton } from '@/components/ui/AppButton';
+import { HomePage } from '@/features/home/pages/HomePage';
 
 export const App = () => (
   <PrimeReactProvider {...primeReactConfig}>
-    <AppButton appearance="primary">SmartDev</AppButton>
+    <HomePage />
   </PrimeReactProvider>
 );
 
