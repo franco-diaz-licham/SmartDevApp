@@ -10,14 +10,6 @@ import item5Image from '@/assets/images/item5.jpg';
 import processImage from '@/assets/images/process.png';
 import websiteImage from '@/assets/images/website.png';
 
-export const navigationItems = [
-  { label: 'HOME', href: '#hero' },
-  { label: 'ABOUT ME', href: '#about-me' },
-  { label: 'EXPERIENCE', href: '#experience' },
-  { label: 'PORTFOLIO', href: '#portfolio' },
-  { label: 'CONTACT', href: '#contact-me' }
-] as const;
-
 export const experienceItems = [
   {
     title: 'Application Development',

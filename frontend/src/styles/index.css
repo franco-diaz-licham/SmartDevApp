@@ -78,7 +78,7 @@
   h1 {
     color: var(--foreground);
     font-size: 3rem;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.1;
     margin: 0;
     text-align: left;
@@ -91,7 +91,7 @@
   h5,
   h6 {
     color: var(--foreground);
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.2;
     margin: 0;
   }
@@ -102,8 +102,7 @@
   }
 
   p,
-  li,
-  label {
+  li {
     color: var(--foreground);
   }
 
@@ -114,19 +113,6 @@
 
   a:hover {
     text-decoration: underline;
-  }
-
-  button {
-    font-family: inherit;
-  }
-
-  input,
-  textarea,
-  select {
-    background: var(--background);
-    border: 1px solid var(--border);
-    color: var(--foreground);
-    font-family: inherit;
   }
 }
 

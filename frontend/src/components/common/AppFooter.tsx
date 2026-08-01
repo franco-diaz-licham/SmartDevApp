@@ -1,7 +1,7 @@
 import UilGithub from '@iconscout/react-unicons/icons/uil-github';
 import UilLinkedin from '@iconscout/react-unicons/icons/uil-linkedin';
 
-export const Footer = () => {
+export const AppFooter = () => {
   return (
     <footer className="bg-footer text-footer-foreground">
       <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-4 px-4 py-8">

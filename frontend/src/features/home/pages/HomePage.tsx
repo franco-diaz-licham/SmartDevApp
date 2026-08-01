@@ -1,23 +1,24 @@
+import heroImage from '@/assets/images/hero.png';
+import { AppFooter } from '@/components/common/AppFooter';
+import { AppHero } from '@/components/common/AppHero';
+import { AppTopBar } from '@/components/common/AppTopBar';
 import { AboutMe } from '../components/AboutMe';
 import { Contact } from '../components/Contact';
 import { Experience } from '../components/Experience';
-import { Footer } from '../components/Footer';
-import { Header } from '../components/Header';
-import { Hero } from '../components/Hero';
 import { Portfolio } from '../components/Portfolio';
 
 export const HomePage = () => {
   return (
     <>
-      <Header />
+      <AppTopBar />
       <main>
-        <Hero />
+        <AppHero backgroundImage={heroImage} subtitle="SmartDev: Smart Software Made Simple" title={'Franco Diaz\nFull-Stack Developer'} />
         <AboutMe />
         <Experience />
         <Portfolio />
         <Contact />
       </main>
-      <Footer />
+      <AppFooter />
     </>
   );
 };

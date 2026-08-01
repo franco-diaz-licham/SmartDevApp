@@ -2,7 +2,7 @@ import { experienceItems } from '../data/homeContent';
 
 export const Experience = () => {
   return (
-    <section id="experience" className="scroll-mt-16 bg-muted">
+    <section id="services" className="scroll-mt-16 bg-muted">
       <div className="mx-auto max-w-[1320px] px-4 py-16">
         <h1 className="pb-4">Experience</h1>
         <p className="pb-4">I have end-to-end experience across the full stack.</p>

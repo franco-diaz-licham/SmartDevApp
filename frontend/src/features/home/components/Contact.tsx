@@ -1,5 +1,7 @@
 import { type FormEvent, useState } from 'react';
 import { AppButton } from '@/components/ui/AppButton';
+import { AppInputText } from '@/components/ui/AppInputText';
+import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
 
 type ContactStatus = 'idle' | 'sending' | 'sent' | 'failed';
 
@@ -33,7 +35,7 @@ export const Contact = () => {
   };
 
   return (
-    <section id="contact-me" className="bg-muted">
+    <section id="contact-me" className="scroll-mt-32 bg-muted">
       <div className="mx-auto max-w-[1320px] px-4 py-16">
         <h1 className="pb-4">Get In Touch</h1>
         <p className="pb-4">
@@ -41,19 +43,10 @@ export const Contact = () => {
           looking forward to connecting!
         </p>
         <form className="grid gap-4 px-[15%]" onSubmit={handleSubmit}>
-          <label className="grid gap-1 font-semibold" htmlFor="name">
-            Name:
-            <input id="name" className="min-h-10 rounded border border-border px-3" type="text" name="name" required />
-          </label>
-          <label className="grid gap-1 font-semibold" htmlFor="email">
-            Email:
-            <input id="email" className="min-h-10 rounded border border-border px-3" type="email" name="email" required />
-          </label>
-          <label className="grid gap-1 font-semibold" htmlFor="message">
-            Message:
-            <textarea id="message" className="rounded border border-border px-3 py-2" name="message" rows={5} required />
-          </label>
-          <div className="mt-4">
+          <AppInputText id="name" label="Name:" name="name" required />
+          <AppInputText id="email" label="Email:" name="email" type="email" required />
+          <AppInputTextArea id="message" label="Message:" name="message" rows={5} required />
+          <div>
             <AppButton type="submit" disabled={status === 'sending'}>
               {status === 'sending' ? 'Sending...' : 'Submit'}
             </AppButton>
