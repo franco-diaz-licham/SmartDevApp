@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+import { PortfolioCard } from './PortfolioCard';
 import { portfolioGroups } from '../data/homeContent';
 
 export const Portfolio = () => {
@@ -14,15 +16,9 @@ export const Portfolio = () => {
             <h3 className="mb-4 text-[1.75rem] font-bold leading-tight">{group.title}</h3>
             <div className="flex flex-wrap justify-center gap-12">
               {group.items.map((item) => (
-                <article className="w-full max-w-[540px] overflow-hidden rounded-md border border-black/20 bg-card shadow-[0_10px_15px_rgb(160_160_160_/_0.75)] transition hover:cursor-pointer hover:bg-accent/40 max-sm:max-w-[340px]" key={item.title}>
-                  <div className="max-h-[60%] overflow-hidden">
-                    <img src={item.image} className="h-full w-full object-cover transition duration-500 ease-in hover:scale-110 hover:opacity-70" alt={item.imageAlt} />
-                  </div>
-                  <div className="p-4">
-                    <h5 className="font-bold">{item.title}</h5>
-                    <p>{item.description}</p>
-                  </div>
-                </article>
+                <Link className="w-full max-w-[540px] hover:no-underline max-sm:max-w-[340px]" key={item.title} to={item.href}>
+                  <PortfolioCard description={item.description} image={item.image} imageAlt={item.imageAlt} title={item.title} />
+                </Link>
               ))}
             </div>
           </section>

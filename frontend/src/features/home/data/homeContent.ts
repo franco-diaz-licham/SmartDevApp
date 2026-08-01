@@ -68,18 +68,21 @@ export const portfolioGroups = [
     title: 'Professional Work',
     items: [
       {
+        href: '/portfolio/professional/1',
         title: 'Operations Portal',
         image: item1Image,
         imageAlt: 'Operations Portal',
         description: "A custom business website application for BCC Transport's internal processes including timesheets, compliance and safety checks, staff onboarding, staff logins and more."
       },
       {
+        href: '/portfolio/professional/2',
         title: 'Operations Platform',
         image: item2Image,
         imageAlt: 'Operations Platform',
         description: 'A self-contained system composed of multiple applications, providing NWCC with an efficient and streamlined online platform that supports approval processes such as purchase orders and leave requests.'
       },
       {
+        href: '/portfolio/professional/3',
         title: 'Property Management Platform',
         image: item5Image,
         imageAlt: 'PropertyMe software development work',
@@ -91,12 +94,14 @@ export const portfolioGroups = [
     title: 'Personal Projects',
     items: [
       {
+        href: '/portfolio/personal/1',
         title: 'Alumno360',
         image: item3Image,
         imageAlt: 'Alumno360 student plans platform',
         description: 'A focused student plans platform for Australian schools, designed around learning support, compliance evidence, reviews, reporting, audit history, and staff planning workflows.'
       },
       {
+        href: '/portfolio/personal/2',
         title: 'EarlyLearner',
         image: item4Image,
         imageAlt: 'EarlyLearner full-stack application',

@@ -1,10 +1,11 @@
 import { PrimeReactProvider } from '@primereact/core';
+import { RouterProvider } from 'react-router-dom';
 import { primeReactConfig } from './primeReactConfig';
-import { HomePage } from '@/features/home/pages/HomePage';
+import { router } from './router';
 
 export const App = () => (
   <PrimeReactProvider {...primeReactConfig}>
-    <HomePage />
+    <RouterProvider router={router} />
   </PrimeReactProvider>
 );
 

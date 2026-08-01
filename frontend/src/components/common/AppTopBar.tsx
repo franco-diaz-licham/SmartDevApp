@@ -4,11 +4,11 @@ import UilTimes from '@iconscout/react-unicons/icons/uil-times';
 import logoImage from '@/assets/images/logo.png';
 
 const navigationItems = [
-  { label: 'HOME', href: '#hero' },
-  { label: 'ABOUT ME', href: '#about-me' },
-  { label: 'EXPERIENCE', href: '#services' },
-  { label: 'PORTFOLIO', href: '#portfolio' },
-  { label: 'CONTACT', href: '#contact-me' }
+  { label: 'HOME', href: '/home#hero' },
+  { label: 'ABOUT ME', href: '/home#about-me' },
+  { label: 'EXPERIENCE', href: '/home#services' },
+  { label: 'PORTFOLIO', href: '/home#portfolio' },
+  { label: 'CONTACT', href: '/home#contact-me' }
 ] as const;
 
 export const AppTopBar = () => {
