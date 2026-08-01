@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import heroImage from '@/assets/images/hero.png';
 import { AppHero } from '@/components/common/AppHero';
+import { useAppToast } from '@/components/common/AppToastContext';
 import { AboutMe } from '../components/AboutMe';
 import { Contact, type ContactStatus } from '../components/ContactMe';
 import { Experience } from '../components/Experience';
@@ -8,11 +9,15 @@ import { Portfolio } from '../components/Portfolio';
 import type { ContactMePayload, ContactMeFormValues } from '../types/contactMeForm.schema';
 
 export const HomePage = () => {
+  const toast = useAppToast();
   const [contactStatus, setContactStatus] = useState<ContactStatus>('idle');
 
   const handleContactSave = async (validForm: ContactMeFormValues) => {
     if (validForm.companyWebsite.trim()) {
-      setContactStatus('sent');
+      toast.success({
+        title: 'Message sent',
+        message: 'Thanks! Message sent.'
+      });
       return true;
     }
 
@@ -31,10 +36,25 @@ export const HomePage = () => {
         body: JSON.stringify(payload)
       });
 
-      setContactStatus(response.ok ? 'sent' : 'failed');
+      setContactStatus('idle');
+      if (response.ok) {
+        toast.success({
+          title: 'Message sent',
+          message: 'Thanks! Message sent.'
+        });
+      } else {
+        toast.error({
+          title: 'Message failed',
+          message: 'Message could not be sent. Please try again.'
+        });
+      }
       return response.ok;
     } catch {
-      setContactStatus('failed');
+      setContactStatus('idle');
+      toast.error({
+        title: 'Message failed',
+        message: 'Message could not be sent. Please try again.'
+      });
       return false;
     }
   };

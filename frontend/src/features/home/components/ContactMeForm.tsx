@@ -6,18 +6,15 @@ import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
 import type { useContactMeForm } from '../hooks/useContactMeForm';
 import { contactMeFormLimits, type ContactMeFormValues } from '../types/contactMeForm.schema';
 
-export type ContactFormStatus = 'idle' | 'sending' | 'sent' | 'failed';
-
 type ContactMeFormProps = {
   form: ReturnType<typeof useContactMeForm>;
   saving: boolean;
-  status: ContactFormStatus;
   onSave: (form: ContactMeFormValues) => void;
 };
 
 const getInputValue = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => event.target.value;
 
-export const ContactMeForm = ({ form, saving, status, onSave }: ContactMeFormProps) => {
+export const ContactMeForm = ({ form, saving, onSave }: ContactMeFormProps) => {
   const { draft, errors } = form;
   const hasErrors = Object.keys(errors).length > 0;
 
@@ -81,12 +78,6 @@ export const ContactMeForm = ({ form, saving, status, onSave }: ContactMeFormPro
           {saving ? 'Sending...' : 'Submit'}
         </AppButton>
       </div>
-      {status === 'sent' && <p role="status">Thanks! Message sent.</p>}
-      {status === 'failed' && (
-        <p role="alert" className="text-destructive">
-          Message could not be sent. Please try again.
-        </p>
-      )}
     </div>
   );
 };

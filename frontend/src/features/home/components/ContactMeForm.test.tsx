@@ -10,14 +10,13 @@ import type { ContactMeFormValues } from '../types/contactMeForm.schema';
 type ContactMeFormHarnessProps = {
   onSave?: (form: ContactMeFormValues) => void;
   saving?: boolean;
-  status?: 'idle' | 'sending' | 'sent' | 'failed';
 };
 
-const ContactMeFormHarness = ({ onSave = vi.fn(), saving = false, status = 'idle' }: ContactMeFormHarnessProps) => {
+const ContactMeFormHarness = ({ onSave = vi.fn(), saving = false }: ContactMeFormHarnessProps) => {
   const form = useContactMeForm();
   return (
     <PrimeReactProvider {...primeReactConfig}>
-      <ContactMeForm form={form} saving={saving} status={status} onSave={onSave} />
+      <ContactMeForm form={form} saving={saving} onSave={onSave} />
     </PrimeReactProvider>
   );
 };
@@ -83,23 +82,11 @@ describe('ContactMeForm', () => {
     });
   });
 
-  test('shows the sending, sent, and failed states', () => {
+  test('shows the sending state', () => {
     // Arrange & Act
-    const { rerender } = render(<ContactMeFormHarness saving status="sending" />);
+    render(<ContactMeFormHarness saving />);
 
     // Assert
     expect(screen.getByRole('button', { name: 'Sending...' })).toBeDisabled();
-
-    // Act
-    rerender(<ContactMeFormHarness status="sent" />);
-
-    // Assert
-    expect(screen.getByRole('status')).toHaveTextContent('Thanks! Message sent.');
-
-    // Act
-    rerender(<ContactMeFormHarness status="failed" />);
-
-    // Assert
-    expect(screen.getByRole('alert')).toHaveTextContent('Message could not be sent. Please try again.');
   });
 });

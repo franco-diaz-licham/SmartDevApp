@@ -1,11 +1,14 @@
 import { PrimeReactProvider } from '@primereact/core';
 import { RouterProvider } from 'react-router-dom';
+import { AppToastProvider } from '@/components/common/AppToastProvider';
 import { primeReactConfig } from './primeReactConfig';
 import { router } from './router';
 
 export const App = () => (
   <PrimeReactProvider {...primeReactConfig}>
-    <RouterProvider router={router} />
+    <AppToastProvider>
+      <RouterProvider router={router} />
+    </AppToastProvider>
   </PrimeReactProvider>
 );
 
