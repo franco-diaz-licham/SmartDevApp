@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { AppPageContainer } from '@/components/common/AppPageContainer';
 
 type PortfolioSectionProps = {
   children: ReactNode;
@@ -7,13 +8,10 @@ type PortfolioSectionProps = {
 };
 
 export const PortfolioSection = ({ children, shaded = false, title }: PortfolioSectionProps) => {
-  const content = (
-    <div className="mx-auto max-w-[1320px] px-4 py-16">
-      <h1 className="mb-4 text-left text-5xl font-bold uppercase leading-[1.1]">{title}</h1>
+  return (
+    <AppPageContainer sectionClassName={shaded ? 'bg-muted' : undefined}>
+      <h1 className="text-left text-5xl font-bold uppercase leading-[1.1]">{title}</h1>
       {children}
-    </div>
+    </AppPageContainer>
   );
-
-  if (shaded) return <section className="bg-muted">{content}</section>;
-  return <section>{content}</section>;
 };

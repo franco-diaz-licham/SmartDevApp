@@ -1,5 +1,6 @@
 import { Navigate, useParams } from 'react-router-dom';
-import { SkillsCard } from '@/components/common/SkillsCard';
+import { AppPageContainer } from '@/components/common/AppPageContainer';
+import { SkillsCard } from '@/features/portfolio/components/SkillsCard';
 import { PortfolioHero } from '../components/PortfolioHero';
 import { PortfolioSection } from '../components/PortfolioSection';
 import { WorkSummary } from '../components/WorkSummary';
@@ -26,7 +27,7 @@ export const PersonalProjectPage = () => {
         <WorkSummary image={item.image} imageAlt={`${item.projectName} logo`} summary={item.overview} />
       </PortfolioSection>
       {item.demoUrl ? (
-        <section className="mx-auto max-w-[1320px] px-4 pb-16">
+        <AppPageContainer contentClassName="pt-0">
           <div className="aspect-video bg-footer">
             <iframe
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -37,14 +38,12 @@ export const PersonalProjectPage = () => {
               title={`${item.projectName} demo video`}
             />
           </div>
-        </section>
+        </AppPageContainer>
       ) : null}
       <PortfolioSection shaded title="Impact">
         <ul className="list-disc pl-6">
           {item.impact.map((impact) => (
-            <li key={impact}>
-              {impact}
-            </li>
+            <li key={impact}>{impact}</li>
           ))}
         </ul>
       </PortfolioSection>

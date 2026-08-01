@@ -1,5 +1,5 @@
 import { Navigate, useParams } from 'react-router-dom';
-import { SkillsCard } from '@/components/common/SkillsCard';
+import { SkillsCard } from '@/features/portfolio/components/SkillsCard';
 import { PortfolioHero } from '../components/PortfolioHero';
 import { PortfolioSection } from '../components/PortfolioSection';
 import { WorkSummary } from '../components/WorkSummary';
@@ -20,9 +20,7 @@ export const ProfessionalWorkPage = () => {
       <PortfolioSection shaded title="Key Contributions">
         <ul className="list-disc pl-6">
           {item.keyContributions.map((contribution) => (
-            <li key={contribution}>
-              {contribution}
-            </li>
+            <li key={contribution}>{contribution}</li>
           ))}
         </ul>
       </PortfolioSection>
