@@ -22,9 +22,9 @@ export const AppCarousel = ({ children }: AppCarouselProps) => {
 
   return (
     <Carousel.Root align="center" className={cn('mx-auto w-full', carouselMaxWidthClassName)} loop slidesPerPage={slidesPerPage} spacing={0}>
-      <Carousel.Content className="pb-6">
+      <Carousel.Content className="pb-6 w-full">
         {slides.map((slide, index) => (
-          <Carousel.Item key={index} value={index} className={carouselContentPaddingClassName}>
+          <Carousel.Item key={index} value={index} className={cn(carouselContentPaddingClassName, 'max-w-120')}>
             {slide}
           </Carousel.Item>
         ))}
