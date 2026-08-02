@@ -3,29 +3,30 @@ import { AppHoneypot } from '@/components/common/AppHoneypot';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
-import type { useContactMeForm } from '../hooks/useContactMeForm';
+import { useContactMeForm } from '../hooks/useContactMeForm';
 import { contactMeFormLimits, type ContactMeFormValues } from '../types/contactMeForm.schema';
 
 type ContactMeFormProps = {
-  form: ReturnType<typeof useContactMeForm>;
   saving: boolean;
-  onSave: (form: ContactMeFormValues) => void;
+  onSave: (form: ContactMeFormValues) => Promise<boolean>;
 };
 
 const getInputValue = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => event.target.value;
 
-export const ContactMeForm = ({ form, saving, onSave }: ContactMeFormProps) => {
+export const ContactMeForm = ({ saving, onSave }: ContactMeFormProps) => {
+  const form = useContactMeForm();
   const { draft, errors } = form;
   const hasErrors = Object.keys(errors).length > 0;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const validForm = form.getValidForm();
     if (!validForm) return;
-    void onSave(validForm);
+    const saved = await onSave(validForm);
+    if (saved) form.reset();
   };
 
   return (
-    <div className="grid gap-4 px-[15%]">
+    <div className="grid gap-4 sm:px-[15%]">
       <AppHoneypot
         id="companyWebsite"
         label="Company website"

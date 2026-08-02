@@ -4,19 +4,17 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
 import { primeReactConfig } from '@/app/primeReactConfig';
 import { ContactMeForm } from './ContactMeForm';
-import { useContactMeForm } from '../hooks/useContactMeForm';
 import type { ContactMeFormValues } from '../types/contactMeForm.schema';
 
 type ContactMeFormHarnessProps = {
-  onSave?: (form: ContactMeFormValues) => void;
+  onSave?: (form: ContactMeFormValues) => Promise<boolean>;
   saving?: boolean;
 };
 
 const ContactMeFormHarness = ({ onSave = vi.fn(), saving = false }: ContactMeFormHarnessProps) => {
-  const form = useContactMeForm();
   return (
     <PrimeReactProvider {...primeReactConfig}>
-      <ContactMeForm form={form} saving={saving} onSave={onSave} />
+      <ContactMeForm saving={saving} onSave={onSave} />
     </PrimeReactProvider>
   );
 };
@@ -42,7 +40,7 @@ describe('ContactMeForm', () => {
   test('submits the valid controlled draft', async () => {
     // Arrange
     const user = userEvent.setup();
-    const onSave = vi.fn();
+    const onSave = vi.fn().mockResolvedValue(true);
     render(<ContactMeFormHarness onSave={onSave} />);
 
     // Act
@@ -63,7 +61,7 @@ describe('ContactMeForm', () => {
   test('includes the honeypot value when it has been filled', async () => {
     // Arrange
     const user = userEvent.setup();
-    const onSave = vi.fn();
+    const onSave = vi.fn().mockResolvedValue(true);
     render(<ContactMeFormHarness onSave={onSave} />);
 
     // Act
@@ -88,5 +86,23 @@ describe('ContactMeForm', () => {
 
     // Assert
     expect(screen.getByRole('button', { name: 'Sending...' })).toBeDisabled();
+  });
+
+  test('resets the form after a successful save', async () => {
+    // Arrange
+    const user = userEvent.setup();
+    const onSave = vi.fn().mockResolvedValue(true);
+    render(<ContactMeFormHarness onSave={onSave} />);
+
+    // Act
+    await user.type(screen.getByLabelText(/name/i), 'Franco Diaz');
+    await user.type(screen.getByLabelText(/email/i), 'franco@example.com');
+    await user.type(screen.getByLabelText(/message/i), 'Hello there');
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+    // Assert
+    expect(screen.getByLabelText(/name/i)).toHaveValue('');
+    expect(screen.getByLabelText(/email/i)).toHaveValue('');
+    expect(screen.getByLabelText(/message/i)).toHaveValue('');
   });
 });
