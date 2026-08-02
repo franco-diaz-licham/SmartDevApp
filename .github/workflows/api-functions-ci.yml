@@ -1,0 +1,32 @@
+name: API Functions CI
+
+on:
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: 10.0.x
+  PROJECT_PATH: backend/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj
+
+jobs:
+  build:
+    name: Build API Functions
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore API Functions
+        run: dotnet restore $env:PROJECT_PATH
+
+      - name: Build API Functions
+        run: dotnet build $env:PROJECT_PATH --configuration Release --no-restore

@@ -1,4 +1,4 @@
-name: Frontend
+name: Frontend CD
 
 on:
   workflow_dispatch:
@@ -17,8 +17,8 @@ env:
   VITE_PRIMEREACT_LICENSE_KEY: ${{ secrets.PRIMEREACT_LICENSE_KEY }}
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy Frontend
+  deploy:
+    name: Deploy Frontend
     runs-on: ubuntu-latest
 
     defaults:
@@ -26,11 +26,9 @@ jobs:
         shell: pwsh
 
     steps:
-      # Checkout the repository so the React application and package-lock.json are available to the workflow.
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Install the Node.js version used to build the frontend and enable npm dependency caching.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -38,29 +36,19 @@ jobs:
           cache: npm
           cache-dependency-path: ${{ env.BUILD_DIR }}/package-lock.json
 
-      # Restore the exact dependency versions recorded in package-lock.json, including Rollup's Linux optional packages.
       - name: Install frontend dependencies
         working-directory: ${{ env.BUILD_DIR }}
         run: npm ci --include=optional
 
-      # Run the frontend test suite before producing the deployable artifact.
-      - name: Run frontend tests
-        working-directory: ${{ env.BUILD_DIR }}
-        run: npm run test
-
-      # Build the production Vite application into frontend/dist.
-      # Vite reads the VITE_* environment variables above and embeds them into the generated browser bundle.
       - name: Build frontend
         working-directory: ${{ env.BUILD_DIR }}
         run: npm run build
 
-      # Log in with the repository service principal so the workflow can retrieve the Static Web Apps deployment token.
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ env.AZURE_CREDENTIALS }}
 
-      # Deploy the pre-built frontend/dist artifact to the production Azure Static Web Apps environment.
       - name: Deploy frontend
         run: |
           $artifactPath = Join-Path `

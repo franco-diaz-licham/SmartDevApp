@@ -1,4 +1,4 @@
-name: API Functions
+name: API Functions CD
 
 on:
   workflow_dispatch:
@@ -11,29 +11,26 @@ env:
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy API Functions
+  deploy:
+    name: Deploy API Functions
     runs-on: ubuntu-latest
+
     defaults:
       run:
         shell: pwsh
 
     steps:
-      # Checkout the repository so the .NET solution and Function App project can be restored and published.
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Install the .NET SDK version used by the Azure Functions projects.
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      # Restore dependencies explicitly so package failures are visible before publish.
       - name: Restore API Functions
         run: dotnet restore $env:PROJECT_PATH
 
-      # Publish the API Functions app into a clean deployment artifact folder.
       - name: Publish API Functions
         run: |
           $publishPath = Join-Path $env:RUNNER_TEMP "api-functions-publish"
@@ -47,13 +44,11 @@ jobs:
             --output $publishPath `
             --no-restore
 
-      # Log in with the repository service principal so the workflow can deploy the Function App.
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ env.AZURE_CREDENTIALS }}
 
-      # Deploy the published API Functions folder using the Azure Functions action so Flex Consumption uses One Deploy.
       - name: Deploy API Functions
         uses: Azure/functions-action@v1
         with:
@@ -62,7 +57,6 @@ jobs:
           sku: flexconsumption
           remote-build: false
 
-      # List the functions Azure indexed after deployment.
       - name: List API Functions
         run: |
           az functionapp function list `

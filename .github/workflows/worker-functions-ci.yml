@@ -1,0 +1,32 @@
+name: Worker Functions CI
+
+on:
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: 10.0.x
+  PROJECT_PATH: backend/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj
+
+jobs:
+  build:
+    name: Build Worker Functions
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore Worker Functions
+        run: dotnet restore $env:PROJECT_PATH
+
+      - name: Build Worker Functions
+        run: dotnet build $env:PROJECT_PATH --configuration Release --no-restore
