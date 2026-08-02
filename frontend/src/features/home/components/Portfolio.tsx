@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { AppCarousel } from '@/components/common/AppCarousel';
 import { AppPageContainer } from '@/components/common/AppPageContainer';
 import { PortfolioCard } from './PortfolioCard';
 import { portfolioGroups } from '../data/homeContent';
@@ -13,15 +14,15 @@ export const Portfolio = () => {
       </p>
       <div className="grid gap-10">
         {portfolioGroups.map((group) => (
-          <section key={group.title} className="flex gap-10 flex-col">
+          <section key={group.title} className="flex flex-col gap-10">
             <h3 className=" text-[1.75rem] font-bold leading-tight">{group.title}</h3>
-            <div className="flex flex-wrap justify-center gap-12">
+            <AppCarousel>
               {group.items.map((item) => (
-                <Link className="w-full max-w-[540px] hover:no-underline max-sm:max-w-[340px]" key={item.title} to={item.href}>
+                <Link className="mx-auto block h-full w-full max-w-[540px] hover:no-underline" key={item.title} to={item.href}>
                   <PortfolioCard description={item.description} image={item.image} imageAlt={item.imageAlt} title={item.title} />
                 </Link>
               ))}
-            </div>
+            </AppCarousel>
           </section>
         ))}
       </div>

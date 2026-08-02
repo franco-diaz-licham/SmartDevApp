@@ -68,6 +68,13 @@ export const portfolioGroups = [
     title: 'Professional Work',
     items: [
       {
+        href: '/portfolio/professional/3',
+        title: 'Property Management Platform',
+        image: item5Image,
+        imageAlt: 'PropertyMe software development work',
+        description: 'Cloud-based software development for PropertyMe, including backend services, responsive customer-facing applications, asynchronous processing, and frontend architecture improvements.'
+      },
+      {
         href: '/portfolio/professional/1',
         title: 'Operations Portal',
         image: item1Image,
@@ -80,13 +87,6 @@ export const portfolioGroups = [
         image: item2Image,
         imageAlt: 'Operations Platform',
         description: 'A self-contained system composed of multiple applications, providing NWCC with an efficient and streamlined online platform that supports approval processes such as purchase orders and leave requests.'
-      },
-      {
-        href: '/portfolio/professional/3',
-        title: 'Property Management Platform',
-        image: item5Image,
-        imageAlt: 'PropertyMe software development work',
-        description: 'Cloud-based software development for PropertyMe, including backend services, responsive customer-facing applications, asynchronous processing, and frontend architecture improvements.'
       }
     ]
   },
