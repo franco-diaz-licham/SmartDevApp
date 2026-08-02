@@ -69,7 +69,7 @@ export const portfolioGroups = [
     items: [
       {
         href: '/portfolio/professional/3',
-        title: 'Property Management Platform',
+        title: 'Property Management',
         image: item5Image,
         imageAlt: 'PropertyMe software development work',
         description: 'Cloud-based software development for PropertyMe, including backend services, responsive customer-facing applications, asynchronous processing, and frontend architecture improvements.'
