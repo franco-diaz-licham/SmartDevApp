@@ -4,17 +4,17 @@ import { cn } from '@/lib/cn';
 import type { AppToastIntent } from './AppToastContext';
 
 const toastClassNames: Record<AppToastIntent, string> = {
-  info: 'border-border bg-background',
-  success: 'border-primary bg-background',
-  warn: 'border-accent bg-background',
-  error: 'border-destructive bg-background'
+  info: 'border-info-border bg-info',
+  success: 'border-success-border bg-success',
+  warn: 'border-warn-border bg-warn',
+  error: 'border-error-border bg-error'
 };
 
 const toastTitleClassNames: Record<AppToastIntent, string> = {
-  info: 'text-foreground',
-  success: 'text-primary',
-  warn: 'text-accent',
-  error: 'text-destructive'
+  info: 'text-info-heading',
+  success: 'text-success-heading',
+  warn: 'text-warn-heading',
+  error: 'text-error-heading'
 };
 
 const getToastIntent = (severity: string | undefined): AppToastIntent => {

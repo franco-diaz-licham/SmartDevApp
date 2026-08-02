@@ -24,11 +24,11 @@ export const AppToastProvider = ({ children }: AppToastProviderProps) => {
 
   const value = useMemo(
     () => ({
-      error: (options: Omit<AppToastOptions, 'intent'>) => show({ ...options, intent: 'error' }),
-      info: (options: Omit<AppToastOptions, 'intent'>) => show({ ...options, intent: 'info' }),
+      error: (options: AppToastOptions) => show({ ...options, intent: 'error' }),
+      info: (options: AppToastOptions) => show({ ...options, intent: 'info' }),
       show,
-      success: (options: Omit<AppToastOptions, 'intent'>) => show({ ...options, intent: 'success' }),
-      warn: (options: Omit<AppToastOptions, 'intent'>) => show({ ...options, intent: 'warn' })
+      success: (options: AppToastOptions) => show({ ...options, intent: 'success' }),
+      warn: (options: AppToastOptions) => show({ ...options, intent: 'warn' })
     }),
     [show]
   );

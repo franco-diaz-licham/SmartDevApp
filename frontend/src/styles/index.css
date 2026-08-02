@@ -26,9 +26,26 @@
   --footer: #000000;
   --footer-foreground: #ffffff;
   --shadow: rgb(160 160 160 / 0.75);
+
+  --info: #dbeafe;
+  --info-border: #bfdbfe;
+  --info-heading: #1e40af;
+
+  --success: #dcfce7;
+  --success-border: #bbf7d0;
+  --success-heading: #166534;
+
+  --warn: #fef3c7;
+  --warn-border: #fde68a;
+  --warn-heading: #92400e;
+
+  --error: #fee2e2;
+  --error-border: #fecaca;
+  --error-heading: #991b1b;
 }
 
 @theme inline {
+  --font-sans: 'Raleway', sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
@@ -52,7 +69,19 @@
   --color-card-foreground: var(--card-foreground);
   --color-footer: var(--footer);
   --color-footer-foreground: var(--footer-foreground);
-  --font-sans: 'Raleway', sans-serif;
+
+  --color-info: var(--info);
+  --color-info-border: var(--info-border);
+  --color-info-heading: var(--info-heading);
+  --color-success: var(--success);
+  --color-success-border: var(--success-border);
+  --color-success-heading: var(--success-heading);
+  --color-warn: var(--warn);
+  --color-warn-border: var(--warn-border);
+  --color-warn-heading: var(--warn-heading);
+  --color-error: var(--error);
+  --color-error-border: var(--error-border);
+  --color-error-heading: var(--error-heading);
 }
 
 @layer base {
