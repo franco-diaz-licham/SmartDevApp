@@ -1,7 +1,5 @@
 <Solution>
-  <Folder Name="/Tests/">
-    <Project Path="Tests/SmartDev.Tests/SmartDev.Tests.csproj" Id="001c5c2c-ea95-4824-9320-e5212b78a650" />
-  </Folder>
+  <Project Path="SmartDev.Tests/SmartDev.Tests.csproj" Id="001c5c2c-ea95-4824-9320-e5212b78a650" />
   <Project Path="SmartDev.Api.Functions/SmartDev.Api.Functions.csproj" />
   <Project Path="SmartDev.Shared/SmartDev.Shared.csproj" />
   <Project Path="SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj" Id="a1a48766-034c-4c0a-b4a6-d6ff89465771" />

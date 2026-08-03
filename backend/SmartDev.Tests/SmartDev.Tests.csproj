@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SmartDev.Api.Functions\SmartDev.Api.Functions.csproj" />
-    <ProjectReference Include="..\..\SmartDev.Worker.Functions\SmartDev.Worker.Functions.csproj" />
+    <ProjectReference Include="..\SmartDev.Api.Functions\SmartDev.Api.Functions.csproj" />
+    <ProjectReference Include="..\SmartDev.Worker.Functions\SmartDev.Worker.Functions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
