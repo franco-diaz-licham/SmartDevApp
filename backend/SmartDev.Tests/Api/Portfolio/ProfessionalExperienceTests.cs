@@ -1,4 +1,5 @@
 using SmartDev.Api.Functions.Domain.Portfolio;
+using static SmartDev.Tests.TestData.AggregateTestData;
 
 namespace SmartDev.Tests.Api.Portfolio;
 
@@ -10,7 +11,7 @@ public sealed class ProfessionalExperienceTests
     {
         // Arrange
         var id = ProfessionalExperienceId.New();
-        var skills = CreateSkills();
+        var skills = CreateProfessionalSkills();
 
         // Act
         var experience = ProfessionalExperience.Create(
@@ -23,13 +24,13 @@ public sealed class ProfessionalExperienceTests
             skillsAndPractices: skills);
 
         // Assert
-        Assert.That(experience.Id, Is.EqualTo(id));
-        Assert.That(experience.CompanyName, Is.EqualTo("Contoso"));
-        Assert.That(experience.RoleTitle, Is.EqualTo("Senior Engineer"));
-        Assert.That(experience.ImagePath, Is.EqualTo("/images/contoso.png"));
-        Assert.That(experience.RoleSummary, Is.EqualTo("Built production systems."));
-        Assert.That(experience.KeyContributions, Is.EqualTo(new[] { "Improved deployment reliability", "Reduced lead time" }));
-        Assert.That(experience.SkillsAndPractices, Is.EqualTo(skills));
+        experience.Id.ShouldBe(id);
+        experience.CompanyName.ShouldBe("Contoso");
+        experience.RoleTitle.ShouldBe("Senior Engineer");
+        experience.ImagePath.ShouldBe("/images/contoso.png");
+        experience.RoleSummary.ShouldBe("Built production systems.");
+        experience.KeyContributions.ShouldBe(["Improved deployment reliability", "Reduced lead time"]);
+        experience.SkillsAndPractices.ShouldBe(skills);
     }
 
     [TestCase("")]
@@ -37,10 +38,10 @@ public sealed class ProfessionalExperienceTests
     public void Create_CompanyNameMissing_ThrowsArgumentException(string companyName)
     {
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => CreateProfessionalExperience(companyName: companyName));
+        var exception = Should.Throw<ArgumentException>(() => CreateProfessionalExperience(companyName: companyName));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("companyName"));
+        exception.ParamName.ShouldBe("companyName");
     }
 
     [TestCase("")]
@@ -48,20 +49,20 @@ public sealed class ProfessionalExperienceTests
     public void Create_RoleTitleMissing_ThrowsArgumentException(string roleTitle)
     {
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => CreateProfessionalExperience(roleTitle: roleTitle));
+        var exception = Should.Throw<ArgumentException>(() => CreateProfessionalExperience(roleTitle: roleTitle));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("roleTitle"));
+        exception.ParamName.ShouldBe("roleTitle");
     }
 
     [Test]
     public void Create_KeyContributionsEmpty_ThrowsArgumentException()
     {
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => CreateProfessionalExperience(keyContributions: []));
+        var exception = Should.Throw<ArgumentException>(() => CreateProfessionalExperience(keyContributions: []));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("keyContributions"));
+        exception.ParamName.ShouldBe("keyContributions");
     }
 
     [TestCase("")]
@@ -69,33 +70,9 @@ public sealed class ProfessionalExperienceTests
     public void Create_KeyContributionItemMissing_ThrowsArgumentException(string contribution)
     {
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => CreateProfessionalExperience(keyContributions: [contribution]));
+        var exception = Should.Throw<ArgumentException>(() => CreateProfessionalExperience(keyContributions: [contribution]));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("keyContributions"));
-    }
-
-    private static ProfessionalExperience CreateProfessionalExperience(
-        string companyName = "Contoso",
-        string roleTitle = "Senior Engineer",
-        IEnumerable<string>? keyContributions = null)
-    {
-        return ProfessionalExperience.Create(
-            id: ProfessionalExperienceId.New(),
-            companyName: companyName,
-            roleTitle: roleTitle,
-            imagePath: "/images/contoso.png",
-            roleSummary: "Built production systems.",
-            keyContributions: keyContributions ?? ["Improved deployment reliability"],
-            skillsAndPractices: CreateSkills());
-    }
-
-    private static ProfessionalSkills CreateSkills()
-    {
-        return ProfessionalSkills.Create(
-            backend: ".NET",
-            frontend: "React",
-            cicdCloud: "Azure DevOps",
-            engineeringPractices: "DDD and automated testing");
+        exception.ParamName.ShouldBe("keyContributions");
     }
 }

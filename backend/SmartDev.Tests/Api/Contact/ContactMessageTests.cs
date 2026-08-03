@@ -1,4 +1,5 @@
 using SmartDev.Api.Functions.Domain.Contact;
+using static SmartDev.Tests.TestData.AggregateTestData;
 
 namespace SmartDev.Tests.Api.Contact;
 
@@ -19,24 +20,24 @@ public sealed class ContactMessageTests
             submittedAt: submittedAt);
 
         // Assert
-        Assert.That(contactMessage.Id.Value, Is.Not.EqualTo(Guid.Empty));
-        Assert.That(contactMessage.SenderName, Is.EqualTo("Ada Lovelace"));
-        Assert.That(contactMessage.SenderEmail, Is.EqualTo("ada@example.com"));
-        Assert.That(contactMessage.Message, Is.EqualTo("I would like to talk about a project."));
-        Assert.That(contactMessage.SubmittedAt, Is.EqualTo(submittedAt));
-        Assert.That(contactMessage.Status, Is.EqualTo(ContactMessageStatus.Submitted));
-        Assert.That(contactMessage.EmailSentAt, Is.Null);
-        Assert.That(contactMessage.FailureReason, Is.Null);
+        contactMessage.Id.Value.ShouldNotBe(Guid.Empty);
+        contactMessage.SenderName.ShouldBe("Ada Lovelace");
+        contactMessage.SenderEmail.ShouldBe("ada@example.com");
+        contactMessage.Message.ShouldBe("I would like to talk about a project.");
+        contactMessage.SubmittedAt.ShouldBe(submittedAt);
+        contactMessage.Status.ShouldBe(ContactMessageStatus.Submitted);
+        contactMessage.EmailSentAt.ShouldBeNull();
+        contactMessage.FailureReason.ShouldBeNull();
 
         var createdEvent = contactMessage.DomainEvents.Single();
-        Assert.That(createdEvent, Is.TypeOf<ContactMessageCreated>());
+        createdEvent.ShouldBeOfType<ContactMessageCreated>();
 
         var contactMessageCreated = (ContactMessageCreated)createdEvent;
-        Assert.That(contactMessageCreated.ContactMessageId, Is.EqualTo(contactMessage.Id));
-        Assert.That(contactMessageCreated.SenderName, Is.EqualTo(contactMessage.SenderName));
-        Assert.That(contactMessageCreated.SenderEmail, Is.EqualTo(contactMessage.SenderEmail));
-        Assert.That(contactMessageCreated.Message, Is.EqualTo(contactMessage.Message));
-        Assert.That(contactMessageCreated.OccurredAt, Is.EqualTo(submittedAt));
+        contactMessageCreated.ContactMessageId.ShouldBe(contactMessage.Id);
+        contactMessageCreated.SenderName.ShouldBe(contactMessage.SenderName);
+        contactMessageCreated.SenderEmail.ShouldBe(contactMessage.SenderEmail);
+        contactMessageCreated.Message.ShouldBe(contactMessage.Message);
+        contactMessageCreated.OccurredAt.ShouldBe(submittedAt);
     }
 
     [TestCase("")]
@@ -47,14 +48,14 @@ public sealed class ContactMessageTests
         var submittedAt = DateTimeOffset.UtcNow;
 
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => ContactMessage.Create(
+        var exception = Should.Throw<ArgumentException>(() => ContactMessage.Create(
             senderName: senderName,
             senderEmail: "ada@example.com",
             message: "Hello",
             submittedAt: submittedAt));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("senderName"));
+        exception.ParamName.ShouldBe("senderName");
     }
 
     [TestCase("")]
@@ -66,14 +67,14 @@ public sealed class ContactMessageTests
         var submittedAt = DateTimeOffset.UtcNow;
 
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => ContactMessage.Create(
+        var exception = Should.Throw<ArgumentException>(() => ContactMessage.Create(
             senderName: "Ada Lovelace",
             senderEmail: senderEmail,
             message: "Hello",
             submittedAt: submittedAt));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("senderEmail"));
+        exception.ParamName.ShouldBe("senderEmail");
     }
 
     [TestCase("")]
@@ -84,14 +85,14 @@ public sealed class ContactMessageTests
         var submittedAt = DateTimeOffset.UtcNow;
 
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => ContactMessage.Create(
+        var exception = Should.Throw<ArgumentException>(() => ContactMessage.Create(
             senderName: "Ada Lovelace",
             senderEmail: "ada@example.com",
             message: message,
             submittedAt: submittedAt));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("message"));
+        exception.ParamName.ShouldBe("message");
     }
 
     [Test]
@@ -106,9 +107,9 @@ public sealed class ContactMessageTests
         contactMessage.MarkEmailSent(sentAt);
 
         // Assert
-        Assert.That(contactMessage.Status, Is.EqualTo(ContactMessageStatus.EmailSent));
-        Assert.That(contactMessage.EmailSentAt, Is.EqualTo(sentAt));
-        Assert.That(contactMessage.FailureReason, Is.Null);
+        contactMessage.Status.ShouldBe(ContactMessageStatus.EmailSent);
+        contactMessage.EmailSentAt.ShouldBe(sentAt);
+        contactMessage.FailureReason.ShouldBeNull();
     }
 
     [Test]
@@ -121,8 +122,8 @@ public sealed class ContactMessageTests
         contactMessage.MarkEmailFailed("Mailbox unavailable");
 
         // Assert
-        Assert.That(contactMessage.Status, Is.EqualTo(ContactMessageStatus.EmailFailed));
-        Assert.That(contactMessage.FailureReason, Is.EqualTo("Mailbox unavailable"));
+        contactMessage.Status.ShouldBe(ContactMessageStatus.EmailFailed);
+        contactMessage.FailureReason.ShouldBe("Mailbox unavailable");
     }
 
     [TestCase("")]
@@ -133,18 +134,9 @@ public sealed class ContactMessageTests
         var contactMessage = CreateContactMessage();
 
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => contactMessage.MarkEmailFailed(failureReason));
+        var exception = Should.Throw<ArgumentException>(() => contactMessage.MarkEmailFailed(failureReason));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("failureReason"));
-    }
-
-    private static ContactMessage CreateContactMessage()
-    {
-        return ContactMessage.Create(
-            senderName: "Ada Lovelace",
-            senderEmail: "ada@example.com",
-            message: "Hello",
-            submittedAt: DateTimeOffset.UtcNow);
+        exception.ParamName.ShouldBe("failureReason");
     }
 }

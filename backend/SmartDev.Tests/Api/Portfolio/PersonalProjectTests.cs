@@ -1,4 +1,5 @@
 using SmartDev.Api.Functions.Domain.Portfolio;
+using static SmartDev.Tests.TestData.AggregateTestData;
 
 namespace SmartDev.Tests.Api.Portfolio;
 
@@ -24,14 +25,14 @@ public sealed class PersonalProjectTests
             technology: technology);
 
         // Assert
-        Assert.That(project.Id, Is.EqualTo(id));
-        Assert.That(project.ProjectName, Is.EqualTo("SmartDev Portfolio"));
-        Assert.That(project.Subtitle, Is.EqualTo("Production portfolio"));
-        Assert.That(project.ImagePath, Is.EqualTo("/images/portfolio.png"));
-        Assert.That(project.DemoUrl, Is.EqualTo("https://example.com"));
-        Assert.That(project.Overview, Is.EqualTo("A portfolio with a contact workflow."));
-        Assert.That(project.Impact, Is.EqualTo(new[] { "Clearer client enquiry flow", "Cloud-hosted deployment" }));
-        Assert.That(project.Technology, Is.EqualTo(technology));
+        project.Id.ShouldBe(id);
+        project.ProjectName.ShouldBe("SmartDev Portfolio");
+        project.Subtitle.ShouldBe("Production portfolio");
+        project.ImagePath.ShouldBe("/images/portfolio.png");
+        project.DemoUrl.ShouldBe("https://example.com");
+        project.Overview.ShouldBe("A portfolio with a contact workflow.");
+        project.Impact.ShouldBe(["Clearer client enquiry flow", "Cloud-hosted deployment"]);
+        project.Technology.ShouldBe(technology);
     }
 
     [Test]
@@ -44,7 +45,7 @@ public sealed class PersonalProjectTests
         var project = CreatePersonalProject(id: id, demoUrl: "   ");
 
         // Assert
-        Assert.That(project.DemoUrl, Is.Null);
+        project.DemoUrl.ShouldBeNull();
     }
 
     [TestCase("")]
@@ -52,20 +53,20 @@ public sealed class PersonalProjectTests
     public void Create_ProjectNameMissing_ThrowsArgumentException(string projectName)
     {
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => CreatePersonalProject(projectName: projectName));
+        var exception = Should.Throw<ArgumentException>(() => CreatePersonalProject(projectName: projectName));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("projectName"));
+        exception.ParamName.ShouldBe("projectName");
     }
 
     [Test]
     public void Create_ImpactEmpty_ThrowsArgumentException()
     {
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => CreatePersonalProject(impact: []));
+        var exception = Should.Throw<ArgumentException>(() => CreatePersonalProject(impact: []));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("impact"));
+        exception.ParamName.ShouldBe("impact");
     }
 
     [TestCase("")]
@@ -73,35 +74,9 @@ public sealed class PersonalProjectTests
     public void Create_ImpactItemMissing_ThrowsArgumentException(string impactItem)
     {
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => CreatePersonalProject(impact: [impactItem]));
+        var exception = Should.Throw<ArgumentException>(() => CreatePersonalProject(impact: [impactItem]));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("impact"));
-    }
-
-    private static PersonalProject CreatePersonalProject(
-        PersonalProjectId? id = null,
-        string projectName = "SmartDev Portfolio",
-        string demoUrl = "https://example.com",
-        IEnumerable<string>? impact = null)
-    {
-        return PersonalProject.Create(
-            id: id ?? PersonalProjectId.New(),
-            projectName: projectName,
-            subtitle: "Production portfolio",
-            imagePath: "/images/portfolio.png",
-            demoUrl: demoUrl,
-            overview: "A portfolio with a contact workflow.",
-            impact: impact ?? ["Clearer client enquiry flow"],
-            technology: CreateTechnologyProfile());
-    }
-
-    private static ProjectTechnologyProfile CreateTechnologyProfile()
-    {
-        return ProjectTechnologyProfile.Create(
-            backend: ".NET Azure Functions",
-            frontend: "React",
-            cicdCloud: "Azure Static Web Apps",
-            architecture: "Clean architecture");
+        exception.ParamName.ShouldBe("impact");
     }
 }

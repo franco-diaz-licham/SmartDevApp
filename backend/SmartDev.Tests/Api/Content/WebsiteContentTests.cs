@@ -1,5 +1,5 @@
 using SmartDev.Api.Functions.Domain.Content;
-using SmartDev.Api.Functions.Domain.Portfolio;
+using static SmartDev.Tests.TestData.AggregateTestData;
 
 namespace SmartDev.Tests.Api.Content;
 
@@ -23,10 +23,10 @@ public sealed class WebsiteContentTests
             updatedAt: updatedAt);
 
         // Assert
-        Assert.That(websiteContent.Id, Is.EqualTo(id));
-        Assert.That(websiteContent.PersonalProjects, Is.EqualTo(new[] { personalProject }));
-        Assert.That(websiteContent.ProfessionalExperiences, Is.EqualTo(new[] { professionalExperience }));
-        Assert.That(websiteContent.UpdatedAt, Is.EqualTo(updatedAt));
+        websiteContent.Id.ShouldBe(id);
+        websiteContent.PersonalProjects.ShouldBe([personalProject]);
+        websiteContent.ProfessionalExperiences.ShouldBe([professionalExperience]);
+        websiteContent.UpdatedAt.ShouldBe(updatedAt);
     }
 
     [Test]
@@ -36,14 +36,14 @@ public sealed class WebsiteContentTests
         var professionalExperience = CreateProfessionalExperience("Contoso");
 
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => WebsiteContent.Create(
+        var exception = Should.Throw<ArgumentException>(() => WebsiteContent.Create(
             id: WebsiteContentId.New(),
             personalProjects: [],
             professionalExperiences: [professionalExperience],
             updatedAt: DateTimeOffset.UtcNow));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("personalProjects"));
+        exception.ParamName.ShouldBe("personalProjects");
     }
 
     [Test]
@@ -53,14 +53,14 @@ public sealed class WebsiteContentTests
         var personalProject = CreatePersonalProject("SmartDev Portfolio");
 
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => WebsiteContent.Create(
+        var exception = Should.Throw<ArgumentException>(() => WebsiteContent.Create(
             id: WebsiteContentId.New(),
             personalProjects: [personalProject],
             professionalExperiences: [],
             updatedAt: DateTimeOffset.UtcNow));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("professionalExperiences"));
+        exception.ParamName.ShouldBe("professionalExperiences");
     }
 
     [Test]
@@ -84,9 +84,9 @@ public sealed class WebsiteContentTests
             updatedAt: updatedAt);
 
         // Assert
-        Assert.That(websiteContent.PersonalProjects, Is.EqualTo(new[] { newPersonalProject }));
-        Assert.That(websiteContent.ProfessionalExperiences, Is.EqualTo(new[] { newProfessionalExperience }));
-        Assert.That(websiteContent.UpdatedAt, Is.EqualTo(updatedAt));
+        websiteContent.PersonalProjects.ShouldBe([newPersonalProject]);
+        websiteContent.ProfessionalExperiences.ShouldBe([newProfessionalExperience]);
+        websiteContent.UpdatedAt.ShouldBe(updatedAt);
     }
 
     [Test]
@@ -96,13 +96,13 @@ public sealed class WebsiteContentTests
         var websiteContent = CreateWebsiteContent();
 
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => websiteContent.ReplaceContent(
+        var exception = Should.Throw<ArgumentException>(() => websiteContent.ReplaceContent(
             personalProjects: [],
             professionalExperiences: [CreateProfessionalExperience("Contoso")],
             updatedAt: DateTimeOffset.UtcNow));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("personalProjects"));
+        exception.ParamName.ShouldBe("personalProjects");
     }
 
     [Test]
@@ -112,54 +112,12 @@ public sealed class WebsiteContentTests
         var websiteContent = CreateWebsiteContent();
 
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => websiteContent.ReplaceContent(
+        var exception = Should.Throw<ArgumentException>(() => websiteContent.ReplaceContent(
             personalProjects: [CreatePersonalProject("SmartDev Portfolio")],
             professionalExperiences: [],
             updatedAt: DateTimeOffset.UtcNow));
 
         // Assert
-        Assert.That(exception!.ParamName, Is.EqualTo("professionalExperiences"));
-    }
-
-    private static WebsiteContent CreateWebsiteContent()
-    {
-        return WebsiteContent.Create(
-            id: WebsiteContentId.New(),
-            personalProjects: [CreatePersonalProject("SmartDev Portfolio")],
-            professionalExperiences: [CreateProfessionalExperience("Contoso")],
-            updatedAt: DateTimeOffset.UtcNow);
-    }
-
-    private static PersonalProject CreatePersonalProject(string projectName)
-    {
-        return PersonalProject.Create(
-            id: PersonalProjectId.New(),
-            projectName: projectName,
-            subtitle: "Production portfolio",
-            imagePath: "/images/portfolio.png",
-            demoUrl: "https://example.com",
-            overview: "A portfolio with a contact workflow.",
-            impact: ["Clearer client enquiry flow"],
-            technology: ProjectTechnologyProfile.Create(
-                backend: ".NET Azure Functions",
-                frontend: "React",
-                cicdCloud: "Azure Static Web Apps",
-                architecture: "Clean architecture"));
-    }
-
-    private static ProfessionalExperience CreateProfessionalExperience(string companyName)
-    {
-        return ProfessionalExperience.Create(
-            id: ProfessionalExperienceId.New(),
-            companyName: companyName,
-            roleTitle: "Senior Engineer",
-            imagePath: "/images/contoso.png",
-            roleSummary: "Built production systems.",
-            keyContributions: ["Improved deployment reliability"],
-            skillsAndPractices: ProfessionalSkills.Create(
-                backend: ".NET",
-                frontend: "React",
-                cicdCloud: "Azure DevOps",
-                engineeringPractices: "DDD and automated testing"));
+        exception.ParamName.ShouldBe("professionalExperiences");
     }
 }
