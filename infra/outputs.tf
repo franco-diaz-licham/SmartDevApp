@@ -39,6 +39,16 @@ output "api_function_app_default_hostname" {
   value       = azurerm_function_app_flex_consumption.api.default_hostname
 }
 
+output "worker_function_app_name" {
+  description = "Worker Function App name."
+  value       = azurerm_function_app_flex_consumption.worker.name
+}
+
+output "worker_function_app_default_hostname" {
+  description = "Worker Function App default hostname."
+  value       = azurerm_function_app_flex_consumption.worker.default_hostname
+}
+
 output "function_deployment_storage_account_name" {
   description = "Function deployment storage account name."
   value       = azurerm_storage_account.function_deployment.name

@@ -39,6 +39,18 @@ variable "api_service_plan_name" {
   default     = "ASP-SmartDevApp-a0fb"
 }
 
+variable "worker_function_app_name" {
+  description = "Production Worker Function App name."
+  type        = string
+  default     = "smartdevapp-worker-af"
+}
+
+variable "worker_service_plan_name" {
+  description = "Production Worker Flex Consumption service plan name."
+  type        = string
+  default     = "ASP-SmartDevApp-91b9"
+}
+
 variable "function_deployment_storage_account_name" {
   description = "Storage account used by Flex Consumption Function App package deployment."
   type        = string
@@ -51,6 +63,12 @@ variable "api_deployment_container_name" {
   default     = "app-package-smartdevapp-api-af-7983b6a"
 }
 
+variable "worker_deployment_container_name" {
+  description = "Blob container used by the Worker Function App package deployment."
+  type        = string
+  default     = "app-package-smartdevapp-worker-af-62d2b21"
+}
+
 variable "api_maximum_instance_count" {
   description = "Maximum API Function App instance count."
   type        = number
@@ -59,6 +77,18 @@ variable "api_maximum_instance_count" {
 
 variable "api_instance_memory_mb" {
   description = "API Function App instance memory in MB."
+  type        = number
+  default     = 512
+}
+
+variable "worker_maximum_instance_count" {
+  description = "Maximum Worker Function App instance count."
+  type        = number
+  default     = 1
+}
+
+variable "worker_instance_memory_mb" {
+  description = "Worker Function App instance memory in MB."
   type        = number
   default     = 512
 }

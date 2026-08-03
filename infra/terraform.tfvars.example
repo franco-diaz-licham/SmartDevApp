@@ -5,11 +5,16 @@ resource_group_name = "SmartDevApp"
 application_insights_name                  = "smartdevapp-ai"
 api_function_app_name                      = "smartdevapp-api-af"
 api_service_plan_name                      = "ASP-SmartDevApp-a0fb"
+worker_function_app_name                   = "smartdevapp-worker-af"
+worker_service_plan_name                   = "ASP-SmartDevApp-91b9"
 function_deployment_storage_account_name   = "smartdevappsa"
 api_deployment_container_name              = "app-package-smartdevapp-api-af-7983b6a"
+worker_deployment_container_name           = "app-package-smartdevapp-worker-af-62d2b21"
 api_maximum_instance_count                 = 1
 api_instance_memory_mb                     = 512
 api_always_ready_http_instance_count       = 1
+worker_maximum_instance_count              = 1
+worker_instance_memory_mb                  = 512
 
 cosmos_account_name                  = "smartdevapp-cdb"
 cosmos_database_name                 = "smartdev"

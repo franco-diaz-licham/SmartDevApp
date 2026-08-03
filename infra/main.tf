@@ -28,10 +28,24 @@ resource "azurerm_storage_container" "api_deployment_package" {
   container_access_type = "private"
 }
 
-## API Function App hosting plan
+resource "azurerm_storage_container" "worker_deployment_package" {
+  name                  = var.worker_deployment_container_name
+  storage_account_id    = azurerm_storage_account.function_deployment.id
+  container_access_type = "private"
+}
+
+## Function App hosting plans
 
 resource "azurerm_service_plan" "api" {
   name                = var.api_service_plan_name
+  resource_group_name = azurerm_resource_group.production.name
+  location            = azurerm_resource_group.production.location
+  os_type             = "Linux"
+  sku_name            = "FC1"
+}
+
+resource "azurerm_service_plan" "worker" {
+  name                = var.worker_service_plan_name
   resource_group_name = azurerm_resource_group.production.name
   location            = azurerm_resource_group.production.location
   os_type             = "Linux"
@@ -132,6 +146,39 @@ resource "azurerm_function_app_flex_consumption" "api" {
     name           = "http"
     instance_count = var.api_always_ready_http_instance_count
   }
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  site_config {
+    application_insights_connection_string = data.azurerm_application_insights.main.connection_string
+  }
+
+  lifecycle {
+    ignore_changes = [
+      app_settings
+    ]
+  }
+}
+
+## Worker Function App
+
+resource "azurerm_function_app_flex_consumption" "worker" {
+  name                = var.worker_function_app_name
+  resource_group_name = azurerm_resource_group.production.name
+  location            = azurerm_resource_group.production.location
+  service_plan_id     = azurerm_service_plan.worker.id
+
+  storage_container_type      = "blobContainer"
+  storage_container_endpoint  = "${azurerm_storage_account.function_deployment.primary_blob_endpoint}${azurerm_storage_container.worker_deployment_package.name}"
+  storage_authentication_type = "StorageAccountConnectionString"
+  storage_access_key          = azurerm_storage_account.function_deployment.primary_access_key
+
+  runtime_name           = "dotnet-isolated"
+  runtime_version        = "10.0"
+  maximum_instance_count = var.worker_maximum_instance_count
+  instance_memory_in_mb  = var.worker_instance_memory_mb
 
   identity {
     type = "SystemAssigned"
