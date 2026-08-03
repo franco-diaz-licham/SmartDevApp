@@ -267,3 +267,16 @@ __pycache__/
 /docs/planning
 *.pem
 .env
+
+# Terraform
+**/.terraform/*
+terraform.tfvars
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json

@@ -155,6 +155,12 @@ docker/
 └── worker-functions.dockerfile
 ```
 
+### Infrastructure
+
+```text
+infra/terraform/       # Simple production Terraform for Azure resources
+```
+
 ## 🔁 Contact Email Workflow
 
 ```text
