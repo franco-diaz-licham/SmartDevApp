@@ -158,7 +158,7 @@ docker/
 ### Infrastructure
 
 ```text
-infra/terraform/       # Simple production Terraform for Azure resources
+infra/                 # Simple production Terraform for Azure resources
 ```
 
 ## 🔁 Contact Email Workflow

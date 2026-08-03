@@ -28,3 +28,18 @@ output "contact_messages_container_name" {
   description = "Contact messages container name."
   value       = azurerm_cosmosdb_sql_container.contact_messages.name
 }
+
+output "api_function_app_name" {
+  description = "API Function App name."
+  value       = azurerm_function_app_flex_consumption.api.name
+}
+
+output "api_function_app_default_hostname" {
+  description = "API Function App default hostname."
+  value       = azurerm_function_app_flex_consumption.api.default_hostname
+}
+
+output "function_deployment_storage_account_name" {
+  description = "Function deployment storage account name."
+  value       = azurerm_storage_account.function_deployment.name
+}
