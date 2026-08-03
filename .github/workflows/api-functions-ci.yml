@@ -6,6 +6,7 @@ on:
 env:
   DOTNET_VERSION: 10.0.x
   PROJECT_PATH: backend/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj
+  TEST_PROJECT_PATH: backend/SmartDev.Tests/SmartDev.Tests.csproj
 
 jobs:
   build:
@@ -30,3 +31,6 @@ jobs:
 
       - name: Build API Functions
         run: dotnet build $env:PROJECT_PATH --configuration Release --no-restore
+
+      - name: Run backend tests
+        run: dotnet test $env:TEST_PROJECT_PATH --configuration Release
