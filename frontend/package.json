@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@azure/msal-browser": "^5.17.3",
     "@base-ui/react": "^1.6.0",
     "@iconscout/react-unicons": "^2.2.5",
     "@primereact/core": "^11.0.0",
