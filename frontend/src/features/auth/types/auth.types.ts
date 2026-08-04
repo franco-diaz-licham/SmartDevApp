@@ -1,22 +1,21 @@
-import type { AuthAccount } from '@/features/auth/types/auth.types';
+export interface AuthAccount {
+  id: string;
+  name?: string;
+  username: string;
+  tenantId: string;
+}
 
-export interface MsalTokenOptions {
+export interface AuthTokenOptions {
   allowRedirect: boolean;
   beforeRedirect?: () => void;
 }
 
-export interface MsalAuthRequest {
-  scopes: string[];
-  prompt?: string;
-}
-
-export interface MsalAuthConnector {
+export interface AuthProvider {
   initialize: () => Promise<void>;
   handleRedirect: () => Promise<void>;
   getCurrentAccount: () => AuthAccount | null;
   login: (redirectStartPage?: string) => Promise<void>;
   logout: () => Promise<void>;
-  getAccessToken: (options: MsalTokenOptions) => Promise<string | null>;
+  getAccessToken: (options: AuthTokenOptions) => Promise<string | null>;
   isInteractionInProgressError: (err: unknown) => boolean;
 }
-

@@ -1,9 +1,9 @@
 import { BrowserAuthError, InteractionRequiredAuthError, PublicClientApplication, type IPublicClientApplication } from '@azure/msal-browser';
 import { appConfig } from '@/app/appConfig';
-import type { AuthAccount } from '@/features/auth/types/auth.types';
-import { toAuthAccount } from './msalAccount.mapper';
+import type { AuthAccount, AuthProvider, AuthTokenOptions } from '@/features/auth/types/auth.types';
+import { toAuthAccount } from './auth.mapper';
 import { msalConfig } from './msalConfig';
-import type { MsalAuthConnector, MsalAuthRequest, MsalTokenOptions } from './msal.types';
+import type { MsalAuthRequest } from './msal.types';
 
 const loginRequest: MsalAuthRequest = {
   scopes: [appConfig.entraApiScope].filter(Boolean),
@@ -23,7 +23,7 @@ const selectCachedAccountWhenNeeded = (instance: IPublicClientApplication) => {
   if (firstAccount) instance.setActiveAccount(firstAccount);
 };
 
-export const msalAuthConnector: MsalAuthConnector = {
+export const msalAuthProvider: AuthProvider = {
   async initialize(): Promise<void> {
     if (!appConfig.entraClientId || !appConfig.entraAuthority) return;
 
@@ -59,7 +59,7 @@ export const msalAuthConnector: MsalAuthConnector = {
     await instance.logoutRedirect({ account: instance.getActiveAccount() ?? undefined, postLogoutRedirectUri: '/' });
   },
 
-  async getAccessToken({ allowRedirect, beforeRedirect }: MsalTokenOptions): Promise<string | null> {
+  async getAccessToken({ allowRedirect, beforeRedirect }: AuthTokenOptions): Promise<string | null> {
     const instance = getMsalInstance();
     const account = instance.getActiveAccount();
     if (!account) return null;

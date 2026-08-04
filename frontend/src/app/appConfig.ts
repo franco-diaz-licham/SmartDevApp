@@ -10,7 +10,7 @@ const apiVersion = readEnvValue('VITE_API_VERSION', 'v1').replace(/^\/+|\/+$/g, 
 
 export const appConfig = {
   apiBaseUrl: `${rootUrl}/api/${apiVersion}`,
-  appName: readEnvValue('VITE_APP_NAME', 'EarlyLearner'),
+  appName: readEnvValue('VITE_APP_NAME', 'SmartDevApp'),
   entraClientId: readEnvValue('VITE_ENTRA_CLIENT_ID'),
   entraApiScope: readEnvValue('VITE_ENTRA_API_SCOPE'),
   entraAuthority: readEnvValue('VITE_ENTRA_AUTHORITY'),
