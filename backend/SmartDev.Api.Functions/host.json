@@ -9,6 +9,11 @@
   "Cors": {
     "AllowedOrigins": ["http://localhost:5173"]
   },
+  "EntraId": {
+    "TenantId": "",
+    "Audience": "",
+    "OwnerObjectId": ""
+  },
   "RateLimiting": {
     "Enabled": true,
     "DefaultPolicy": {
