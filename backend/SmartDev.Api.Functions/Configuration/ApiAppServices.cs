@@ -13,6 +13,7 @@ using SmartDev.Api.Functions.Infrastructure.Persistence;
 using SmartDev.Shared.Options;
 using SmartDev.Api.Functions.Application.UsesCases;
 using SmartDev.Api.Functions.Configuration.Middleware;
+using SmartDev.Api.Functions.Infrastructure.Auth;
 
 namespace SmartDev.Api.Functions.Configuration;
 
@@ -42,8 +43,16 @@ public static class ApiAppServices
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services
+            .AddOptions<EntraIdOptions>()
+            .Bind(configuration.GetSection(EntraIdOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services.AddSingleton<HttpCorsHeaders>();
         services.AddSingleton<HttpRateLimiter>();
+        services.AddSingleton<IAccessTokenValidator, EntraAccessTokenValidator>();
+        services.AddSingleton<IAdminAccessAuthorizer, AdminAccessAuthorizer>();
 
         return services;
     }

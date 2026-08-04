@@ -10,7 +10,8 @@ try {
     builder
         .AddHostServices()
         .UseMiddleware<HttpCorsMiddleware>()
-        .UseMiddleware<HttpRateLimitingMiddleware>();
+        .UseMiddleware<HttpRateLimitingMiddleware>()
+        .UseMiddleware<HttpAdminAuthorizationMiddleware>();
 
     Log.Information("Starting SmartDev API Functions host");
     builder.Services.AddAppServices(builder.Configuration, builder.Environment);
