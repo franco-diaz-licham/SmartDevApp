@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import UilBars from '@iconscout/react-unicons/icons/uil-bars';
 import UilTimes from '@iconscout/react-unicons/icons/uil-times';
+import { Link } from 'react-router-dom';
 import logoImage from '@/assets/images/logo.png';
+import { useAuth } from '@/features/auth';
 
 const navigationItems = [
   { label: 'HOME', href: '/home#hero' },
@@ -13,6 +15,16 @@ const navigationItems = [
 
 export const AppTopBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, isAuthReady, interactionInProgress, logout } = useAuth();
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    closeMenu();
+    void logout();
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-muted">
@@ -28,11 +40,33 @@ export const AppTopBar = () => {
         <ul id="site-navigation" className={`ml-4 basis-full flex-col gap-y-2 pt-3 font-bold lg:flex lg:basis-auto lg:flex-row lg:justify-end lg:gap-x-6 lg:pt-0 ${isMenuOpen ? 'flex' : 'hidden'}`}>
           {navigationItems.map((item) => (
             <li key={item.href}>
-              <a className="block py-2 no-underline hover:underline lg:py-0" href={item.href} onClick={() => setIsMenuOpen(false)}>
+              <a className="block py-2 no-underline hover:underline lg:py-0" href={item.href} onClick={closeMenu}>
                 {item.label}
               </a>
             </li>
           ))}
+
+          {isAuthReady &&
+            (isAuthenticated ? (
+              <>
+                <li>
+                  <Link className="block py-2 no-underline hover:underline lg:py-0" to="/notes" onClick={closeMenu}>
+                    NOTES
+                  </Link>
+                </li>
+                <li>
+                  <button className="block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline disabled:cursor-not-allowed disabled:opacity-60 lg:py-0" type="button" disabled={interactionInProgress} onClick={handleLogout}>
+                    LOG OUT
+                  </button>
+                </li>
+              </>
+            ) : (
+              <li>
+                <Link className="block py-2 no-underline hover:underline lg:py-0" to="/login?returnTo=%2Fnotes" onClick={closeMenu}>
+                  LOGIN
+                </Link>
+              </li>
+            ))}
         </ul>
       </nav>
     </header>
