@@ -1,8 +1,9 @@
 import UilMicrosoft from '@iconscout/react-unicons/icons/uil-microsoft';
-import UilShieldCheck from '@iconscout/react-unicons/icons/uil-shield-check';
+import UilArrowLeft from '@iconscout/react-unicons/icons/uil-arrow-left';
 import { useEffect } from 'react';
-import { Navigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { appConfig } from '@/app/appConfig';
+import logoImage from '@/assets/images/logo.png';
 import { AppButton } from '@/components/ui/AppButton';
 import { useAuth } from '../hooks/useAuth';
 
@@ -28,30 +29,22 @@ export const LoginPage = () => {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      <section className="grid w-full max-w-5xl overflow-hidden rounded-2xl border border-border bg-card shadow-xl lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="flex flex-col justify-between bg-muted p-8 sm:p-12">
-          <div>
-            <p className="text-sm font-extrabold uppercase tracking-wide text-primary">Owner workspace</p>
-            <h1 className="mt-4 text-3xl font-extrabold leading-tight text-foreground sm:text-4xl">Sign in to SmartDevApp</h1>
-            <p className="mt-5 text-base leading-7 text-muted-foreground sm:text-lg">Use your Microsoft account to manage private notes, drafts, and future admin tools.</p>
-          </div>
+      <section className="w-full max-w-sm rounded-lg border border-border bg-background px-8 py-10 text-center shadow-xl sm:max-w-md sm:px-12">
+        <img src={logoImage} className="mx-auto mb-6 size-30 object-contain" alt="SmartDev" />
+        <h1 className="text-3xl font-extrabold leading-tight text-foreground">Welcome back</h1>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">Sign in to continue to SmartDev.</p>
+        <div className="my-8 border-t border-border" />
+        <div className="flex flex-col gap-5 items-center">
+          <AppButton className="mb-0 mt-0 w-full rounded-full" disabled={!isAuthReady || interactionInProgress} onClick={handleLogin}>
+            <UilMicrosoft aria-hidden="true" className="size-5" />
+            {interactionInProgress || !isAuthReady ? 'Connecting...' : 'Sign in with Microsoft'}
+          </AppButton>
+          <Link className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-muted-foreground no-underline hover:text-foreground hover:underline" to="/home">
+            <UilArrowLeft aria-hidden="true" size={20} />
+            Back home
+          </Link>
         </div>
-
-        <div className="flex flex-col justify-center p-8 sm:p-12">
-          <div className="mx-auto w-full max-w-sm">
-            <div className="mb-8 flex size-14 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <UilShieldCheck aria-hidden="true" className="size-8" />
-            </div>
-
-            <h2 className="text-2xl font-extrabold text-foreground">Owner login</h2>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">Account creation is disabled. Only the configured owner account should be authorised by the API.</p>
-
-            <AppButton className="mt-8 w-full" disabled={!isAuthReady || interactionInProgress} onClick={handleLogin}>
-              <UilMicrosoft aria-hidden="true" className="size-5" />
-              {interactionInProgress || !isAuthReady ? 'Connecting...' : 'Log in with Microsoft'}
-            </AppButton>
-          </div>
-        </div>
+        <p className="mx-auto mt-5 max-w-xs text-sm leading-6 text-muted-foreground">Access is limited to Admin of the website.</p>
       </section>
     </main>
   );
