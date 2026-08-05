@@ -80,16 +80,16 @@ export const professionalWorkItems: ProfessionalWorkItem[] = [
   {
     id: '3',
     companyName: 'PropertyMe',
-    roleTitle: 'Software Developer',
+    roleTitle: 'Software Engineer',
     image: item5Image,
     roleSummary:
-      'This role involved delivering cloud-based features for a national property management platform in collaboration with Product Managers and business stakeholders. The work included developing .NET solutions using DDD, Clean Architecture, SOLID principles, and modern engineering practices; maintaining software quality through automated unit and integration testing; conducting code reviews; mentoring junior developers; building responsive customer-facing applications with TypeScript, JavaScript, and Vue; working with CI/CD workflows including GitHub Actions; and contributing to Agile delivery through sprint planning, backlog refinement, and continuous improvement initiatives.',
+      'This role involved delivering cloud-based features for a national property management platform in collaboration with Product Managers and business stakeholders. The work included developing .NET solutions using DDD, Clean Architecture, SOLID principles, and modern engineering practices; maintaining software quality through automated unit and integration testing; conducting code reviews; mentoring junior engineers; building responsive customer-facing applications with TypeScript, JavaScript, and Vue; working with CI/CD workflows including GitHub Actions; and contributing to Agile delivery through sprint planning, backlog refinement, and continuous improvement initiatives.',
     keyContributions: [
       'Architected and implemented a high-performance PDF and image processing background worker using RabbitMQ for asynchronous workloads, reducing PDF generation times by 75% from 60 seconds to 15 seconds',
-      'Proposed and drove the adoption of a vertical feature-slice architecture for a major frontend codebase, improving maintainability, scalability, and developer experience',
+      'Proposed and drove the adoption of a vertical feature-slice architecture for a major frontend codebase, improving maintainability, scalability, and engineering experience',
       'Delivered cloud-based product features in collaboration with Product Managers and business stakeholders',
       'Maintained software quality through automated unit and integration testing',
-      'Supported engineering standards through code reviews and mentoring junior developers'
+      'Supported engineering standards through code reviews and mentoring junior engineers'
     ],
     skillsAndPractices: {
       backend: '.NET, DDD, Clean Architecture, SOLID principles, cloud-based application patterns',

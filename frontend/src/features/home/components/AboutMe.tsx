@@ -8,7 +8,7 @@ export const AboutMe = () => {
         <h1 className="text-left text-5xl font-bold uppercase leading-[1.1]">About Me</h1>
         <img src={meImage} className="mx-auto block w-1/2 rounded-full border border-[#9e9e9e] shadow-[0_10px_15px_rgb(160_160_160_/_0.75)] md:hidden" alt="Franco Diaz Licham" />
         <p>
-          Hi, I'm <strong>Franco Diaz</strong>, a Software Developer based in Western Sydney, Australia. <em>SmartDev</em> began as a personal project I created in my own time - a way to share my passion for building software solutions and to
+          Hi, I'm <strong>Franco Diaz</strong>, a Software Engineer based in Western Sydney, Australia. <em>SmartDev</em> began as a personal project I created in my own time - a way to share my passion for building software solutions and to
           collaborate with others who value clean, practical, and approachable technology. It reflects how I like to work: turning ideas into real applications that are intuitive and reliable.
         </p>
         <p>

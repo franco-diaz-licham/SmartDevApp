@@ -61,7 +61,7 @@ export const HomePage = () => {
 
   return (
     <main>
-      <AppHero backgroundImage={heroImage} subtitle="SmartDev: Smart Software Made Simple" title={'Franco Diaz\nFull-Stack Developer'} />
+      <AppHero backgroundImage={heroImage} subtitle="SmartDev: Smart Software Made Simple" title={'Franco Diaz\nFull-Stack Engineer'} />
       <AboutMe />
       <Experience />
       <Portfolio />
