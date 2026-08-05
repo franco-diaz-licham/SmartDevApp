@@ -30,15 +30,8 @@ public sealed class CosmosDocumentStore(CosmosClient client, IOptions<CosmosDbOp
         return await JsonSerializer.DeserializeAsync<TDocument>(response.Content, SerializerOptions, cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<TDocument>> QueryAsync<TDocument>(
-        string containerName,
-        string queryText,
-        IReadOnlyDictionary<string, object?>? parameters = null,
-        string? partitionKey = null,
-        CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<TDocument>> QueryAsync<TDocument>(string containerName, QueryDefinition query, string? partitionKey = null, CancellationToken cancellationToken = default)
     {
-        var query = new QueryDefinition(queryText);
-        foreach (var parameter in parameters ?? new Dictionary<string, object?>()) query = query.WithParameter(parameter.Key, parameter.Value);
         var requestOptions = string.IsNullOrWhiteSpace(partitionKey) ? null : new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey) };
 
         var results = new List<TDocument>();
