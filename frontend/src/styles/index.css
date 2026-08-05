@@ -86,7 +86,7 @@
 
 @layer base {
   html {
-    font-size: 20px;
+    font-size: 16px;
     scroll-behavior: smooth;
   }
 
@@ -107,24 +107,6 @@
 
 @media screen and (max-width: 600px) {
   html {
-    font-size: 14px;
-  }
-}
-
-@media screen and (min-width: 601px) and (max-width: 767px) {
-  html {
-    font-size: 20px;
-  }
-}
-
-@media screen and (min-width: 768px) and (max-width: 991px) {
-  html {
-    font-size: 26px;
-  }
-}
-
-@media screen and (min-width: 992px) and (max-width: 1199px) {
-  html {
-    font-size: 30px;
+    font-size: 15px;
   }
 }

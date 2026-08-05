@@ -16,8 +16,8 @@ export const AppHero = ({ backgroundImage, id = 'hero', subtitle, title }: AppHe
     >
       <div className="relative mx-auto h-full max-w-[1320px] px-4">
         <div className="absolute top-[30%]">
-          <h1 className="mb-4 whitespace-pre-line text-left text-[4rem] font-bold uppercase leading-[1.2] text-primary-foreground max-sm:text-[3rem]">{title}</h1>
-          <h5 className="text-[1.25rem] font-medium uppercase text-primary-foreground">{subtitle}</h5>
+          <h1 className="mb-4 whitespace-pre-line text-left text-[2.75rem] font-bold uppercase leading-[1.15] text-primary-foreground sm:text-[3.5rem] lg:text-[4rem]">{title}</h1>
+          <h5 className="text-base font-medium uppercase text-primary-foreground sm:text-lg">{subtitle}</h5>
         </div>
       </div>
     </section>

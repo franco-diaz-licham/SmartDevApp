@@ -12,7 +12,7 @@ export const ExperienceCard = ({ image, imageAlt, points, title }: ExperienceCar
         <img src={image} className="w-3/5 sm:w-2/5" alt={imageAlt} />
       </div>
       <div className="border-b border-foreground pb-10">
-        <h5 className="font-bold uppercase text-secondary text-[1.25rem]">{title}</h5>
+        <h5 className="text-lg font-bold uppercase text-secondary sm:text-xl">{title}</h5>
         <ul className="list-disc pl-6">
           {points.map((point) => (
             <li key={point}>{point}</li>

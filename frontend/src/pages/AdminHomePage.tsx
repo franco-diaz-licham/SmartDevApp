@@ -7,7 +7,7 @@ export const AdminHomePage = () => {
     <main className="min-h-screen bg-background px-4 py-16">
       <section className="mx-auto max-w-5xl rounded-2xl border border-border bg-card p-8 shadow-xl">
         <p className="text-sm font-extrabold uppercase tracking-wide text-primary">Admin</p>
-        <h1 className="mt-3 text-4xl font-extrabold text-foreground">SmartDevApp owner workspace</h1>
+        <h1 className="mt-3 text-3xl font-extrabold leading-tight text-foreground sm:text-4xl">SmartDevApp owner workspace</h1>
         <p className="mt-4 max-w-2xl text-muted-foreground">Frontend Microsoft Entra login is wired. Backend owner-only token validation comes next before real admin actions are added.</p>
 
         {account && (
@@ -26,4 +26,3 @@ export const AdminHomePage = () => {
     </main>
   );
 };
-

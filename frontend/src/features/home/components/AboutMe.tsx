@@ -5,7 +5,7 @@ export const AboutMe = () => {
   return (
     <AppPageContainer contentClassName="grid md:grid-cols-4" id="about-me" sectionClassName="scroll-mt-32">
       <div className="flex flex-col gap-8 md:col-span-3">
-        <h1 className="text-left text-5xl font-bold uppercase leading-[1.1]">About Me</h1>
+        <h1 className="text-left text-3xl font-bold uppercase leading-tight sm:text-4xl md:text-5xl">About Me</h1>
         <img src={meImage} className="mx-auto block w-1/2 rounded-full border border-[#9e9e9e] shadow-[0_10px_15px_rgb(160_160_160_/_0.75)] md:hidden" alt="Franco Diaz Licham" />
         <p>
           Hi, I'm <strong>Franco Diaz</strong>, a Software Engineer based in Western Sydney, Australia. <em>SmartDev</em> began as a personal project I created in my own time - a way to share my passion for building software solutions and to

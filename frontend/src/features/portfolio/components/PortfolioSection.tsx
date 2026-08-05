@@ -10,7 +10,7 @@ type PortfolioSectionProps = {
 export const PortfolioSection = ({ children, shaded = false, title }: PortfolioSectionProps) => {
   return (
     <AppPageContainer sectionClassName={shaded ? 'bg-muted' : undefined}>
-      <h1 className="text-left text-5xl font-bold uppercase leading-[1.1]">{title}</h1>
+      <h1 className="text-left text-3xl font-bold uppercase leading-tight sm:text-4xl md:text-5xl">{title}</h1>
       {children}
     </AppPageContainer>
   );

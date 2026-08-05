@@ -18,11 +18,11 @@ export const AppCarousel = ({ children }: AppCarouselProps) => {
   const slides = Children.toArray(children);
   const slidesPerPage = isDesktop ? 1.75 : 1;
   const carouselMaxWidthClassName = isDesktop ? 'max-w-[1180px]' : 'max-w-[360px]';
-  const carouselContentPaddingClassName = isDesktop ? 'px-0' : 'px-4';
+  const carouselContentPaddingClassName = isDesktop ? 'px-3' : 'px-4';
 
   return (
-    <Carousel.Root align="center" className={cn('mx-auto w-full', carouselMaxWidthClassName)} loop slidesPerPage={slidesPerPage} spacing={0}>
-      <Carousel.Content className="pb-6 w-full">
+    <Carousel.Root align="center" className={cn('mx-auto w-full', carouselMaxWidthClassName)} loop slidesPerPage={slidesPerPage} spacing={24}>
+      <Carousel.Content className="w-full pb-6">
         {slides.map((slide, index) => (
           <Carousel.Item key={index} value={index} className={cn(carouselContentPaddingClassName, 'max-w-120')}>
             {slide}

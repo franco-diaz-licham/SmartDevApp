@@ -32,8 +32,8 @@ export const LoginPage = () => {
         <div className="flex flex-col justify-between bg-muted p-8 sm:p-12">
           <div>
             <p className="text-sm font-extrabold uppercase tracking-wide text-primary">Owner workspace</p>
-            <h1 className="mt-4 text-4xl font-extrabold leading-tight text-foreground sm:text-5xl">Sign in to SmartDevApp</h1>
-            <p className="mt-5 text-lg leading-8 text-muted-foreground">Use your Microsoft account to manage private notes, drafts, and future admin tools.</p>
+            <h1 className="mt-4 text-3xl font-extrabold leading-tight text-foreground sm:text-4xl">Sign in to SmartDevApp</h1>
+            <p className="mt-5 text-base leading-7 text-muted-foreground sm:text-lg">Use your Microsoft account to manage private notes, drafts, and future admin tools.</p>
           </div>
         </div>
 
