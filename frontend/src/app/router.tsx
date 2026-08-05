@@ -31,7 +31,8 @@ export const router = createBrowserRouter([
         element: <WorkspaceLayout />,
         children: [
           { path: '/admin', element: <AdminHomePage /> },
-          { path: '/notes', element: <NotesPage /> }
+          { path: '/workspace', element: <NotesPage /> },
+          { path: '/notes', element: <Navigate to="/workspace" replace /> }
         ]
       }
     ]

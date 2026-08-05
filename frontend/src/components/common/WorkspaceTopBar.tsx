@@ -1,64 +1,54 @@
-import UilEstate from '@iconscout/react-unicons/icons/uil-estate';
-import UilFileAlt from '@iconscout/react-unicons/icons/uil-file-alt';
-import UilSignout from '@iconscout/react-unicons/icons/uil-signout';
-import UilUser from '@iconscout/react-unicons/icons/uil-user';
-import { Link, NavLink } from 'react-router-dom';
+import { useState } from 'react';
+import UilBars from '@iconscout/react-unicons/icons/uil-bars';
+import UilTimes from '@iconscout/react-unicons/icons/uil-times';
+import logoImage from '@/assets/images/logo.png';
 import { useAuth } from '@/features/auth';
-import { cn } from '@/lib/cn';
 
 const workspaceNavigationItems = [
-  { label: 'Notes', to: '/notes', icon: UilFileAlt },
-  { label: 'Admin', to: '/admin', icon: UilUser }
+  { label: 'HOME', href: '/home' },
+  { label: 'WORKSPACE', href: '/workspace' },
+  { label: 'ADMIN', href: '/admin' }
 ] as const;
 
-const workspaceLinkClassName = ({ isActive }: { isActive: boolean }) =>
-  cn(
-    'inline-flex min-h-10 items-center gap-2 rounded-md px-3 text-sm font-bold no-underline transition hover:bg-muted',
-    isActive ? 'bg-primary text-primary-foreground hover:bg-primary' : 'text-foreground'
-  );
-
 export const WorkspaceTopBar = () => {
-  const { account, interactionInProgress, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { interactionInProgress, logout } = useAuth();
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
 
   const handleLogout = () => {
+    closeMenu();
     void logout();
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background">
-      <nav className="mx-auto flex min-h-16 max-w-[1320px] flex-wrap items-center gap-3 px-4 py-3">
-        <Link className="mr-auto inline-flex items-center gap-2 text-sm font-extrabold uppercase text-foreground no-underline" to="/home">
-          <UilEstate aria-hidden="true" size={22} />
-          SmartDev
-        </Link>
+    <header className="sticky top-0 z-50 bg-muted">
+      <nav className="mx-auto flex max-w-[1920px] flex-wrap items-center px-4 py-2">
+        <a className="mr-auto py-[0.3125rem] pl-4 no-underline" href="/home" aria-label="SmartDev home">
+          <img src={logoImage} className="size-[4.5rem]" alt="" />
+        </a>
 
-        <div className="flex items-center gap-2">
-          {workspaceNavigationItems.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <NavLink className={workspaceLinkClassName} key={item.to} to={item.to}>
-                <Icon aria-hidden="true" size={20} />
-                {item.label}
-              </NavLink>
-            );
-          })}
-        </div>
-
-        <div className="ml-auto hidden max-w-56 truncate text-right text-sm text-muted-foreground sm:block">
-          <span className="block truncate font-semibold text-foreground">{account?.name ?? 'Owner'}</span>
-          <span className="block truncate">{account?.username}</span>
-        </div>
-
-        <button
-          className="inline-flex min-h-10 items-center gap-2 rounded-md border border-border bg-background px-3 text-sm font-bold text-foreground transition hover:cursor-pointer hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
-          type="button"
-          disabled={interactionInProgress}
-          onClick={handleLogout}
-        >
-          <UilSignout aria-hidden="true" size={20} />
-          Log out
+        <button aria-controls="workspace-navigation" aria-expanded={isMenuOpen} aria-label="Toggle navigation" className="mx-4 rounded border border-border p-2 lg:hidden" type="button" onClick={() => setIsMenuOpen((current) => !current)}>
+          {isMenuOpen ? <UilTimes size="1.5rem" /> : <UilBars size="1.5rem" />}
         </button>
+
+        <ul id="workspace-navigation" className={`ml-4 basis-full flex-col gap-y-2 pt-3 font-bold lg:flex lg:basis-auto lg:flex-row lg:justify-end lg:gap-x-6 lg:pt-0 ${isMenuOpen ? 'flex' : 'hidden'}`}>
+          {workspaceNavigationItems.map((item) => (
+            <li key={item.href}>
+              <a className="block py-2 no-underline hover:underline lg:py-0" href={item.href} onClick={closeMenu}>
+                {item.label}
+              </a>
+            </li>
+          ))}
+
+          <li>
+            <button className="block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline disabled:cursor-not-allowed disabled:opacity-60 lg:py-0" type="button" disabled={interactionInProgress} onClick={handleLogout}>
+              LOG OUT
+            </button>
+          </li>
+        </ul>
       </nav>
     </header>
   );

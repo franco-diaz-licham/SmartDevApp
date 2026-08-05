@@ -8,7 +8,7 @@ import { AppButton } from '@/components/ui/AppButton';
 import { useAuth } from '../hooks/useAuth';
 
 const getSafeReturnPath = (value: string | null) => {
-  if (!value || !value.startsWith('/') || value.startsWith('//')) return '/notes';
+  if (!value || !value.startsWith('/') || value.startsWith('//')) return '/workspace';
   return value;
 };
 
