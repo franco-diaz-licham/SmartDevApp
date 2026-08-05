@@ -8,8 +8,9 @@ import { router } from './router';
 export const App = () => (
   <PrimeReactProvider {...primeReactConfig}>
     <AppToastProvider>
-      <AuthBootstrap />
-      <RouterProvider router={router} />
+      <AuthBootstrap>
+        <RouterProvider router={router} />
+      </AuthBootstrap>
     </AppToastProvider>
   </PrimeReactProvider>
 );
