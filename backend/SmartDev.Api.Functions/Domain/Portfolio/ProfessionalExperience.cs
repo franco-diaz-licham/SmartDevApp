@@ -22,16 +22,34 @@ public sealed class ProfessionalExperience : Entity<ProfessionalExperienceId>
         SkillsAndPractices = skillsAndPractices;
     }
 
+    /// <summary>
+    /// Gets the company or organisation name.
+    /// </summary>
     public string CompanyName { get; private set; }
 
+    /// <summary>
+    /// Gets the role title held for the professional experience.
+    /// </summary>
     public string RoleTitle { get; private set; }
 
+    /// <summary>
+    /// Gets the image path used to represent the professional experience.
+    /// </summary>
     public string ImagePath { get; private set; }
 
+    /// <summary>
+    /// Gets the professional experience summary.
+    /// </summary>
     public string RoleSummary { get; private set; }
 
+    /// <summary>
+    /// Gets the key contributions delivered in the role.
+    /// </summary>
     public IReadOnlyList<string> KeyContributions { get; private set; }
 
+    /// <summary>
+    /// Gets the skills and engineering practices used in the role.
+    /// </summary>
     public ProfessionalSkills SkillsAndPractices { get; private set; }
 
     public static ProfessionalExperience Create(

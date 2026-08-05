@@ -9,20 +9,23 @@ public sealed class WebsiteContent : Entity<WebsiteContentId>
         WebsiteContentId id,
         IReadOnlyList<PersonalProject> personalProjects,
         IReadOnlyList<ProfessionalExperience> professionalExperiences,
-        DateTimeOffset updatedAt)
+        DateTimeOffset? updatedAt)
         : base(id)
     {
         PersonalProjects = personalProjects;
         ProfessionalExperiences = professionalExperiences;
-        UpdatedAt = updatedAt;
+        if (updatedAt is not null) Touch(updatedAt.Value);
     }
 
+    /// <summary>
+    /// Gets the personal projects shown on the website.
+    /// </summary>
     public IReadOnlyList<PersonalProject> PersonalProjects { get; private set; }
 
+    /// <summary>
+    /// Gets the professional experiences shown on the website.
+    /// </summary>
     public IReadOnlyList<ProfessionalExperience> ProfessionalExperiences { get; private set; }
-
-    public DateTimeOffset UpdatedAt { get; private set; }
-
 
     public static WebsiteContent Create(
         WebsiteContentId id,
@@ -44,6 +47,6 @@ public sealed class WebsiteContent : Entity<WebsiteContentId>
     {
         PersonalProjects = Guard.EnsureAny(personalProjects, nameof(personalProjects));
         ProfessionalExperiences = Guard.EnsureAny(professionalExperiences, nameof(professionalExperiences));
-        UpdatedAt = updatedAt;
+        Touch(updatedAt);
     }
 }

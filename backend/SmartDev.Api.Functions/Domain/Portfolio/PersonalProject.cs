@@ -24,18 +24,39 @@ public sealed class PersonalProject : Entity<PersonalProjectId>
         Technology = technology;
     }
 
+    /// <summary>
+    /// Gets the project display name.
+    /// </summary>
     public string ProjectName { get; private set; }
 
+    /// <summary>
+    /// Gets the short project subtitle.
+    /// </summary>
     public string Subtitle { get; private set; }
 
+    /// <summary>
+    /// Gets the image path used to represent the project.
+    /// </summary>
     public string ImagePath { get; private set; }
 
+    /// <summary>
+    /// Gets the optional demo URL for the project.
+    /// </summary>
     public string? DemoUrl { get; private set; }
 
+    /// <summary>
+    /// Gets the project overview text.
+    /// </summary>
     public string Overview { get; private set; }
 
+    /// <summary>
+    /// Gets the project impact statements.
+    /// </summary>
     public IReadOnlyList<string> Impact { get; private set; }
 
+    /// <summary>
+    /// Gets the technology profile used by the project.
+    /// </summary>
     public ProjectTechnologyProfile Technology { get; private set; }
 
     public static PersonalProject Create(

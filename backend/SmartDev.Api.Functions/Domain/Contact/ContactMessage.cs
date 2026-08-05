@@ -19,18 +19,39 @@ public sealed class ContactMessage : Entity<ContactMessageId>
         Status = ContactMessageStatus.Submitted;
     }
 
+    /// <summary>
+    /// Gets the name supplied by the person submitting the contact form.
+    /// </summary>
     public string SenderName { get; private set; }
 
+    /// <summary>
+    /// Gets the email address supplied by the person submitting the contact form.
+    /// </summary>
     public string SenderEmail { get; private set; }
 
+    /// <summary>
+    /// Gets the submitted contact message body.
+    /// </summary>
     public string Message { get; private set; }
 
+    /// <summary>
+    /// Gets when the contact message was submitted.
+    /// </summary>
     public DateTimeOffset SubmittedAt { get; }
 
+    /// <summary>
+    /// Gets the current contact message processing status.
+    /// </summary>
     public ContactMessageStatus Status { get; private set; }
 
+    /// <summary>
+    /// Gets when the contact email was sent, when delivery has succeeded.
+    /// </summary>
     public DateTimeOffset? EmailSentAt { get; private set; }
 
+    /// <summary>
+    /// Gets the email delivery failure reason, when delivery has failed.
+    /// </summary>
     public string? FailureReason { get; private set; }
 
     public static ContactMessage Create(
