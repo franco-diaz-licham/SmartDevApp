@@ -14,11 +14,7 @@ public sealed class CosmosDocumentStore(CosmosClient client, IOptions<CosmosDbOp
 
     public async Task EnsureContainerAsync(string containerName, string partitionKeyPath, int? defaultTimeToLiveSeconds = null, CancellationToken cancellationToken = default)
     {
-        var databaseResponse = await client.CreateDatabaseIfNotExistsAsync(
-            _options.DatabaseName,
-            throughput: _options.Throughput,
-            cancellationToken: cancellationToken);
-
+        var databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_options.DatabaseName, throughput: _options.Throughput, cancellationToken: cancellationToken);
         var properties = new ContainerProperties(containerName, partitionKeyPath) {
             DefaultTimeToLive = defaultTimeToLiveSeconds ?? _options.DefaultTimeToLiveSeconds
         };
@@ -29,11 +25,30 @@ public sealed class CosmosDocumentStore(CosmosClient client, IOptions<CosmosDbOp
     public async Task<TDocument?> GetAsync<TDocument>(string containerName, string id, string partitionKey, CancellationToken cancellationToken = default)
     {
         using var response = await GetContainer(containerName).ReadItemStreamAsync(id, new PartitionKey(partitionKey), cancellationToken: cancellationToken);
-
         if (response.StatusCode == HttpStatusCode.NotFound) return default;
-
         response.EnsureSuccessStatusCode();
         return await JsonSerializer.DeserializeAsync<TDocument>(response.Content, SerializerOptions, cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<TDocument>> QueryAsync<TDocument>(
+        string containerName,
+        string queryText,
+        IReadOnlyDictionary<string, object?>? parameters = null,
+        string? partitionKey = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new QueryDefinition(queryText);
+        foreach (var parameter in parameters ?? new Dictionary<string, object?>()) query = query.WithParameter(parameter.Key, parameter.Value);
+        var requestOptions = string.IsNullOrWhiteSpace(partitionKey) ? null : new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey) };
+
+        var results = new List<TDocument>();
+        using var iterator = GetContainer(containerName).GetItemQueryIterator<TDocument>(query, requestOptions: requestOptions);
+        while (iterator.HasMoreResults) {
+            var response = await iterator.ReadNextAsync(cancellationToken);
+            results.AddRange(response);
+        }
+
+        return results;
     }
 
     public async Task<bool> TryCreateAsync<TDocument>(string containerName, TDocument document, string partitionKey, CancellationToken cancellationToken = default)
