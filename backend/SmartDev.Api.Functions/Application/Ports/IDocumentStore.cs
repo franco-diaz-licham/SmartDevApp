@@ -1,3 +1,5 @@
+using Microsoft.Azure.Cosmos;
+
 namespace SmartDev.Api.Functions.Application.Ports;
 
 /// <summary>
@@ -38,15 +40,13 @@ public interface IDocumentStore
     /// </summary>
     /// <typeparam name="TDocument">The document type to read.</typeparam>
     /// <param name="containerName">The name of the document container.</param>
-    /// <param name="queryText">The SQL query text.</param>
-    /// <param name="parameters">The query parameters.</param>
+    /// <param name="query">The parameterised Cosmos SQL query.</param>
     /// <param name="partitionKey">The optional partition key to scope the query.</param>
     /// <param name="cancellationToken">The token used to cancel the operation.</param>
     /// <returns>The documents returned by the query.</returns>
     Task<IReadOnlyCollection<TDocument>> QueryAsync<TDocument>(
         string containerName,
-        string queryText,
-        IReadOnlyDictionary<string, object?>? parameters = null,
+        QueryDefinition query,
         string? partitionKey = null,
         CancellationToken cancellationToken = default);
 

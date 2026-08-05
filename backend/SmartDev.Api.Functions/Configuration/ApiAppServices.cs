@@ -65,6 +65,12 @@ public static class ApiAppServices
 
         services.AddScoped<CreateContactEmailHandler>();
         services.AddScoped<UpdateContactEmailStatusHandler>();
+        services.AddScoped<GetPublicNotesHandler>();
+        services.AddScoped<GetPublicNoteBySlugHandler>();
+        services.AddScoped<GetPublicNoteCategoriesHandler>();
+        services.AddScoped<GetPublicNoteTagsHandler>();
+        services.AddScoped<SearchPublicNotesHandler>();
+        services.AddScoped<GetPublicNoteSearchIndexHandler>();
 
         return services;
     }
@@ -101,6 +107,7 @@ public static class ApiAppServices
 
         services.AddSingleton<IDocumentStore, CosmosDocumentStore>();
         services.AddScoped<IContactMessageStore, CosmosContactMessageStore>();
+        services.AddScoped<INoteRepository, CosmosNoteRepository>();
 
         return services;
     }
