@@ -1,6 +1,5 @@
 using SmartDev.Api.Functions.Domain.Contact;
-using SmartDev.Api.Functions.Domain.Content;
-using SmartDev.Api.Functions.Domain.Portfolio;
+using SmartDev.Api.Functions.Domain.Notes;
 
 namespace SmartDev.Tests.TestData;
 
@@ -19,65 +18,49 @@ internal static class AggregateTestData
             submittedAt: submittedAt ?? DateTimeOffset.UtcNow);
     }
 
-    public static WebsiteContent CreateWebsiteContent(
-        IEnumerable<PersonalProject>? personalProjects = null,
-        IEnumerable<ProfessionalExperience>? professionalExperiences = null,
-        DateTimeOffset? updatedAt = null)
+    public static Note CreateNote(
+        string title = "Azure Functions Notes",
+        string slug = "azure-functions-notes",
+        string summary = "Useful notes about Azure Functions.",
+        string category = "Backend",
+        string bodyMarkdown = "# Azure Functions\n\nNotes.",
+        IEnumerable<string>? tags = null,
+        DateTimeOffset? createdAt = null)
     {
-        return WebsiteContent.Create(
-            id: WebsiteContentId.New(),
-            personalProjects: personalProjects ?? [CreatePersonalProject("SmartDev Portfolio")],
-            professionalExperiences: professionalExperiences ?? [CreateProfessionalExperience("Contoso")],
-            updatedAt: updatedAt ?? DateTimeOffset.UtcNow);
+        return Note.CreateDraft(
+            id: NoteId.New(),
+            title: NoteTitle.Create(title),
+            slug: NoteSlug.Create(slug),
+            summary: NoteSummary.Create(summary),
+            category: NoteCategorySnapshot.Create(NoteCategorySlug.Create(ToSlug(category)), category.Trim()),
+            body: MarkdownContent.Create(bodyMarkdown),
+            tags: (tags ?? ["azure-functions", "dotnet"])
+                .Select(tag => NoteTagSnapshot.Create(NoteTagSlug.Create(tag), ToDisplayName(tag))),
+            relatedProjects: [],
+            now: createdAt ?? DateTimeOffset.UtcNow);
     }
 
-    public static PersonalProject CreatePersonalProject(
-        string projectName = "SmartDev Portfolio",
-        PersonalProjectId? id = null,
-        string demoUrl = "https://example.com",
-        IEnumerable<string>? impact = null)
+    public static NoteCategory CreateNoteCategory(string slug = "backend", string displayName = "Backend")
     {
-        return PersonalProject.Create(
-            id: id ?? PersonalProjectId.New(),
-            projectName: projectName,
-            subtitle: "Production portfolio",
-            imagePath: "/images/portfolio.png",
-            demoUrl: demoUrl,
-            overview: "A portfolio with a contact workflow.",
-            impact: impact ?? ["Clearer client enquiry flow"],
-            technology: CreateTechnologyProfile());
+        return NoteCategory.Create(NoteCategorySlug.Create(slug), displayName);
     }
 
-    public static ProfessionalExperience CreateProfessionalExperience(
-        string companyName = "Contoso",
-        string roleTitle = "Senior Engineer",
-        IEnumerable<string>? keyContributions = null)
+    public static NoteTag CreateNoteTag(string slug = "dotnet", string displayName = ".NET", IEnumerable<string>? aliases = null)
     {
-        return ProfessionalExperience.Create(
-            id: ProfessionalExperienceId.New(),
-            companyName: companyName,
-            roleTitle: roleTitle,
-            imagePath: "/images/contoso.png",
-            roleSummary: "Built production systems.",
-            keyContributions: keyContributions ?? ["Improved deployment reliability"],
-            skillsAndPractices: CreateProfessionalSkills());
+        return NoteTag.Create(NoteTagSlug.Create(slug), displayName, aliases);
     }
 
-    public static ProjectTechnologyProfile CreateTechnologyProfile()
+    private static string ToSlug(string value)
     {
-        return ProjectTechnologyProfile.Create(
-            backend: ".NET Azure Functions",
-            frontend: "React",
-            cicdCloud: "Azure Static Web Apps",
-            architecture: "Clean architecture");
+        return value.Trim().ToLowerInvariant().Replace(" ", "-");
     }
 
-    public static ProfessionalSkills CreateProfessionalSkills()
+    private static string ToDisplayName(string slug)
     {
-        return ProfessionalSkills.Create(
-            backend: ".NET",
-            frontend: "React",
-            cicdCloud: "Azure DevOps",
-            engineeringPractices: "DDD and automated testing");
+        return slug switch {
+            "dotnet" => ".NET",
+            "azure-functions" => "Azure Functions",
+            _ => slug.Trim()
+        };
     }
 }
