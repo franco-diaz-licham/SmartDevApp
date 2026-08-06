@@ -106,6 +106,7 @@ public static class ApiAppServices
         });
 
         services.AddSingleton<IDocumentStore, CosmosDocumentStore>();
+        services.AddHostedService<DocumentContainerInitializer>();
         services.AddScoped<IContactMessageStore, CosmosContactMessageStore>();
         services.AddScoped<INoteRepository, CosmosNoteRepository>();
 

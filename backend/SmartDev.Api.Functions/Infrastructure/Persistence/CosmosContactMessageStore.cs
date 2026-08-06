@@ -7,11 +7,6 @@ public sealed class CosmosContactMessageStore(IDocumentStore documentStore) : IC
 {
     public async Task SaveAsync(ContactMessage contactMessage, CancellationToken cancellationToken)
     {
-        await documentStore.EnsureContainerAsync(
-            ContactMessageDocument.ContainerName,
-            ContactMessageDocument.PartitionKeyPath,
-            cancellationToken: cancellationToken);
-
         var created = await documentStore.TryCreateAsync(
             ContactMessageDocument.ContainerName,
             ContactMessageDocument.FromDomain(contactMessage),
@@ -27,7 +22,6 @@ public sealed class CosmosContactMessageStore(IDocumentStore documentStore) : IC
         document.Status = ContactMessageStatus.EmailSent;
         document.EmailSentAt = sentAt;
         document.FailureReason = null;
-
         await documentStore.UpsertAsync(ContactMessageDocument.ContainerName, document, ContactMessageDocument.PartitionKey, cancellationToken);
     }
 
@@ -44,11 +38,6 @@ public sealed class CosmosContactMessageStore(IDocumentStore documentStore) : IC
 
     private async Task<ContactMessageDocument> GetContactMessageDocumentAsync(ContactMessageId contactMessageId, CancellationToken cancellationToken)
     {
-        await documentStore.EnsureContainerAsync(
-            ContactMessageDocument.ContainerName,
-            ContactMessageDocument.PartitionKeyPath,
-            cancellationToken: cancellationToken);
-
         var document = await documentStore.GetAsync<ContactMessageDocument>(
             ContactMessageDocument.ContainerName,
             contactMessageId.Value.ToString("D"),

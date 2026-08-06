@@ -7,8 +7,6 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
 {
     public async Task<Note?> GetByIdAsync(NoteId id, CancellationToken cancellationToken)
     {
-        await EnsureContainerAsync(cancellationToken);
-
         var publicDocument = await documentStore.GetAsync<NoteDocument>(
             NoteDocument.ContainerName,
             id.Value.ToString("D"),
@@ -28,8 +26,6 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
 
     public async Task<Note?> GetBySlugAsync(NoteSlug slug, CancellationToken cancellationToken)
     {
-        await EnsureContainerAsync(cancellationToken);
-
         var documents = await documentStore.QueryAsync<NoteDocument>(
             NoteDocument.ContainerName,
             CosmosNoteQueries.BySlug(slug),
@@ -40,8 +36,6 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
 
     public async Task<IReadOnlyCollection<Note>> GetPublishedPublicNotesAsync(CancellationToken cancellationToken)
     {
-        await EnsureContainerAsync(cancellationToken);
-
         var documents = await documentStore.QueryAsync<NoteDocument>(
             NoteDocument.ContainerName,
             CosmosNoteQueries.PublishedPublic(),
@@ -53,8 +47,6 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
 
     public async Task<IReadOnlyCollection<Note>> GetAllForOwnerAsync(CancellationToken cancellationToken)
     {
-        await EnsureContainerAsync(cancellationToken);
-
         var documents = await documentStore.QueryAsync<NoteDocument>(
             NoteDocument.ContainerName,
             CosmosNoteQueries.AllForOwner(),
@@ -65,8 +57,6 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
 
     public async Task AddAsync(Note note, CancellationToken cancellationToken)
     {
-        await EnsureContainerAsync(cancellationToken);
-
         var existing = await GetBySlugAsync(note.Slug, cancellationToken);
         if (existing is not null) throw new InvalidOperationException($"Note slug '{note.Slug.Value}' already exists.");
 
@@ -81,8 +71,6 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
 
     public async Task SaveAsync(Note note, CancellationToken cancellationToken)
     {
-        await EnsureContainerAsync(cancellationToken);
-
         var existing = await GetBySlugAsync(note.Slug, cancellationToken);
         if (existing is not null && existing.Id != note.Id) throw new InvalidOperationException($"Note slug '{note.Slug.Value}' already exists.");
 
@@ -104,14 +92,4 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
             cancellationToken);
     }
 
-    private static Task EnsureContainerAsync(IDocumentStore documentStore, CancellationToken cancellationToken)
-    {
-        return documentStore.EnsureContainerAsync(
-            NoteDocument.ContainerName,
-            NoteDocument.PartitionKeyPath,
-            defaultTimeToLiveSeconds: null,
-            cancellationToken);
-    }
-
-    private Task EnsureContainerAsync(CancellationToken cancellationToken) => EnsureContainerAsync(documentStore, cancellationToken);
 }
