@@ -48,11 +48,16 @@ export interface PublicSearchIndexModel {
   documents: PublicNoteSearchDocumentModel[];
 }
 
-export interface CreateNoteModel {
+export interface NoteEntryModel {
   title: string;
   slug: string;
   summary: string;
   category: string;
   tags: string;
   bodyMarkdown: string;
+}
+
+export interface NoteSaveResultModel {
+  noteId: string;
+  slug: string;
 }

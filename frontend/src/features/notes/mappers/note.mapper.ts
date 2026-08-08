@@ -7,8 +7,18 @@ import type {
   PublicRelatedProjectReferenceResponse,
   PublicSearchIndexResponse
 } from '../types/note.api.types';
-import type { CreateNoteModel, PublicNoteCategoryModel, PublicNoteDetailModel, PublicNoteListItemModel, PublicNoteSearchDocumentModel, PublicNoteTagModel, PublicRelatedProjectReferenceModel, PublicSearchIndexModel } from '../types/note.types';
-import type { CreateNoteCategoryDto, CreateNoteRequestDto, CreateNoteTagDto } from '../types/note.api.types';
+import type {
+  NoteEntryModel,
+  NoteSaveResultModel,
+  PublicNoteCategoryModel,
+  PublicNoteDetailModel,
+  PublicNoteListItemModel,
+  PublicNoteSearchDocumentModel,
+  PublicNoteTagModel,
+  PublicRelatedProjectReferenceModel,
+  PublicSearchIndexModel
+} from '../types/note.types';
+import type { CreateNoteCategoryDto, CreateNoteRequestDto, CreateNoteResponseDto, CreateNoteTagDto, UpdateNoteRequestDto, UpdateNoteResponseDto } from '../types/note.api.types';
 
 const toNullableDate = (value: string | null): Date | null => (value ? new Date(value) : null);
 
@@ -88,11 +98,25 @@ export const mapPublicSearchIndexResponseToModel = (response: PublicSearchIndexR
   documents: response.documents.map(mapPublicNoteSearchDocumentResponseToModel)
 });
 
-export const mapCreateNoteModelToRequestDto = (note: CreateNoteModel): CreateNoteRequestDto => ({
+const mapNoteEntryModelToRequestDto = (note: NoteEntryModel): CreateNoteRequestDto => ({
   title: note.title,
   slug: note.slug,
   summary: note.summary,
   category: toCreateNoteCategoryDto(note.category),
   tags: mapTagTextToCreateNoteTagDtos(note.tags),
   bodyMarkdown: note.bodyMarkdown
+});
+
+export const mapNoteEntryModelToCreateRequestDto = (note: NoteEntryModel): CreateNoteRequestDto => mapNoteEntryModelToRequestDto(note);
+
+export const mapNoteEntryModelToUpdateRequestDto = (note: NoteEntryModel): UpdateNoteRequestDto => mapNoteEntryModelToRequestDto(note);
+
+export const mapCreateNoteResponseDtoToModel = (response: CreateNoteResponseDto): NoteSaveResultModel => ({
+  noteId: response.noteId,
+  slug: response.slug
+});
+
+export const mapUpdateNoteResponseDtoToModel = (response: UpdateNoteResponseDto): NoteSaveResultModel => ({
+  noteId: response.noteId,
+  slug: response.slug
 });

@@ -13,7 +13,13 @@ public interface INoteRepository
 
     Task<IReadOnlyCollection<Note>> GetPublishedPublicNotesAsync(CancellationToken cancellationToken);
 
-    Task<IReadOnlyCollection<Note>> GetAllForOwnerAsync(CancellationToken cancellationToken);
+    Task<DocumentPage<Note>> SearchPublishedPublicNotesAsync(BaseQuery query, CancellationToken cancellationToken);
+
+    Task<DocumentPage<string>> GetPublishedPublicCategoryNamesAsync(BaseQuery query, CancellationToken cancellationToken);
+
+    Task<DocumentPage<string>> GetPublishedPublicTagNamesAsync(BaseQuery query, CancellationToken cancellationToken);
+
+    Task<DocumentPage<Note>> GetAllForOwnerAsync(BaseQuery query, CancellationToken cancellationToken);
 
     Task AddAsync(Note note, CancellationToken cancellationToken);
 

@@ -27,23 +27,13 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
 
     public async Task<Note?> GetBySlugAsync(NoteSlug slug, CancellationToken cancellationToken)
     {
-        var documents = await documentStore.QueryAsync<NoteDocument>(
+        var documents = await documentStore.QueryPageAsync<NoteDocument>(
             NoteDocument.ContainerName,
             CosmosNoteQueries.BySlug(slug),
+            pageSize: 2,
             cancellationToken: cancellationToken);
 
-        return documents.SingleOrDefault()?.ToDomain();
-    }
-
-    public async Task<IReadOnlyCollection<Note>> GetPublishedPublicNotesAsync(CancellationToken cancellationToken)
-    {
-        var documents = await documentStore.QueryAsync<NoteDocument>(
-            NoteDocument.ContainerName,
-            CosmosNoteQueries.PublishedPublic(),
-            NoteDocument.PublicPartitionKey,
-            cancellationToken);
-
-        return documents.Select(document => document.ToDomain()).ToArray();
+        return documents.Items.SingleOrDefault()?.ToDomain();
     }
 
     public async Task<DocumentPage<Note>> GetPublishedPublicNotesAsync(BaseQuery query, CancellationToken cancellationToken)
@@ -59,14 +49,64 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
         return new DocumentPage<Note>(documents.Items.Select(document => document.ToDomain()).ToArray(), documents.ContinuationToken);
     }
 
-    public async Task<IReadOnlyCollection<Note>> GetAllForOwnerAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<Note>> GetPublishedPublicNotesAsync(CancellationToken cancellationToken)
     {
         var documents = await documentStore.QueryAsync<NoteDocument>(
             NoteDocument.ContainerName,
-            CosmosNoteQueries.AllForOwner(),
-            cancellationToken: cancellationToken);
+            CosmosNoteQueries.PublishedPublic(),
+            NoteDocument.PublicPartitionKey,
+            cancellationToken);
 
         return documents.Select(document => document.ToDomain()).ToArray();
+    }
+
+    public async Task<DocumentPage<Note>> SearchPublishedPublicNotesAsync(BaseQuery query, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(query.SearchTerm)) return new DocumentPage<Note>([], null);
+
+        var documents = await documentStore.QueryPageAsync<NoteDocument>(
+            NoteDocument.ContainerName,
+            CosmosNoteQueries.PublishedPublicSearch(query.SearchTerm),
+            query.PageSize,
+            query.ContinuationToken,
+            NoteDocument.PublicPartitionKey,
+            cancellationToken);
+
+        return new DocumentPage<Note>(documents.Items.Select(document => document.ToDomain()).ToArray(), documents.ContinuationToken);
+    }
+
+    public Task<DocumentPage<string>> GetPublishedPublicCategoryNamesAsync(BaseQuery query, CancellationToken cancellationToken)
+    {
+        return documentStore.QueryPageAsync<string>(
+            NoteDocument.ContainerName,
+            CosmosNoteQueries.PublishedPublicCategoryNames(),
+            query.PageSize,
+            query.ContinuationToken,
+            NoteDocument.PublicPartitionKey,
+            cancellationToken);
+    }
+
+    public Task<DocumentPage<string>> GetPublishedPublicTagNamesAsync(BaseQuery query, CancellationToken cancellationToken)
+    {
+        return documentStore.QueryPageAsync<string>(
+            NoteDocument.ContainerName,
+            CosmosNoteQueries.PublishedPublicTagNames(),
+            query.PageSize,
+            query.ContinuationToken,
+            NoteDocument.PublicPartitionKey,
+            cancellationToken);
+    }
+
+    public async Task<DocumentPage<Note>> GetAllForOwnerAsync(BaseQuery query, CancellationToken cancellationToken)
+    {
+        var documents = await documentStore.QueryPageAsync<NoteDocument>(
+            NoteDocument.ContainerName,
+            CosmosNoteQueries.AllForOwner(),
+            query.PageSize,
+            query.ContinuationToken,
+            cancellationToken: cancellationToken);
+
+        return new DocumentPage<Note>(documents.Items.Select(document => document.ToDomain()).ToArray(), documents.ContinuationToken);
     }
 
     public async Task AddAsync(Note note, CancellationToken cancellationToken)

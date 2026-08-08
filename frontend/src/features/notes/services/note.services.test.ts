@@ -8,7 +8,8 @@ vi.mock('@/lib/api/apiClient', () => ({
     getPage: vi.fn(),
     getList: vi.fn(),
     getSingle: vi.fn(),
-    post: vi.fn()
+    post: vi.fn(),
+    put: vi.fn()
   }
 }));
 
@@ -17,6 +18,7 @@ const apiClientMock = apiClient as unknown as {
   getList: Mock;
   getSingle: Mock;
   post: Mock;
+  put: Mock;
 };
 
 const noteListItemResponse: PublicNoteListItemResponse = {
@@ -80,6 +82,32 @@ describe('noteService', () => {
     });
   });
 
+  test('gets owner notes', async () => {
+    // Arrange
+    apiClientMock.getPage.mockResolvedValue({
+      items: [noteListItemResponse],
+      continuationToken: 'next-token',
+      hasMore: true
+    });
+
+    // Act
+    const result = await noteService.getOwnerNotes({
+      pageSize: 10,
+      continuationToken: 'current-token'
+    });
+
+    // Assert
+    expect(result).toEqual({
+      items: [noteListItemResponse],
+      continuationToken: 'next-token',
+      hasMore: true
+    });
+    expect(apiClientMock.getPage).toHaveBeenCalledWith('/owner/notes', {
+      pageSize: 10,
+      continuationToken: 'current-token'
+    });
+  });
+
   test('gets a public note by slug', async () => {
     // Arrange
     apiClientMock.getSingle.mockResolvedValue(noteDetailResponse);
@@ -94,31 +122,51 @@ describe('noteService', () => {
 
   test('gets public note categories', async () => {
     // Arrange
-    apiClientMock.getList.mockResolvedValue(['Backend']);
+    apiClientMock.getPage.mockResolvedValue({
+      items: ['Backend'],
+      continuationToken: null,
+      hasMore: false
+    });
 
     // Act
-    const result = await noteService.getPublicNoteCategories();
+    const result = await noteService.getPublicNoteCategories({ pageSize: 10 });
 
     // Assert
-    expect(result).toEqual(['Backend']);
-    expect(apiClientMock.getList).toHaveBeenCalledWith('/notes/categories');
+    expect(result).toEqual({
+      items: ['Backend'],
+      continuationToken: null,
+      hasMore: false
+    });
+    expect(apiClientMock.getPage).toHaveBeenCalledWith('/notes/categories', { pageSize: 10 });
   });
 
   test('gets public note tags', async () => {
     // Arrange
-    apiClientMock.getList.mockResolvedValue(['.NET']);
+    apiClientMock.getPage.mockResolvedValue({
+      items: ['.NET'],
+      continuationToken: null,
+      hasMore: false
+    });
 
     // Act
-    const result = await noteService.getPublicNoteTags();
+    const result = await noteService.getPublicNoteTags({ pageSize: 10 });
 
     // Assert
-    expect(result).toEqual(['.NET']);
-    expect(apiClientMock.getList).toHaveBeenCalledWith('/notes/tags');
+    expect(result).toEqual({
+      items: ['.NET'],
+      continuationToken: null,
+      hasMore: false
+    });
+    expect(apiClientMock.getPage).toHaveBeenCalledWith('/notes/tags', { pageSize: 10 });
   });
 
   test('searches public notes', async () => {
     // Arrange
-    apiClientMock.getList.mockResolvedValue([noteListItemResponse]);
+    apiClientMock.getPage.mockResolvedValue({
+      items: [noteListItemResponse],
+      continuationToken: null,
+      hasMore: false
+    });
 
     // Act
     const result = await noteService.searchPublicNotes({
@@ -128,8 +176,12 @@ describe('noteService', () => {
     });
 
     // Assert
-    expect(result).toEqual([noteListItemResponse]);
-    expect(apiClientMock.getList).toHaveBeenCalledWith('/notes/search', {
+    expect(result).toEqual({
+      items: [noteListItemResponse],
+      continuationToken: null,
+      hasMore: false
+    });
+    expect(apiClientMock.getPage).toHaveBeenCalledWith('/notes/search', {
       searchTerm: 'cosmos',
       searchBy: 'title',
       pageSize: 10
@@ -180,5 +232,39 @@ describe('noteService', () => {
     // Assert
     expect(result).toEqual(response);
     expect(apiClientMock.post).toHaveBeenCalledWith('/owner/notes', request);
+  });
+
+  test('updates an owner note by id', async () => {
+    // Arrange
+    const request = {
+      title: 'Updated Cosmos Notes',
+      slug: 'updated-cosmos-notes',
+      summary: 'Updated notes about Cosmos DB.',
+      category: {
+        slug: 'backend',
+        displayName: 'Backend'
+      },
+      tags: [
+        {
+          slug: 'dotnet',
+          displayName: '.NET'
+        }
+      ],
+      bodyMarkdown: '# Updated Cosmos DB'
+    };
+
+    const response = {
+      noteId: '5f4d0b3f-10a9-4c59-9e91-65cb3770887f',
+      slug: 'updated-cosmos-notes'
+    };
+
+    apiClientMock.put.mockResolvedValue(response);
+
+    // Act
+    const result = await noteService.updateNote('5f4d0b3f-10a9-4c59-9e91-65cb3770887f', request);
+
+    // Assert
+    expect(result).toEqual(response);
+    expect(apiClientMock.put).toHaveBeenCalledWith('/owner/notes/5f4d0b3f-10a9-4c59-9e91-65cb3770887f', request);
   });
 });

@@ -35,6 +35,7 @@ export const router = createBrowserRouter([
           { path: '/admin', element: <AdminHomePage /> },
           { path: '/workspace', element: <NotesPage /> },
           { path: '/workspace/notes/new', element: <CreateNotePage /> },
+          { path: '/workspace/notes/:noteId/edit', element: <CreateNotePage /> },
           { path: '/workspace/notes/:slug', element: <NoteArticlePage /> },
           { path: '/notes', element: <Navigate to="/workspace" replace /> }
         ]

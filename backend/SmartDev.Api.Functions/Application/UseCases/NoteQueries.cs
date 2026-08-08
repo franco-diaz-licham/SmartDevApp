@@ -12,6 +12,15 @@ public sealed class GetPublicNotesHandler(INoteRepository noteRepository)
     }
 }
 
+public sealed class GetOwnerNotesHandler(INoteRepository noteRepository)
+{
+    public async Task<Page<PublicNoteListItem>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    {
+        var notes = await noteRepository.GetAllForOwnerAsync(query, cancellationToken);
+        return new Page<PublicNoteListItem>(notes.Items.Select(PublicNoteListItem.FromDomain).ToArray(), notes.ContinuationToken);
+    }
+}
+
 public sealed class GetPublicNoteBySlugHandler(INoteRepository noteRepository)
 {
     public async Task<PublicNoteDetail?> HandleAsync(string slug, CancellationToken cancellationToken)
@@ -24,42 +33,30 @@ public sealed class GetPublicNoteBySlugHandler(INoteRepository noteRepository)
 
 public sealed class GetPublicNoteCategoriesHandler(INoteRepository noteRepository)
 {
-    public async Task<IReadOnlyCollection<string>> HandleAsync(CancellationToken cancellationToken)
+    public async Task<Page<string>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
-        var notes = await noteRepository.GetPublishedPublicNotesAsync(cancellationToken);
-        return notes
-            .Select(note => note.Category.DisplayName)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Order(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
+        var categories = await noteRepository.GetPublishedPublicCategoryNamesAsync(query, cancellationToken);
+        return new Page<string>(categories.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), categories.ContinuationToken);
     }
 }
 
 public sealed class GetPublicNoteTagsHandler(INoteRepository noteRepository)
 {
-    public async Task<IReadOnlyCollection<string>> HandleAsync(CancellationToken cancellationToken)
+    public async Task<Page<string>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
-        var notes = await noteRepository.GetPublishedPublicNotesAsync(cancellationToken);
-        return notes
-            .SelectMany(note => note.Tags.Select(tag => tag.DisplayName))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Order(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
+        var tags = await noteRepository.GetPublishedPublicTagNamesAsync(query, cancellationToken);
+        return new Page<string>(tags.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), tags.ContinuationToken);
     }
 }
 
 public sealed class SearchPublicNotesHandler(INoteRepository noteRepository)
 {
-    public async Task<IReadOnlyCollection<PublicNoteListItem>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Page<PublicNoteListItem>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(query.SearchTerm)) return [];
+        if (string.IsNullOrWhiteSpace(query.SearchTerm)) return new Page<PublicNoteListItem>([], null);
 
-        var normalizedQuery = query.SearchTerm.Trim();
-        var notes = await noteRepository.GetPublishedPublicNotesAsync(cancellationToken);
-        return notes
-            .Where(note => note.SearchableText.Contains(normalizedQuery, StringComparison.OrdinalIgnoreCase))
-            .Select(PublicNoteListItem.FromDomain)
-            .ToArray();
+        var notes = await noteRepository.SearchPublishedPublicNotesAsync(query, cancellationToken);
+        return new Page<PublicNoteListItem>(notes.Items.Select(PublicNoteListItem.FromDomain).ToArray(), notes.ContinuationToken);
     }
 }
 

@@ -1,6 +1,19 @@
 import { apiClient } from '@/lib/api/apiClient';
 import type { BaseQuery } from '@/lib/api/api.types';
-import type { CreateNoteRequestDto, CreateNoteResponseDto, PublicNoteDetailResponse, PublicNoteListItemResponse, PublicNoteListPageResponse, PublicSearchIndexResponse } from '../types/note.api.types';
+import type {
+  CreateNoteRequestDto,
+  CreateNoteResponseDto,
+  OwnerNoteListPageResponse,
+  PublicNoteCategoryPageResponse,
+  PublicNoteDetailResponse,
+  PublicNoteListItemResponse,
+  PublicNoteListPageResponse,
+  PublicNoteSearchPageResponse,
+  PublicNoteTagPageResponse,
+  PublicSearchIndexResponse,
+  UpdateNoteRequestDto,
+  UpdateNoteResponseDto
+} from '../types/note.api.types';
 
 const NOTES_URL = '/notes';
 const OWNER_NOTES_URL = '/owner/notes';
@@ -10,20 +23,24 @@ export const noteService = {
     return apiClient.getPage<PublicNoteListItemResponse, BaseQuery>(NOTES_URL, request);
   },
 
+  getOwnerNotes(request: BaseQuery = {}): Promise<OwnerNoteListPageResponse> {
+    return apiClient.getPage<PublicNoteListItemResponse, BaseQuery>(OWNER_NOTES_URL, request);
+  },
+
   getPublicNoteBySlug(slug: string): Promise<PublicNoteDetailResponse> {
     return apiClient.getSingle<PublicNoteDetailResponse>(`${NOTES_URL}/${encodeURIComponent(slug)}`);
   },
 
-  getPublicNoteCategories(): Promise<string[]> {
-    return apiClient.getList<string>(`${NOTES_URL}/categories`);
+  getPublicNoteCategories(request: BaseQuery = {}): Promise<PublicNoteCategoryPageResponse> {
+    return apiClient.getPage<string, BaseQuery>(`${NOTES_URL}/categories`, request);
   },
 
-  getPublicNoteTags(): Promise<string[]> {
-    return apiClient.getList<string>(`${NOTES_URL}/tags`);
+  getPublicNoteTags(request: BaseQuery = {}): Promise<PublicNoteTagPageResponse> {
+    return apiClient.getPage<string, BaseQuery>(`${NOTES_URL}/tags`, request);
   },
 
-  searchPublicNotes(request: BaseQuery = {}): Promise<PublicNoteListItemResponse[]> {
-    return apiClient.getList<PublicNoteListItemResponse, BaseQuery>(`${NOTES_URL}/search`, request);
+  searchPublicNotes(request: BaseQuery = {}): Promise<PublicNoteSearchPageResponse> {
+    return apiClient.getPage<PublicNoteListItemResponse, BaseQuery>(`${NOTES_URL}/search`, request);
   },
 
   getPublicNoteSearchIndex(): Promise<PublicSearchIndexResponse> {
@@ -32,5 +49,9 @@ export const noteService = {
 
   createNote(request: CreateNoteRequestDto): Promise<CreateNoteResponseDto> {
     return apiClient.post<CreateNoteResponseDto>(OWNER_NOTES_URL, request);
+  },
+
+  updateNote(noteId: string, request: UpdateNoteRequestDto): Promise<UpdateNoteResponseDto> {
+    return apiClient.put<UpdateNoteResponseDto>(`${OWNER_NOTES_URL}/${encodeURIComponent(noteId)}`, request);
   }
 };

@@ -4,17 +4,17 @@ import type { PublicNoteListItemModel } from '../types/note.types';
 interface NotesResultsListProps {
   notes: PublicNoteListItemModel[];
   searchTerm: string;
-  selectedSlug: string;
+  selectedNoteId: string;
   isLoading: boolean;
   isError: boolean;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onSearchTermChange: (searchTerm: string) => void;
-  onSelectNote: (slug: string) => void;
+  onSelectNote: (noteId: string) => void;
   onLoadMore: () => void;
 }
 
-export const NotesResultsList = ({ notes, searchTerm, selectedSlug, isLoading, isError, hasNextPage, isFetchingNextPage, onSearchTermChange, onSelectNote, onLoadMore }: NotesResultsListProps) => (
+export const NotesResultsList = ({ notes, searchTerm, selectedNoteId, isLoading, isError, hasNextPage, isFetchingNextPage, onSearchTermChange, onSelectNote, onLoadMore }: NotesResultsListProps) => (
   <div className="px-5 py-6 sm:px-8 lg:px-10">
     <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
       <div>
@@ -41,14 +41,14 @@ export const NotesResultsList = ({ notes, searchTerm, selectedSlug, isLoading, i
       {isError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Notes could not be loaded.</p>}
 
       {notes.map((note) => {
-        const isSelected = selectedSlug === note.slug;
+        const isSelected = selectedNoteId === note.id;
 
         return (
           <button
             key={note.id}
             className={`rounded-md border p-4 text-left transition hover:border-primary hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 ${isSelected ? 'border-primary bg-muted/70' : 'border-border bg-background'}`}
             type="button"
-            onClick={() => onSelectNote(note.slug)}
+            onClick={() => onSelectNote(note.id)}
           >
             <span className="text-xs font-extrabold uppercase text-primary">{note.category.displayName}</span>
             <span className="mt-2 block text-lg font-extrabold leading-snug">{note.title}</span>

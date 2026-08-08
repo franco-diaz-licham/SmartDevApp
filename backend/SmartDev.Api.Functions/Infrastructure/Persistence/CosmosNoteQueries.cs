@@ -30,6 +30,62 @@ internal static class CosmosNoteQueries
             .WithParameter("@visibility", NoteVisibility.Public.ToString());
     }
 
+    public static QueryDefinition PublishedPublicSearch(string searchTerm)
+    {
+        return new QueryDefinition("""
+            SELECT * FROM c
+            WHERE c.type = @type
+              AND c.status = @status
+              AND c.visibility = @visibility
+              AND (
+                CONTAINS(LOWER(c.title), @searchTerm)
+                OR CONTAINS(LOWER(c.summary), @searchTerm)
+                OR CONTAINS(LOWER(c.bodyMarkdown), @searchTerm)
+                OR CONTAINS(LOWER(c.category.displayName), @searchTerm)
+                OR EXISTS(
+                  SELECT VALUE tag
+                  FROM tag IN c.tags
+                  WHERE CONTAINS(LOWER(tag.displayName), @searchTerm)
+                     OR CONTAINS(LOWER(tag.slug), @searchTerm)
+                )
+              )
+            ORDER BY c.publishedAt DESC
+            """)
+            .WithParameter("@type", NoteDocument.DocumentType)
+            .WithParameter("@status", NoteStatus.Published.ToString())
+            .WithParameter("@visibility", NoteVisibility.Public.ToString())
+            .WithParameter("@searchTerm", searchTerm.Trim().ToLowerInvariant());
+    }
+
+    public static QueryDefinition PublishedPublicCategoryNames()
+    {
+        return new QueryDefinition("""
+            SELECT DISTINCT VALUE c.category.displayName
+            FROM c
+            WHERE c.type = @type
+              AND c.status = @status
+              AND c.visibility = @visibility
+            """)
+            .WithParameter("@type", NoteDocument.DocumentType)
+            .WithParameter("@status", NoteStatus.Published.ToString())
+            .WithParameter("@visibility", NoteVisibility.Public.ToString());
+    }
+
+    public static QueryDefinition PublishedPublicTagNames()
+    {
+        return new QueryDefinition("""
+            SELECT DISTINCT VALUE tag.displayName
+            FROM c
+            JOIN tag IN c.tags
+            WHERE c.type = @type
+              AND c.status = @status
+              AND c.visibility = @visibility
+            """)
+            .WithParameter("@type", NoteDocument.DocumentType)
+            .WithParameter("@status", NoteStatus.Published.ToString())
+            .WithParameter("@visibility", NoteVisibility.Public.ToString());
+    }
+
     public static QueryDefinition AllForOwner()
     {
         return new QueryDefinition("""

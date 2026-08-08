@@ -4,20 +4,20 @@ import { NotesResultsList } from './NotesResultsList';
 interface NotesMainContentProps {
   notes: PublicNoteListItemModel[];
   searchTerm: string;
-  selectedSlug: string;
+  selectedNoteId: string;
   isNotesLoading: boolean;
   isNotesError: boolean;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onSearchTermChange: (searchTerm: string) => void;
-  onSelectNote: (slug: string) => void;
+  onSelectNote: (noteId: string) => void;
   onLoadMore: () => void;
 }
 
 export const NotesMainContent = ({
   notes,
   searchTerm,
-  selectedSlug,
+  selectedNoteId,
   isNotesLoading,
   isNotesError,
   hasNextPage,
@@ -30,7 +30,7 @@ export const NotesMainContent = ({
     <NotesResultsList
       notes={notes}
       searchTerm={searchTerm}
-      selectedSlug={selectedSlug}
+      selectedNoteId={selectedNoteId}
       isLoading={isNotesLoading}
       isError={isNotesError}
       hasNextPage={hasNextPage}

@@ -66,12 +66,14 @@ public static class ApiAppServices
         services.AddScoped<CreateContactEmailHandler>();
         services.AddScoped<UpdateContactEmailStatusHandler>();
         services.AddScoped<GetPublicNotesHandler>();
+        services.AddScoped<GetOwnerNotesHandler>();
         services.AddScoped<GetPublicNoteBySlugHandler>();
         services.AddScoped<GetPublicNoteCategoriesHandler>();
         services.AddScoped<GetPublicNoteTagsHandler>();
         services.AddScoped<SearchPublicNotesHandler>();
         services.AddScoped<GetPublicNoteSearchIndexHandler>();
         services.AddScoped<CreateNoteHandler>();
+        services.AddScoped<UpdateNoteHandler>();
 
         return services;
     }

@@ -7,10 +7,11 @@ export const noteKeys = {
   all: ['notes'] as const,
   lists: () => [...noteKeys.all, 'list'] as const,
   publicList: (query: BaseQuery) => [...noteKeys.lists(), 'public', query] as const,
+  ownerList: (query: BaseQuery) => [...noteKeys.lists(), 'owner', query] as const,
   details: () => [...noteKeys.all, 'detail'] as const,
   publicDetail: (slug: string) => [...noteKeys.details(), 'public', slug] as const,
-  publicCategories: () => [...noteKeys.all, 'public-categories'] as const,
-  publicTags: () => [...noteKeys.all, 'public-tags'] as const,
+  publicCategories: (query: BaseQuery) => [...noteKeys.all, 'public-categories', query] as const,
+  publicTags: (query: BaseQuery) => [...noteKeys.all, 'public-tags', query] as const,
   publicSearch: (query: BaseQuery) => [...noteKeys.all, 'public-search', query] as const,
   publicSearchIndex: () => [...noteKeys.all, 'public-search-index'] as const
 };
@@ -39,10 +40,40 @@ export const usePublicNotesQuery = (query: BaseQuery = {}) => {
   });
 };
 
+export const useOwnerNotesQuery = (query: BaseQuery = {}) => {
+  const initialQuery = {
+    pageSize: 20,
+    ...query
+  };
+
+  return useInfiniteQuery({
+    queryKey: noteKeys.ownerList(initialQuery),
+    queryFn: async ({ pageParam }) => {
+      const page = await noteService.getOwnerNotes({
+        ...initialQuery,
+        continuationToken: pageParam
+      });
+
+      return {
+        ...page,
+        items: page.items.map(mapPublicNoteListItemResponseToModel)
+      };
+    },
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) => lastPage.continuationToken
+  });
+};
+
 export const usePublicNoteSearchQuery = (query: BaseQuery) =>
   useQuery({
     queryKey: noteKeys.publicSearch(query),
-    queryFn: async () => (await noteService.searchPublicNotes(query)).map(mapPublicNoteListItemResponseToModel),
+    queryFn: async () => {
+      const page = await noteService.searchPublicNotes(query);
+      return {
+        ...page,
+        items: page.items.map(mapPublicNoteListItemResponseToModel)
+      };
+    },
     enabled: Boolean(query.searchTerm?.trim())
   });
 
@@ -53,16 +84,16 @@ export const usePublicNoteQuery = (slug: string) =>
     enabled: slug.trim().length > 0
   });
 
-export const usePublicNoteCategoriesQuery = () =>
+export const usePublicNoteCategoriesQuery = (query: BaseQuery = {}) =>
   useQuery({
-    queryKey: noteKeys.publicCategories(),
-    queryFn: () => noteService.getPublicNoteCategories()
+    queryKey: noteKeys.publicCategories(query),
+    queryFn: () => noteService.getPublicNoteCategories(query)
   });
 
-export const usePublicNoteTagsQuery = () =>
+export const usePublicNoteTagsQuery = (query: BaseQuery = {}) =>
   useQuery({
-    queryKey: noteKeys.publicTags(),
-    queryFn: () => noteService.getPublicNoteTags()
+    queryKey: noteKeys.publicTags(query),
+    queryFn: () => noteService.getPublicNoteTags(query)
   });
 
 export const usePublicNoteSearchIndexQuery = () =>

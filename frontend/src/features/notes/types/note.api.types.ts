@@ -52,6 +52,14 @@ export interface PublicSearchIndexResponse {
 
 export type PublicNoteListPageResponse = PageResult<PublicNoteListItemResponse>;
 
+export type OwnerNoteListPageResponse = PageResult<PublicNoteListItemResponse>;
+
+export type PublicNoteCategoryPageResponse = PageResult<string>;
+
+export type PublicNoteTagPageResponse = PageResult<string>;
+
+export type PublicNoteSearchPageResponse = PageResult<PublicNoteListItemResponse>;
+
 export interface CreateNoteCategoryDto {
   slug: string;
   displayName: string;
@@ -75,3 +83,7 @@ export interface CreateNoteResponseDto {
   noteId: string;
   slug: string;
 }
+
+export type UpdateNoteRequestDto = CreateNoteRequestDto;
+
+export type UpdateNoteResponseDto = CreateNoteResponseDto;
