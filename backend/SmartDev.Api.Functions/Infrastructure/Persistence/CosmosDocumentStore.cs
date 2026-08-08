@@ -44,6 +44,32 @@ public sealed class CosmosDocumentStore(CosmosClient client, IOptions<CosmosDbOp
         return results;
     }
 
+    public async Task<DocumentPage<TDocument>> QueryPageAsync<TDocument>(
+        string containerName,
+        QueryDefinition query,
+        int pageSize,
+        string? continuationToken = null,
+        string? partitionKey = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
+
+        var requestOptions = new QueryRequestOptions {
+            MaxItemCount = pageSize
+        };
+
+        if (!string.IsNullOrWhiteSpace(partitionKey)) requestOptions.PartitionKey = new PartitionKey(partitionKey);
+
+        using var iterator = GetContainer(containerName).GetItemQueryIterator<TDocument>(
+            query,
+            continuationToken,
+            requestOptions);
+
+        if (!iterator.HasMoreResults) return new DocumentPage<TDocument>([], null);
+        var response = await iterator.ReadNextAsync(cancellationToken);
+        return new DocumentPage<TDocument>(response.ToArray(), response.ContinuationToken);
+    }
+
     public async Task<bool> TryCreateAsync<TDocument>(string containerName, TDocument document, string partitionKey, CancellationToken cancellationToken = default)
     {
         try {

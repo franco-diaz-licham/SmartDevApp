@@ -1,14 +1,15 @@
 using SmartDev.Api.Functions.Application.Ports;
 using SmartDev.Api.Functions.Domain.Notes;
+using SmartDev.Api.Functions.Functions;
 
 namespace SmartDev.Api.Functions.Application.UsesCases;
 
 public sealed class GetPublicNotesHandler(INoteRepository noteRepository)
 {
-    public async Task<IReadOnlyCollection<PublicNoteListItem>> HandleAsync(CancellationToken cancellationToken)
+    public async Task<CursorPage<PublicNoteListItem>> HandleAsync(int pageSize, string? continuationToken, CancellationToken cancellationToken)
     {
-        var notes = await noteRepository.GetPublishedPublicNotesAsync(cancellationToken);
-        return notes.Select(PublicNoteListItem.FromDomain).ToArray();
+        var notes = await noteRepository.GetPublishedPublicNotesAsync(pageSize, continuationToken, cancellationToken);
+        return new CursorPage<PublicNoteListItem>(notes.Items.Select(PublicNoteListItem.FromDomain).ToArray(), notes.ContinuationToken);
     }
 }
 

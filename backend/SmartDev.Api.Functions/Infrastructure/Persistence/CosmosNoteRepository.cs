@@ -45,6 +45,19 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
         return documents.Select(document => document.ToDomain()).ToArray();
     }
 
+    public async Task<DocumentPage<Note>> GetPublishedPublicNotesAsync(int pageSize, string? continuationToken, CancellationToken cancellationToken)
+    {
+        var documents = await documentStore.QueryPageAsync<NoteDocument>(
+            NoteDocument.ContainerName,
+            CosmosNoteQueries.PublishedPublic(),
+            pageSize,
+            continuationToken,
+            NoteDocument.PublicPartitionKey,
+            cancellationToken);
+
+        return new DocumentPage<Note>(documents.Items.Select(document => document.ToDomain()).ToArray(), documents.ContinuationToken);
+    }
+
     public async Task<IReadOnlyCollection<Note>> GetAllForOwnerAsync(CancellationToken cancellationToken)
     {
         var documents = await documentStore.QueryAsync<NoteDocument>(
