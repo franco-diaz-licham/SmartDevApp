@@ -1,8 +1,9 @@
 import { apiClient } from '@/lib/api/apiClient';
 import type { BaseQuery } from '@/lib/api/api.types';
-import type { PublicNoteDetailResponse, PublicNoteListItemResponse, PublicNoteListPageResponse, PublicSearchIndexResponse } from '../types/note.api.types';
+import type { CreateNoteRequestDto, CreateNoteResponseDto, PublicNoteDetailResponse, PublicNoteListItemResponse, PublicNoteListPageResponse, PublicSearchIndexResponse } from '../types/note.api.types';
 
 const NOTES_URL = '/notes';
+const OWNER_NOTES_URL = '/owner/notes';
 
 export const noteService = {
   getPublicNotes(request: BaseQuery = {}): Promise<PublicNoteListPageResponse> {
@@ -27,5 +28,9 @@ export const noteService = {
 
   getPublicNoteSearchIndex(): Promise<PublicSearchIndexResponse> {
     return apiClient.getSingle<PublicSearchIndexResponse>(`${NOTES_URL}/search-index`);
+  },
+
+  createNote(request: CreateNoteRequestDto): Promise<CreateNoteResponseDto> {
+    return apiClient.post<CreateNoteResponseDto>(OWNER_NOTES_URL, request);
   }
 };

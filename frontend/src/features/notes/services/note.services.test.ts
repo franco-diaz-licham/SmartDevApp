@@ -7,7 +7,8 @@ vi.mock('@/lib/api/apiClient', () => ({
   apiClient: {
     getPage: vi.fn(),
     getList: vi.fn(),
-    getSingle: vi.fn()
+    getSingle: vi.fn(),
+    post: vi.fn()
   }
 }));
 
@@ -15,6 +16,7 @@ const apiClientMock = apiClient as unknown as {
   getPage: Mock;
   getList: Mock;
   getSingle: Mock;
+  post: Mock;
 };
 
 const noteListItemResponse: PublicNoteListItemResponse = {
@@ -144,5 +146,39 @@ describe('noteService', () => {
     // Assert
     expect(result).toEqual(searchIndexResponse);
     expect(apiClientMock.getSingle).toHaveBeenCalledWith('/notes/search-index');
+  });
+
+  test('creates an owner note', async () => {
+    // Arrange
+    const request = {
+      title: 'Cosmos Notes',
+      slug: 'cosmos-notes',
+      summary: 'Notes about Cosmos DB.',
+      category: {
+        slug: 'backend',
+        displayName: 'Backend'
+      },
+      tags: [
+        {
+          slug: 'dotnet',
+          displayName: '.NET'
+        }
+      ],
+      bodyMarkdown: '# Cosmos DB'
+    };
+
+    const response = {
+      noteId: '5f4d0b3f-10a9-4c59-9e91-65cb3770887f',
+      slug: 'cosmos-notes'
+    };
+
+    apiClientMock.post.mockResolvedValue(response);
+
+    // Act
+    const result = await noteService.createNote(request);
+
+    // Assert
+    expect(result).toEqual(response);
+    expect(apiClientMock.post).toHaveBeenCalledWith('/owner/notes', request);
   });
 });

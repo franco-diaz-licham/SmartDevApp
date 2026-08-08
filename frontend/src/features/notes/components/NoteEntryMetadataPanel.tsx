@@ -9,26 +9,33 @@ type TextInputChangeEvent = {
 
 interface NoteEntryMetadataPanelProps {
   category: string;
+  errorMessage?: string;
+  isSaving: boolean;
+  savedMessage?: string;
   slug: string;
   summary: string;
   tags: string;
   onCategoryChange: (category: string) => void;
+  onSave: () => void;
   onSlugChange: (slug: string) => void;
   onSummaryChange: (summary: string) => void;
   onTagsChange: (tags: string) => void;
 }
 
-export const NoteEntryMetadataPanel = ({ category, slug, summary, tags, onCategoryChange, onSlugChange, onSummaryChange, onTagsChange }: NoteEntryMetadataPanelProps) => (
+export const NoteEntryMetadataPanel = ({ category, errorMessage, isSaving, savedMessage, slug, summary, tags, onCategoryChange, onSave, onSlugChange, onSummaryChange, onTagsChange }: NoteEntryMetadataPanelProps) => (
   <aside className="min-h-0 overflow-y-auto border-t border-border px-5 py-6 lg:border-l lg:border-t-0 xl:px-6">
     <div className="flex items-center justify-between border-b border-border pb-4">
       <div>
         <p className="text-xs font-extrabold uppercase text-primary">Metadata</p>
         <h2 className="mt-1 text-lg font-extrabold">Note details</h2>
       </div>
-      <button className="rounded-md bg-primary px-4 py-2 text-sm font-extrabold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60" type="button" disabled>
-        Save draft
+      <button className="rounded-md bg-primary px-4 py-2 text-sm font-extrabold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60" type="button" disabled={isSaving} onClick={onSave}>
+        {isSaving ? 'Saving...' : 'Save draft'}
       </button>
     </div>
+
+    {savedMessage ? <p className="mt-4 rounded-md border border-success-border bg-success p-3 text-sm font-bold text-success-heading">{savedMessage}</p> : null}
+    {errorMessage ? <p className="mt-4 rounded-md border border-error-border bg-error p-3 text-sm font-bold text-error-heading">{errorMessage}</p> : null}
 
     <div className="mt-6 space-y-5">
       <AppInputText label="Slug" value={slug} placeholder="azure-functions-notes" onChange={(event: TextInputChangeEvent) => onSlugChange(event.target.value)} />

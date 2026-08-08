@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { appConfig } from '@/app/appConfig';
 import { WorkspacePageWrapper } from '@/components/common/WorkspacePageWrapper';
 import { NotesCategoryPane } from '../components/NotesCategoryPane';
@@ -10,6 +11,7 @@ export const NotesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(allNotesCategory);
   const [selectedSlug, setSelectedSlug] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   const notesQueryParams = useMemo(() => ({ pageSize: 30 }), []);
   const notesQuery = usePublicNotesQuery(notesQueryParams);
@@ -32,6 +34,11 @@ export const NotesPage = () => {
     void notesQuery.fetchNextPage();
   };
 
+  const handleSelectNote = (slug: string) => {
+    setSelectedSlug(slug);
+    void navigate(`/workspace/notes/${encodeURIComponent(slug)}`);
+  };
+
   return (
     <WorkspacePageWrapper>
       <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 lg:grid-cols-[17rem_minmax(0,1fr)]">
@@ -46,7 +53,7 @@ export const NotesPage = () => {
             hasNextPage={notesQuery.hasNextPage}
             isFetchingNextPage={notesQuery.isFetchingNextPage}
             onSearchTermChange={setSearchTerm}
-            onSelectNote={setSelectedSlug}
+            onSelectNote={handleSelectNote}
             onLoadMore={handleLoadMore}
           />
         </div>

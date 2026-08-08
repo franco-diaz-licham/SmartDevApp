@@ -47,3 +47,12 @@ export interface PublicSearchIndexModel {
   generatedAt: Date;
   documents: PublicNoteSearchDocumentModel[];
 }
+
+export interface CreateNoteModel {
+  title: string;
+  slug: string;
+  summary: string;
+  category: string;
+  tags: string;
+  bodyMarkdown: string;
+}
