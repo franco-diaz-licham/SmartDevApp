@@ -160,7 +160,7 @@ public sealed class Note : Entity<NoteId>
             publishedAt: null,
             archivedAt: null);
 
-        note.RaiseDomainEvent(new NoteCreated(id, occurredAt));
+        note.RaiseDomainEvent(new NoteCreatedEvent(id, occurredAt));
         return note;
     }
 
@@ -235,7 +235,7 @@ public sealed class Note : Entity<NoteId>
         PublishedAt ??= now;
         ArchivedAt = null;
         MarkUpdated(now);
-        RaiseDomainEvent(new NotePublished(Id, now));
+        RaiseDomainEvent(new NotePublishedEvent(Id, now));
     }
 
     public void MakePrivate(DateTimeOffset now)
@@ -255,13 +255,13 @@ public sealed class Note : Entity<NoteId>
         Status = NoteStatus.Archived;
         ArchivedAt = now;
         MarkUpdated(now);
-        RaiseDomainEvent(new NoteArchived(Id, now));
+        RaiseDomainEvent(new NoteArchivedEvent(Id, now));
     }
 
     private void MarkUpdated(DateTimeOffset now)
     {
         Touch(now);
-        RaiseDomainEvent(new NoteUpdated(Id, now));
+        RaiseDomainEvent(new NoteUpdatedEvent(Id, now));
     }
 
     private static List<NoteTagSnapshot> NormalizeTags(IEnumerable<NoteTagSnapshot> tags)

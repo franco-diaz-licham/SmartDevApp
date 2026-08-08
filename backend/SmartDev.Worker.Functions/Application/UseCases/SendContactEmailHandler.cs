@@ -14,7 +14,7 @@ public sealed class SendContactEmailHandler(
     private const string SubjectPrefix = "New portfolio contact message";
     private const string ContactEmailTemplateResourceName = "SmartDev.Worker.Functions.Application.Templates.ContactEmail.html";
 
-    public async Task HandleAsync(ContactMessageCreatedModel message, CancellationToken cancellationToken)
+    public async Task HandleAsync(ContactMessageCreatedIntegrationEvent message, CancellationToken cancellationToken)
     {
         try {
             var emailMessage = new EmailMessageModel(
@@ -47,9 +47,9 @@ public sealed class SendContactEmailHandler(
         logger.LogInformation("Contact message email sent for {ContactMessageId} from {SenderEmail}", message.ContactMessageId, message.SenderEmail);
     }
 
-    private static string BuildSubject(ContactMessageCreatedModel message) => $"{SubjectPrefix}: {message.SenderName}";
+    private static string BuildSubject(ContactMessageCreatedIntegrationEvent message) => $"{SubjectPrefix}: {message.SenderName}";
 
-    private static string BuildPlainTextBody(ContactMessageCreatedModel message)
+    private static string BuildPlainTextBody(ContactMessageCreatedIntegrationEvent message)
     {
         return $"""
             New contact message received
@@ -64,7 +64,7 @@ public sealed class SendContactEmailHandler(
             """;
     }
 
-    private static string BuildHtmlBody(ContactMessageCreatedModel message)
+    private static string BuildHtmlBody(ContactMessageCreatedIntegrationEvent message)
     {
         var template = LoadContactEmailTemplate();
 
@@ -84,7 +84,7 @@ public sealed class SendContactEmailHandler(
         return reader.ReadToEnd();
     }
 
-    private static string FormatOccurredAt(ContactMessageCreatedModel message) => $"{message.OccurredAt:dd MMM yyyy HH:mm:ss zzz} ({message.OccurredAt:O})";
+    private static string FormatOccurredAt(ContactMessageCreatedIntegrationEvent message) => $"{message.OccurredAt:dd MMM yyyy HH:mm:ss zzz} ({message.OccurredAt:O})";
 
 
     private static string HtmlEncodeMultiline(string value)

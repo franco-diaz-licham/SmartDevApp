@@ -2,7 +2,7 @@ using SmartDev.Api.Functions.Domain.Common;
 
 namespace SmartDev.Api.Functions.Domain.Contact;
 
-public sealed record ContactMessageCreated(
+public sealed record ContactMessageCreatedEvent(
     ContactMessageId ContactMessageId,
     string SenderName,
     string SenderEmail,

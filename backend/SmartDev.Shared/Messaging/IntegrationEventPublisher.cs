@@ -29,7 +29,7 @@ public sealed class IntegrationEventPublisher(ServiceBusClient serviceBusClient)
         where TIntegrationEventModel : class
     {
         return typeof(TIntegrationEventModel) switch {
-            var type when type == typeof(ContactMessageCreatedModel) => ContactMessagingTopology.ContactMessageCreatedQueue,
+            var type when type == typeof(ContactMessageCreatedIntegrationEvent) => ContactMessagingTopology.ContactMessageCreatedQueue,
             var type when type == typeof(ContactEmailDeliveryResultModel) => ContactMessagingTopology.ContactEmailDeliveryResultQueue,
             _ => throw new InvalidOperationException($"No Service Bus endpoint configured for {typeof(TIntegrationEventModel).Name}.")
         };
@@ -39,7 +39,7 @@ public sealed class IntegrationEventPublisher(ServiceBusClient serviceBusClient)
         where TIntegrationEventModel : class
     {
         return integrationEventModel switch {
-            ContactMessageCreatedModel message => $"{nameof(ContactMessageCreatedModel)}-{message.ContactMessageId:N}",
+            ContactMessageCreatedIntegrationEvent message => $"{nameof(ContactMessageCreatedIntegrationEvent)}-{message.ContactMessageId:N}",
             ContactEmailDeliveryResultModel result => $"{nameof(ContactEmailDeliveryResultModel)}-{result.ContactMessageId:N}-{result.Status}",
             _ => Guid.NewGuid().ToString("N")
         };
@@ -49,7 +49,7 @@ public sealed class IntegrationEventPublisher(ServiceBusClient serviceBusClient)
         where TIntegrationEventModel : class
     {
         return integrationEventModel switch {
-            ContactMessageCreatedModel message => message.ContactMessageId.ToString("N"),
+            ContactMessageCreatedIntegrationEvent message => message.ContactMessageId.ToString("N"),
             ContactEmailDeliveryResultModel result => result.ContactMessageId.ToString("N"),
             _ => null
         };

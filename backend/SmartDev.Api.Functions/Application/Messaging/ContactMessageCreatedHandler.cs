@@ -7,15 +7,15 @@ namespace SmartDev.Api.Functions.Application.Messaging.Handlers;
 
 public sealed class ContactMessageCreatedHandler(IIntegrationEventPublisher integrationEventPublisher) : IDomainEventHandler
 {
-    public Type EventType => typeof(ContactMessageCreated);
+    public Type EventType => typeof(ContactMessageCreatedEvent);
 
     public async Task HandleAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
-        if (domainEvent is not ContactMessageCreated) throw new InvalidOperationException($"{nameof(ContactMessageCreatedHandler)} cannot handle {domainEvent.GetType().Name}.");
-        var emailEvent = (ContactMessageCreated)domainEvent;
+        if (domainEvent is not ContactMessageCreatedEvent) throw new InvalidOperationException($"{nameof(ContactMessageCreatedHandler)} cannot handle {domainEvent.GetType().Name}.");
+        var emailEvent = (ContactMessageCreatedEvent)domainEvent;
 
         await integrationEventPublisher.PublishAsync(
-            new ContactMessageCreatedModel(
+            new ContactMessageCreatedIntegrationEvent(
                 ContactMessageId: emailEvent.ContactMessageId.Value,
                 SenderName: emailEvent.SenderName,
                 SenderEmail: emailEvent.SenderEmail,

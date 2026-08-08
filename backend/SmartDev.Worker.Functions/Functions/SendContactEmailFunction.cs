@@ -21,8 +21,8 @@ public sealed class SendContactEmailFunction(
         CancellationToken cancellationToken)
     {
         try {
-            var contactMessage = JsonSerializer.Deserialize<ContactMessageCreatedModel>(message.Body.ToString(), SerializerOptions)
-                ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ContactMessageCreatedModel)}.");
+            var contactMessage = JsonSerializer.Deserialize<ContactMessageCreatedIntegrationEvent>(message.Body.ToString(), SerializerOptions)
+                ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ContactMessageCreatedIntegrationEvent)}.");
 
             await handler.HandleAsync(contactMessage, cancellationToken);
 

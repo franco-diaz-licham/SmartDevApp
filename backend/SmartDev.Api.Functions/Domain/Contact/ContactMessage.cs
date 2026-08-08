@@ -70,7 +70,7 @@ public sealed class ContactMessage : Entity<ContactMessageId>
             Guard.Required(message, nameof(message), 4000),
             submittedAt);
 
-        contactMessage.RaiseDomainEvent(new ContactMessageCreated(
+        contactMessage.RaiseDomainEvent(new ContactMessageCreatedEvent(
             contactMessage.Id,
             contactMessage.SenderName,
             contactMessage.SenderEmail,

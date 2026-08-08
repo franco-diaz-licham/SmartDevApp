@@ -22,7 +22,7 @@ public sealed class NoteTests
         note.UpdatedAt.ShouldBeNull();
         note.PublishedAt.ShouldBeNull();
         note.ArchivedAt.ShouldBeNull();
-        note.DomainEvents.OfType<NoteCreated>().Count().ShouldBe(1);
+        note.DomainEvents.OfType<NoteCreatedEvent>().Count().ShouldBe(1);
     }
 
     [Test]
@@ -40,7 +40,7 @@ public sealed class NoteTests
         note.Visibility.ShouldBe(NoteVisibility.Public);
         note.PublishedAt.ShouldBe(publishedAt);
         note.UpdatedAt.ShouldBe(publishedAt);
-        note.DomainEvents.OfType<NotePublished>().Count().ShouldBe(1);
+        note.DomainEvents.OfType<NotePublishedEvent>().Count().ShouldBe(1);
     }
 
     [Test]

@@ -30,9 +30,9 @@ public sealed class ContactMessageTests
         contactMessage.FailureReason.ShouldBeNull();
 
         var createdEvent = contactMessage.DomainEvents.Single();
-        createdEvent.ShouldBeOfType<ContactMessageCreated>();
+        createdEvent.ShouldBeOfType<ContactMessageCreatedEvent>();
 
-        var contactMessageCreated = (ContactMessageCreated)createdEvent;
+        var contactMessageCreated = (ContactMessageCreatedEvent)createdEvent;
         contactMessageCreated.ContactMessageId.ShouldBe(contactMessage.Id);
         contactMessageCreated.SenderName.ShouldBe(contactMessage.SenderName);
         contactMessageCreated.SenderEmail.ShouldBe(contactMessage.SenderEmail);

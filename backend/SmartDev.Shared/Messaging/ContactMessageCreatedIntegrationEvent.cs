@@ -1,6 +1,6 @@
 namespace SmartDev.Shared.Messaging;
 
-public sealed record ContactMessageCreatedModel(
+public sealed record ContactMessageCreatedIntegrationEvent(
     Guid ContactMessageId,
     string SenderName,
     string SenderEmail,
