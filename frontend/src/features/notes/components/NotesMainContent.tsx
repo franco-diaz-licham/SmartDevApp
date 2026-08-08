@@ -1,10 +1,8 @@
 import type { PublicNoteListItemModel } from '../types/note.types';
 import { NotesResultsList } from './NotesResultsList';
-import { SelectedNoteMiniArticle } from './SelectedNoteMiniArticle';
 
 interface NotesMainContentProps {
   notes: PublicNoteListItemModel[];
-  selectedNoteSummary: PublicNoteListItemModel | undefined;
   searchTerm: string;
   selectedSlug: string;
   isNotesLoading: boolean;
@@ -18,7 +16,6 @@ interface NotesMainContentProps {
 
 export const NotesMainContent = ({
   notes,
-  selectedNoteSummary,
   searchTerm,
   selectedSlug,
   isNotesLoading,
@@ -30,8 +27,6 @@ export const NotesMainContent = ({
   onLoadMore
 }: NotesMainContentProps) => (
   <section className="min-h-0 min-w-0 overflow-y-auto xl:border-r">
-    <SelectedNoteMiniArticle note={selectedNoteSummary} />
-
     <NotesResultsList
       notes={notes}
       searchTerm={searchTerm}

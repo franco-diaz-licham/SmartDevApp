@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { PublicNoteListItemModel } from '../types/note.types';
 
 interface NotesResultsListProps {
@@ -15,17 +16,25 @@ interface NotesResultsListProps {
 
 export const NotesResultsList = ({ notes, searchTerm, selectedSlug, isLoading, isError, hasNextPage, isFetchingNextPage, onSearchTermChange, onSelectNote, onLoadMore }: NotesResultsListProps) => (
   <div className="px-5 py-6 sm:px-8 lg:px-10">
-    <label className="block text-sm font-extrabold" htmlFor="notes-search">
-      Search notes
-    </label>
-    <input
-      id="notes-search"
-      className="mt-2 w-full rounded-md border border-border bg-background px-4 py-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-      type="search"
-      value={searchTerm}
-      placeholder="Search title, summary, category, or tag"
-      onChange={(event) => onSearchTermChange(event.target.value)}
-    />
+    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+      <div>
+        <label className="block text-sm font-extrabold" htmlFor="notes-search">
+          Search notes
+        </label>
+        <input
+          id="notes-search"
+          className="mt-2 w-full rounded-md border border-border bg-background px-4 py-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+          type="search"
+          value={searchTerm}
+          placeholder="Search title, summary, category, or tag"
+          onChange={(event) => onSearchTermChange(event.target.value)}
+        />
+      </div>
+
+      <Link className="inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-4 text-sm font-extrabold text-primary-foreground no-underline hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30" to="/workspace/notes/new">
+        New note
+      </Link>
+    </div>
 
     <div className="mt-6 grid gap-3">
       {isLoading && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">Loading notes...</p>}

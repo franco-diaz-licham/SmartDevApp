@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth, LoginPage } from '@/features/auth';
 import { HomePage } from '@/features/home/pages/HomePage';
+import { CreateNotePage } from '@/features/notes/pages/CreateNotePage';
 import { NoteArticlePage } from '@/features/notes/pages/NoteArticlePage';
 import { NotesPage } from '@/features/notes/pages/NotesPage';
 import { PersonalProjectPage } from '@/features/portfolio/pages/PersonalProjectPage';
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
         children: [
           { path: '/admin', element: <AdminHomePage /> },
           { path: '/workspace', element: <NotesPage /> },
+          { path: '/workspace/notes/new', element: <CreateNotePage /> },
           { path: '/workspace/notes/:slug', element: <NoteArticlePage /> },
           { path: '/notes', element: <Navigate to="/workspace" replace /> }
         ]

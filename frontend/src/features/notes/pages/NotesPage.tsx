@@ -22,7 +22,6 @@ export const NotesPage = () => {
   const categories = useMemo(() => getNoteCategories(notes), [notes]);
   const filteredNotes = useMemo(() => getFilteredNotes(notes, selectedCategory, searchTerm), [notes, searchTerm, selectedCategory]);
   const activeSlug = filteredNotes.some((note) => note.slug === selectedSlug) ? selectedSlug : (filteredNotes[0]?.slug ?? '');
-  const selectedListItem = notes.find((note) => note.slug === activeSlug);
 
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);
@@ -37,19 +36,20 @@ export const NotesPage = () => {
     <WorkspacePageWrapper>
       <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 lg:grid-cols-[17rem_minmax(0,1fr)]">
         <NotesCategoryPane categories={categories} selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} />
-        <NotesMainContent
-          notes={filteredNotes}
-          selectedNoteSummary={selectedListItem}
-          searchTerm={searchTerm}
-          selectedSlug={activeSlug}
-          isNotesLoading={notesQuery.isLoading}
-          isNotesError={notesQuery.isError}
-          hasNextPage={notesQuery.hasNextPage}
-          isFetchingNextPage={notesQuery.isFetchingNextPage}
-          onSearchTermChange={setSearchTerm}
-          onSelectNote={setSelectedSlug}
-          onLoadMore={handleLoadMore}
-        />
+        <div className="min-h-0 min-w-0">
+          <NotesMainContent
+            notes={filteredNotes}
+            searchTerm={searchTerm}
+            selectedSlug={activeSlug}
+            isNotesLoading={notesQuery.isLoading}
+            isNotesError={notesQuery.isError}
+            hasNextPage={notesQuery.hasNextPage}
+            isFetchingNextPage={notesQuery.isFetchingNextPage}
+            onSearchTermChange={setSearchTerm}
+            onSelectNote={setSelectedSlug}
+            onLoadMore={handleLoadMore}
+          />
+        </div>
       </div>
     </WorkspacePageWrapper>
   );
