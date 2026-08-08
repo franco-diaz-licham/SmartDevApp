@@ -1,14 +1,13 @@
 using SmartDev.Api.Functions.Application.Ports;
 using SmartDev.Api.Functions.Domain.Notes;
-using SmartDev.Api.Functions.Functions;
 
 namespace SmartDev.Api.Functions.Application.UsesCases;
 
 public sealed class GetPublicNotesHandler(INoteRepository noteRepository)
 {
-    public async Task<CursorPage<PublicNoteListItem>> HandleAsync(int pageSize, string? continuationToken, CancellationToken cancellationToken)
+    public async Task<CursorPage<PublicNoteListItem>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
-        var notes = await noteRepository.GetPublishedPublicNotesAsync(pageSize, continuationToken, cancellationToken);
+        var notes = await noteRepository.GetPublishedPublicNotesAsync(query, cancellationToken);
         return new CursorPage<PublicNoteListItem>(notes.Items.Select(PublicNoteListItem.FromDomain).ToArray(), notes.ContinuationToken);
     }
 }
@@ -51,11 +50,11 @@ public sealed class GetPublicNoteTagsHandler(INoteRepository noteRepository)
 
 public sealed class SearchPublicNotesHandler(INoteRepository noteRepository)
 {
-    public async Task<IReadOnlyCollection<PublicNoteListItem>> HandleAsync(string query, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<PublicNoteListItem>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(query)) return [];
+        if (string.IsNullOrWhiteSpace(query.SearchTerm)) return [];
 
-        var normalizedQuery = query.Trim();
+        var normalizedQuery = query.SearchTerm.Trim();
         var notes = await noteRepository.GetPublishedPublicNotesAsync(cancellationToken);
         return notes
             .Where(note => note.SearchableText.Contains(normalizedQuery, StringComparison.OrdinalIgnoreCase))

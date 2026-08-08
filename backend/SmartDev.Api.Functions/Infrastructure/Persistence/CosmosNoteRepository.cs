@@ -1,4 +1,5 @@
 using SmartDev.Api.Functions.Application.Ports;
+using SmartDev.Api.Functions.Application.UsesCases;
 using SmartDev.Api.Functions.Domain.Notes;
 
 namespace SmartDev.Api.Functions.Infrastructure.Persistence;
@@ -45,13 +46,13 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
         return documents.Select(document => document.ToDomain()).ToArray();
     }
 
-    public async Task<DocumentPage<Note>> GetPublishedPublicNotesAsync(int pageSize, string? continuationToken, CancellationToken cancellationToken)
+    public async Task<DocumentPage<Note>> GetPublishedPublicNotesAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var documents = await documentStore.QueryPageAsync<NoteDocument>(
             NoteDocument.ContainerName,
             CosmosNoteQueries.PublishedPublic(),
-            pageSize,
-            continuationToken,
+            query.PageSize,
+            query.ContinuationToken,
             NoteDocument.PublicPartitionKey,
             cancellationToken);
 

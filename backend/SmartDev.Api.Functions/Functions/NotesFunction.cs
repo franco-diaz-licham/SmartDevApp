@@ -13,16 +13,14 @@ public sealed class NotesFunction(
     SearchPublicNotesHandler searchPublicNotesHandler,
     GetPublicNoteSearchIndexHandler getPublicNoteSearchIndexHandler)
 {
-    private const string SearchQueryKey = "q";
-
     [Function(nameof(GetPublicNotes))]
     public async Task<HttpResponseData> GetPublicNotes([HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "notes")] HttpRequestData request, CancellationToken cancellationToken)
     {
         try {
-            var pageRequest = request.GetCursorPageRequest();
-            var notes = await getPublicNotesHandler.HandleAsync(pageRequest.PageSize, pageRequest.ContinuationToken, cancellationToken);
+            var query = request.BindBaseQuery();
+            var notes = await getPublicNotesHandler.HandleAsync(query, cancellationToken);
             return await request.CreateJsonResponseAsync(HttpStatusCode.OK, notes, cancellationToken);
-        } catch (ArgumentOutOfRangeException exception) {
+        } catch (ArgumentException exception) {
             return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse(exception.Message), cancellationToken);
         }
     }
@@ -44,9 +42,13 @@ public sealed class NotesFunction(
     [Function(nameof(SearchPublicNotes))]
     public async Task<HttpResponseData> SearchPublicNotes([HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "notes/search")] HttpRequestData request, CancellationToken cancellationToken)
     {
-        var query = request.GetQueryValue(SearchQueryKey);
-        var notes = await searchPublicNotesHandler.HandleAsync(query, cancellationToken);
-        return await request.CreateJsonResponseAsync(HttpStatusCode.OK, notes, cancellationToken);
+        try {
+            var query = request.BindBaseQuery();
+            var notes = await searchPublicNotesHandler.HandleAsync(query, cancellationToken);
+            return await request.CreateJsonResponseAsync(HttpStatusCode.OK, notes, cancellationToken);
+        } catch (ArgumentException exception) {
+            return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse(exception.Message), cancellationToken);
+        }
     }
 
     [Function(nameof(GetPublicNoteSearchIndex))]

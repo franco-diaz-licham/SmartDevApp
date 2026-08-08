@@ -1,4 +1,5 @@
 using SmartDev.Api.Functions.Domain.Notes;
+using SmartDev.Api.Functions.Application.UsesCases;
 
 namespace SmartDev.Api.Functions.Application.Ports;
 
@@ -8,10 +9,7 @@ public interface INoteRepository
 
     Task<Note?> GetBySlugAsync(NoteSlug slug, CancellationToken cancellationToken);
 
-    Task<DocumentPage<Note>> GetPublishedPublicNotesAsync(
-        int pageSize,
-        string? continuationToken,
-        CancellationToken cancellationToken);
+    Task<DocumentPage<Note>> GetPublishedPublicNotesAsync(BaseQuery query, CancellationToken cancellationToken);
 
     Task<IReadOnlyCollection<Note>> GetPublishedPublicNotesAsync(CancellationToken cancellationToken);
 
