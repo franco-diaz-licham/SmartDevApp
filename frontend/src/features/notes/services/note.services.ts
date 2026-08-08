@@ -1,19 +1,12 @@
 import { apiClient } from '@/lib/api/apiClient';
+import type { BaseQuery } from '@/lib/api/api.types';
 import type { PublicNoteDetailResponse, PublicNoteListItemResponse, PublicNoteListPageResponse, PublicSearchIndexResponse } from '../types/note.api.types';
 
 const NOTES_URL = '/notes';
 
-interface GetPublicNotesRequest {
-  pageSize?: number;
-  continuationToken?: string | null;
-}
-
 export const noteService = {
-  getPublicNotes(request: GetPublicNotesRequest = {}): Promise<PublicNoteListPageResponse> {
-    return apiClient.getCursorPage<PublicNoteListItemResponse>(NOTES_URL, {
-      pageSize: request.pageSize,
-      continuationToken: request.continuationToken
-    });
+  getPublicNotes(request: BaseQuery = {}): Promise<PublicNoteListPageResponse> {
+    return apiClient.getPage<PublicNoteListItemResponse, BaseQuery>(NOTES_URL, request);
   },
 
   getPublicNoteBySlug(slug: string): Promise<PublicNoteDetailResponse> {
@@ -28,8 +21,8 @@ export const noteService = {
     return apiClient.getList<string>(`${NOTES_URL}/tags`);
   },
 
-  searchPublicNotes(query: string): Promise<PublicNoteListItemResponse[]> {
-    return apiClient.getList<PublicNoteListItemResponse>(`${NOTES_URL}/search`, { q: query });
+  searchPublicNotes(request: BaseQuery = {}): Promise<PublicNoteListItemResponse[]> {
+    return apiClient.getList<PublicNoteListItemResponse, BaseQuery>(`${NOTES_URL}/search`, request);
   },
 
   getPublicNoteSearchIndex(): Promise<PublicSearchIndexResponse> {

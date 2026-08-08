@@ -1,4 +1,4 @@
-import type { CursorPageResult } from '@/lib/api/api.types';
+import type { PageResult } from '@/lib/api/api.types';
 
 export interface PublicNoteCategoryResponse {
   slug: string;
@@ -50,4 +50,4 @@ export interface PublicSearchIndexResponse {
   documents: PublicNoteSearchDocumentResponse[];
 }
 
-export type PublicNoteListPageResponse = CursorPageResult<PublicNoteListItemResponse>;
+export type PublicNoteListPageResponse = PageResult<PublicNoteListItemResponse>;

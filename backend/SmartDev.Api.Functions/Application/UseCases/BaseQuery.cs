@@ -26,7 +26,7 @@ public sealed record QueryFilter(
     FilterOperator Operator,
     string Value);
 
-public sealed record CursorPage<TItem>(IReadOnlyCollection<TItem> Items, string? ContinuationToken)
+public sealed record Page<TItem>(IReadOnlyCollection<TItem> Items, string? ContinuationToken)
 {
     public bool HasMore => !string.IsNullOrWhiteSpace(ContinuationToken);
 }

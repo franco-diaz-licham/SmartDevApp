@@ -1,12 +1,18 @@
 import axios, { type AxiosInstance } from 'axios';
 import { appConfig } from '@/app/appConfig';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
+import type { QueryFilter } from './api.types';
 
-const serializeParams = (params: Record<string, unknown>): string => {
+const serializeParams = (params: object): string => {
   const search = new URLSearchParams();
 
   for (const [key, value] of Object.entries(params)) {
     if (value === null || value === undefined) continue;
+
+    if (key === 'filters' && Array.isArray(value)) {
+      for (const filter of value as QueryFilter[]) search.append(key, `${filter.field}:${filter.operator}:${String(filter.value)}`);
+      continue;
+    }
 
     if (Array.isArray(value)) {
       for (const item of value) search.append(key, String(item));

@@ -1,10 +1,10 @@
 /**
- * Cursor-paged response returned by document-store backed endpoints.
+ * Paged response returned by list endpoints.
  *
  * The continuation token is opaque and should only be passed back to the API
  * when requesting the next page.
  */
-export interface CursorPageResult<T> {
+export interface PageResult<T> {
   /** Items returned for the current page. */
   items: T[];
 
@@ -69,41 +69,33 @@ export type ApiQueryParams = Record<string, unknown>;
 /**
  * Common query parameters for list endpoints.
  */
-export interface BaseQueryParams {
+export interface BaseQuery {
   /** Maximum number of items to return. */
-  pageSize: number;
-
-  /** Field name to sort by, or `null` for endpoint default ordering. */
-  sortBy: string | null;
-
-  /** Sort direction, or `null` for endpoint default ordering. */
-  sortDirection: SortByDirection;
-
-  /** Field name to search within, or `null` for endpoint default search scope. */
-  searchBy: string | null;
-
-  /** Search text, or `null` when search is not applied. */
-  searchTerm: string | null;
-
-  /** Whether filters should match all rules or any rule. */
-  filterMatch: FilterMatch | null;
-
-  /** Structured filters to apply. */
-  filters: QueryFilter[];
-
-  /** Optional include expression for endpoints that support expanded data. */
-  include: string | null;
-}
-
-/**
- * Query parameters for continuation-token based pagination.
- */
-export interface CursorQueryParams {
-  /** Maximum number of items to return. */
-  pageSize: number;
+  pageSize?: number;
 
   /** Opaque cursor returned by a previous page, or `null` for the first page. */
-  continuationToken: string | null;
+  continuationToken?: string | null;
+
+  /** Field name to sort by, or `null` for endpoint default ordering. */
+  sortBy?: string | null;
+
+  /** Sort direction, or `null` for endpoint default ordering. */
+  sortDirection?: SortByDirection;
+
+  /** Field name to search within, or `null` for endpoint default search scope. */
+  searchBy?: string | null;
+
+  /** Search text, or `null` when search is not applied. */
+  searchTerm?: string | null;
+
+  /** Whether filters should match all rules or any rule. */
+  filterMatch?: FilterMatch | null;
+
+  /** Structured filters to apply. */
+  filters?: QueryFilter[];
+
+  /** Optional include expression for endpoints that support expanded data. */
+  include?: string | null;
 }
 
 /**

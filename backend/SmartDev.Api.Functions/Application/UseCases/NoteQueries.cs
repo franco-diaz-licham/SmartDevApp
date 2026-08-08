@@ -5,10 +5,10 @@ namespace SmartDev.Api.Functions.Application.UsesCases;
 
 public sealed class GetPublicNotesHandler(INoteRepository noteRepository)
 {
-    public async Task<CursorPage<PublicNoteListItem>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Page<PublicNoteListItem>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var notes = await noteRepository.GetPublishedPublicNotesAsync(query, cancellationToken);
-        return new CursorPage<PublicNoteListItem>(notes.Items.Select(PublicNoteListItem.FromDomain).ToArray(), notes.ContinuationToken);
+        return new Page<PublicNoteListItem>(notes.Items.Select(PublicNoteListItem.FromDomain).ToArray(), notes.ContinuationToken);
     }
 }
 

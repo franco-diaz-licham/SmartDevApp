@@ -1,19 +1,19 @@
-import type { ApiQueryParams, CursorPageResult } from './api.types';
+import type { ApiQueryParams, PageResult } from './api.types';
 import http from './http';
 
 export const apiClient = {
-  async getList<T>(url: string, params?: ApiQueryParams): Promise<T[]> {
+  async getList<T, TQuery extends object = ApiQueryParams>(url: string, params?: TQuery): Promise<T[]> {
     const { data } = await http.get<T[]>(url, { params });
     return data;
   },
 
-  async getSingle<T>(url: string, params?: ApiQueryParams): Promise<T> {
+  async getSingle<T, TQuery extends object = ApiQueryParams>(url: string, params?: TQuery): Promise<T> {
     const { data } = await http.get<T>(url, { params });
     return data;
   },
 
-  async getCursorPage<T>(url: string, params?: ApiQueryParams): Promise<CursorPageResult<T>> {
-    const { data } = await http.get<CursorPageResult<T>>(url, { params });
+  async getPage<T, TQuery extends object = ApiQueryParams>(url: string, params?: TQuery): Promise<PageResult<T>> {
+    const { data } = await http.get<PageResult<T>>(url, { params });
     return data;
   },
 
@@ -53,7 +53,7 @@ export const apiClient = {
     return data;
   },
 
-  async getBlob(url: string, params?: ApiQueryParams): Promise<Blob> {
+  async getBlob<TQuery extends object = ApiQueryParams>(url: string, params?: TQuery): Promise<Blob> {
     const response = await http.get(url, { params, responseType: 'blob' });
     return response.data as Blob;
   },
