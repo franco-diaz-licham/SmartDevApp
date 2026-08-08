@@ -16,7 +16,7 @@ public sealed class HttpAdminAuthorizationMiddleware(IAccessTokenValidator acces
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
         var request = await context.GetHttpRequestDataAsync();
-        if (request is null || IsPreflight(request) || !IsAdminRoute(request)) {
+        if (request is null || IsPreflight(request) || !IsOwnerRoute(request)) {
             await next(context);
             return;
         }
@@ -25,7 +25,7 @@ public sealed class HttpAdminAuthorizationMiddleware(IAccessTokenValidator acces
         if (principal is null) return;
 
         if (!adminAccessAuthorizer.CanAccessAdminArea(principal)) {
-            await WriteErrorResponseAsync(context, request, HttpStatusCode.Forbidden, "The authenticated account is not authorised for this admin endpoint.");
+            await WriteErrorResponseAsync(context, request, HttpStatusCode.Forbidden, "The authenticated account is not authorised for this owner endpoint.");
             return;
         }
 
@@ -52,10 +52,10 @@ public sealed class HttpAdminAuthorizationMiddleware(IAccessTokenValidator acces
         return string.Equals(request.Method, "OPTIONS", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static bool IsAdminRoute(HttpRequestData request)
+    private static bool IsOwnerRoute(HttpRequestData request)
     {
         var path = request.Url.AbsolutePath.TrimEnd('/');
-        return path.Contains("/api/admin", StringComparison.OrdinalIgnoreCase);
+        return path.Contains("/api/owner", StringComparison.OrdinalIgnoreCase);
     }
 
     private static string? TryReadBearerToken(HttpRequestData request)

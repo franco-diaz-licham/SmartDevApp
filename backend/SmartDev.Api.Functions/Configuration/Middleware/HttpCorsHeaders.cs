@@ -6,6 +6,9 @@ namespace SmartDev.Api.Functions.Configuration.Middleware;
 
 public sealed class HttpCorsHeaders(IOptions<CorsOptions> options)
 {
+    private const string AllowedMethods = "GET, POST, PUT, PATCH, DELETE, OPTIONS";
+    private const string AllowedHeaders = "Authorization, Content-Type";
+
     /// <summary>
     /// Stores the normalized origins that are allowed to call this Functions host from a browser.
     /// </summary>
@@ -35,8 +38,8 @@ public sealed class HttpCorsHeaders(IOptions<CorsOptions> options)
         response.Headers.Remove("Vary");
 
         response.Headers.Add("Access-Control-Allow-Origin", allowedOrigin);
-        response.Headers.Add("Access-Control-Allow-Methods", "POST, OPTIONS");
-        response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+        response.Headers.Add("Access-Control-Allow-Methods", AllowedMethods);
+        response.Headers.Add("Access-Control-Allow-Headers", AllowedHeaders);
         response.Headers.Add("Vary", "Origin");
     }
 }

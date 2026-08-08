@@ -71,6 +71,7 @@ public static class ApiAppServices
         services.AddScoped<GetPublicNoteTagsHandler>();
         services.AddScoped<SearchPublicNotesHandler>();
         services.AddScoped<GetPublicNoteSearchIndexHandler>();
+        services.AddScoped<CreateNoteHandler>();
 
         return services;
     }

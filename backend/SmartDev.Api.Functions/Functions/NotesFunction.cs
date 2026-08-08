@@ -11,7 +11,8 @@ public sealed class NotesFunction(
     GetPublicNoteCategoriesHandler getPublicNoteCategoriesHandler,
     GetPublicNoteTagsHandler getPublicNoteTagsHandler,
     SearchPublicNotesHandler searchPublicNotesHandler,
-    GetPublicNoteSearchIndexHandler getPublicNoteSearchIndexHandler)
+    GetPublicNoteSearchIndexHandler getPublicNoteSearchIndexHandler,
+    CreateNoteHandler createNoteHandler)
 {
     [Function(nameof(GetPublicNotes))]
     public async Task<HttpResponseData> GetPublicNotes([HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "notes")] HttpRequestData request, CancellationToken cancellationToken)
@@ -22,6 +23,31 @@ public sealed class NotesFunction(
             return await request.CreateJsonResponseAsync(HttpStatusCode.OK, notes, cancellationToken);
         } catch (ArgumentException exception) {
             return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse(exception.Message), cancellationToken);
+        }
+    }
+
+    [Function(nameof(CreateOwnerNote))]
+    public async Task<HttpResponseData> CreateOwnerNote([HttpTrigger(AuthorizationLevel.Anonymous, "post", "options", Route = "owner/notes")] HttpRequestData request, CancellationToken cancellationToken)
+    {
+        var body = await request.ReadFromJsonAsync<CreateNoteRequest>(cancellationToken);
+        if (body is null) return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse("Request body is required."), cancellationToken);
+
+        try {
+            var result = await createNoteHandler.HandleAsync(
+                new CreateNoteCommand(
+                    body.Title,
+                    body.Slug,
+                    body.Summary,
+                    new CreateNoteCategory(body.Category.Slug, body.Category.DisplayName),
+                    body.Tags.Select(tag => new CreateNoteTag(tag.Slug, tag.DisplayName)).ToArray(),
+                    body.BodyMarkdown),
+                cancellationToken);
+
+            return await request.CreateJsonResponseAsync(HttpStatusCode.Created, new CreateNoteResponse(result.NoteId, result.Slug), cancellationToken);
+        } catch (ArgumentException exception) {
+            return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse(exception.Message), cancellationToken);
+        } catch (InvalidOperationException exception) {
+            return await request.CreateJsonResponseAsync(HttpStatusCode.Conflict, new NotesErrorResponse(exception.Message), cancellationToken);
         }
     }
 
@@ -74,3 +100,17 @@ public sealed class NotesFunction(
 }
 
 public sealed record NotesErrorResponse(string Error);
+
+public sealed record CreateNoteRequest(
+    string Title,
+    string Slug,
+    string Summary,
+    CreateNoteCategoryRequest Category,
+    IReadOnlyCollection<CreateNoteTagRequest> Tags,
+    string BodyMarkdown);
+
+public sealed record CreateNoteCategoryRequest(string Slug, string DisplayName);
+
+public sealed record CreateNoteTagRequest(string Slug, string DisplayName);
+
+public sealed record CreateNoteResponse(Guid NoteId, string Slug);
