@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth, LoginPage } from '@/features/auth';
 import { HomePage } from '@/features/home/pages/HomePage';
+import { NoteArticlePage } from '@/features/notes/pages/NoteArticlePage';
 import { NotesPage } from '@/features/notes/pages/NotesPage';
 import { PersonalProjectPage } from '@/features/portfolio/pages/PersonalProjectPage';
 import { ProfessionalWorkPage } from '@/features/portfolio/pages/ProfessionalWorkPage';
@@ -32,6 +33,7 @@ export const router = createBrowserRouter([
         children: [
           { path: '/admin', element: <AdminHomePage /> },
           { path: '/workspace', element: <NotesPage /> },
+          { path: '/workspace/notes/:slug', element: <NoteArticlePage /> },
           { path: '/notes', element: <Navigate to="/workspace" replace /> }
         ]
       }

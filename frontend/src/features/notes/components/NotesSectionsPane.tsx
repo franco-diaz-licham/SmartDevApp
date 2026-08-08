@@ -5,7 +5,7 @@ interface NotesSectionsPaneProps {
 }
 
 export const NotesSectionsPane = ({ sections }: NotesSectionsPaneProps) => (
-  <aside className="hidden px-6 py-8 xl:sticky xl:top-[5.5rem] xl:block xl:h-[calc(100vh-5.5rem)] xl:overflow-y-auto xl:border-l">
+  <aside className="hidden min-h-0 overflow-y-auto px-6 py-8 xl:block xl:border-l">
     <p className="text-sm font-extrabold">On this note</p>
     <nav className="mt-4 space-y-1" aria-label="Selected note sections">
       {sections.map((section) => (

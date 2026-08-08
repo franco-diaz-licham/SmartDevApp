@@ -1,9 +1,8 @@
-import type { PublicNoteDetailModel, PublicNoteListItemModel } from '../types/note.types';
+import type { PublicNoteDetailModel } from '../types/note.types';
 import { formatNoteDate, getNoteSectionId } from '../utils/noteContent';
 
-interface SelectedNoteContentProps {
+interface NoteArticleContentProps {
   note: PublicNoteDetailModel | undefined;
-  noteSummary: PublicNoteListItemModel | undefined;
   isLoading: boolean;
   isError: boolean;
 }
@@ -64,22 +63,22 @@ const renderMarkdown = (markdown: string) => {
   return blocks.map(renderMarkdownBlock);
 };
 
-export const SelectedNoteContent = ({ note, noteSummary, isLoading, isError }: SelectedNoteContentProps) => (
-  <article className="min-w-0 px-5 py-7 sm:px-8 lg:px-10">
-    {noteSummary && (
-      <header id="overview" className="scroll-mt-28">
-        <p className="text-sm font-extrabold uppercase text-primary">{noteSummary.category.displayName}</p>
-        <h2 className="mt-2 text-3xl font-extrabold leading-tight">{noteSummary.title}</h2>
-        <p className="mt-3 text-sm text-muted-foreground">Published {formatNoteDate(noteSummary.publishedAt)}</p>
-        <p className="mt-5 text-lg leading-8 text-muted-foreground">{noteSummary.summary}</p>
-      </header>
-    )}
+export const NoteArticleContent = ({ note, isLoading, isError }: NoteArticleContentProps) => (
+  <article className="min-h-0 min-w-0 overflow-y-auto px-5 py-7 sm:px-8 lg:px-10">
+    {isLoading && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">Loading note...</p>}
+    {isError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Note could not be loaded.</p>}
 
-    <div className="mt-10 space-y-6 pb-16">
-      {isLoading && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">Loading selected note...</p>}
-      {isError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Selected note could not be loaded.</p>}
-      {note && renderMarkdown(note.bodyMarkdown)}
-      {!noteSummary && !isLoading && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">Select a note to read.</p>}
-    </div>
+    {note && (
+      <>
+        <header id="overview" className="scroll-mt-28">
+          <p className="text-sm font-extrabold uppercase text-primary">{note.category.displayName}</p>
+          <h1 className="mt-2 text-3xl font-extrabold leading-tight">{note.title}</h1>
+          <p className="mt-3 text-sm text-muted-foreground">Published {formatNoteDate(note.publishedAt)}</p>
+          <p className="mt-5 text-lg leading-8 text-muted-foreground">{note.summary}</p>
+        </header>
+
+        <div className="mt-10 space-y-6 pb-16">{renderMarkdown(note.bodyMarkdown)}</div>
+      </>
+    )}
   </article>
 );

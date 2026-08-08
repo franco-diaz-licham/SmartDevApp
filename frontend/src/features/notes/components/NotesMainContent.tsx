@@ -1,10 +1,9 @@
-import type { PublicNoteDetailModel, PublicNoteListItemModel } from '../types/note.types';
+import type { PublicNoteListItemModel } from '../types/note.types';
 import { NotesResultsList } from './NotesResultsList';
-import { SelectedNoteContent } from './SelectedNoteContent';
+import { SelectedNoteMiniArticle } from './SelectedNoteMiniArticle';
 
 interface NotesMainContentProps {
   notes: PublicNoteListItemModel[];
-  selectedNote: PublicNoteDetailModel | undefined;
   selectedNoteSummary: PublicNoteListItemModel | undefined;
   searchTerm: string;
   selectedSlug: string;
@@ -12,8 +11,6 @@ interface NotesMainContentProps {
   isNotesError: boolean;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
-  isSelectedNoteLoading: boolean;
-  isSelectedNoteError: boolean;
   onSearchTermChange: (searchTerm: string) => void;
   onSelectNote: (slug: string) => void;
   onLoadMore: () => void;
@@ -21,7 +18,6 @@ interface NotesMainContentProps {
 
 export const NotesMainContent = ({
   notes,
-  selectedNote,
   selectedNoteSummary,
   searchTerm,
   selectedSlug,
@@ -29,13 +25,13 @@ export const NotesMainContent = ({
   isNotesError,
   hasNextPage,
   isFetchingNextPage,
-  isSelectedNoteLoading,
-  isSelectedNoteError,
   onSearchTermChange,
   onSelectNote,
   onLoadMore
 }: NotesMainContentProps) => (
-  <section className="min-w-0 xl:border-r">
+  <section className="min-h-0 min-w-0 overflow-y-auto xl:border-r">
+    <SelectedNoteMiniArticle note={selectedNoteSummary} />
+
     <NotesResultsList
       notes={notes}
       searchTerm={searchTerm}
@@ -48,7 +44,5 @@ export const NotesMainContent = ({
       onSelectNote={onSelectNote}
       onLoadMore={onLoadMore}
     />
-
-    <SelectedNoteContent note={selectedNote} noteSummary={selectedNoteSummary} isLoading={isSelectedNoteLoading} isError={isSelectedNoteError} />
   </section>
 );

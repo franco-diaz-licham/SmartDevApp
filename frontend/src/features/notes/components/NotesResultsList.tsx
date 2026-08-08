@@ -14,7 +14,7 @@ interface NotesResultsListProps {
 }
 
 export const NotesResultsList = ({ notes, searchTerm, selectedSlug, isLoading, isError, hasNextPage, isFetchingNextPage, onSearchTermChange, onSelectNote, onLoadMore }: NotesResultsListProps) => (
-  <div className="border-b border-border px-5 py-6 sm:px-8 lg:px-10">
+  <div className="px-5 py-6 sm:px-8 lg:px-10">
     <label className="block text-sm font-extrabold" htmlFor="notes-search">
       Search notes
     </label>
