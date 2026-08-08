@@ -67,6 +67,7 @@ public static class ApiAppServices
         services.AddScoped<UpdateContactEmailStatusHandler>();
         services.AddScoped<GetPublicNotesHandler>();
         services.AddScoped<GetOwnerNotesHandler>();
+        services.AddScoped<GetOwnerNoteByIdHandler>();
         services.AddScoped<GetPublicNoteBySlugHandler>();
         services.AddScoped<GetPublicNoteCategoriesHandler>();
         services.AddScoped<GetPublicNoteTagsHandler>();

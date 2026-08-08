@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using System.Web;
 using Microsoft.Azure.Functions.Worker.Http;
 using SmartDev.Api.Functions.Application.UsesCases;
@@ -7,6 +8,7 @@ namespace SmartDev.Api.Functions.Functions;
 
 internal static class HttpRequestDataExtensions
 {
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private const char FilterSeparator = ':';
     private const string PageSizeQueryKey = "pageSize";
     private const string ContinuationTokenQueryKey = "continuationToken";
@@ -112,7 +114,8 @@ internal static class HttpRequestDataExtensions
     public static async Task<HttpResponseData> CreateJsonResponseAsync<TResponse>(this HttpRequestData request, HttpStatusCode statusCode, TResponse body, CancellationToken cancellationToken)
     {
         var response = request.CreateResponse(statusCode);
-        await response.WriteAsJsonAsync(body, cancellationToken);
+        response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+        await response.WriteStringAsync(JsonSerializer.Serialize(body, JsonOptions), cancellationToken);
         return response;
     }
 }

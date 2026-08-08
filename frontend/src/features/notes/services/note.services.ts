@@ -3,6 +3,7 @@ import type { BaseQuery } from '@/lib/api/api.types';
 import type {
   CreateNoteRequestDto,
   CreateNoteResponseDto,
+  OwnerNoteDetailResponse,
   OwnerNoteListPageResponse,
   PublicNoteCategoryPageResponse,
   PublicNoteDetailResponse,
@@ -25,6 +26,10 @@ export const noteService = {
 
   getOwnerNotes(request: BaseQuery = {}): Promise<OwnerNoteListPageResponse> {
     return apiClient.getPage<PublicNoteListItemResponse, BaseQuery>(OWNER_NOTES_URL, request);
+  },
+
+  getOwnerNoteById(noteId: string): Promise<OwnerNoteDetailResponse> {
+    return apiClient.getSingle<OwnerNoteDetailResponse>(`${OWNER_NOTES_URL}/${encodeURIComponent(noteId)}`);
   },
 
   getPublicNoteBySlug(slug: string): Promise<PublicNoteDetailResponse> {

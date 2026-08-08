@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import type { BaseQuery } from '@/lib/api/api.types';
-import { mapPublicNoteDetailResponseToModel, mapPublicNoteListItemResponseToModel, mapPublicSearchIndexResponseToModel } from '../mappers/note.mapper';
+import { mapPublicNoteDetailResponseToEntryModel, mapPublicNoteDetailResponseToModel, mapPublicNoteListItemResponseToModel, mapPublicSearchIndexResponseToModel } from '../mappers/note.mapper';
 import { noteService } from '../services/note.services';
 
 export const noteKeys = {
@@ -10,6 +10,7 @@ export const noteKeys = {
   ownerList: (query: BaseQuery) => [...noteKeys.lists(), 'owner', query] as const,
   details: () => [...noteKeys.all, 'detail'] as const,
   publicDetail: (slug: string) => [...noteKeys.details(), 'public', slug] as const,
+  ownerDetail: (noteId: string) => [...noteKeys.details(), 'owner', noteId] as const,
   publicCategories: (query: BaseQuery) => [...noteKeys.all, 'public-categories', query] as const,
   publicTags: (query: BaseQuery) => [...noteKeys.all, 'public-tags', query] as const,
   publicSearch: (query: BaseQuery) => [...noteKeys.all, 'public-search', query] as const,
@@ -82,6 +83,13 @@ export const usePublicNoteQuery = (slug: string) =>
     queryKey: noteKeys.publicDetail(slug),
     queryFn: async () => mapPublicNoteDetailResponseToModel(await noteService.getPublicNoteBySlug(slug)),
     enabled: slug.trim().length > 0
+  });
+
+export const useOwnerNoteEntryQuery = (noteId: string) =>
+  useQuery({
+    queryKey: noteKeys.ownerDetail(noteId),
+    queryFn: async () => mapPublicNoteDetailResponseToEntryModel(await noteService.getOwnerNoteById(noteId)),
+    enabled: noteId.trim().length > 0
   });
 
 export const usePublicNoteCategoriesQuery = (query: BaseQuery = {}) =>

@@ -120,6 +120,18 @@ describe('noteService', () => {
     expect(apiClientMock.getSingle).toHaveBeenCalledWith('/notes/cosmos%20notes');
   });
 
+  test('gets an owner note by id', async () => {
+    // Arrange
+    apiClientMock.getSingle.mockResolvedValue(noteDetailResponse);
+
+    // Act
+    const result = await noteService.getOwnerNoteById('5f4d0b3f-10a9-4c59-9e91-65cb3770887f');
+
+    // Assert
+    expect(result).toEqual(noteDetailResponse);
+    expect(apiClientMock.getSingle).toHaveBeenCalledWith('/owner/notes/5f4d0b3f-10a9-4c59-9e91-65cb3770887f');
+  });
+
   test('gets public note categories', async () => {
     // Arrange
     apiClientMock.getPage.mockResolvedValue({

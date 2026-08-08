@@ -54,6 +54,8 @@ export type PublicNoteListPageResponse = PageResult<PublicNoteListItemResponse>;
 
 export type OwnerNoteListPageResponse = PageResult<PublicNoteListItemResponse>;
 
+export type OwnerNoteDetailResponse = PublicNoteDetailResponse;
+
 export type PublicNoteCategoryPageResponse = PageResult<string>;
 
 export type PublicNoteTagPageResponse = PageResult<string>;

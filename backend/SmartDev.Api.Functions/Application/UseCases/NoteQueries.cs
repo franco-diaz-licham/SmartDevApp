@@ -21,6 +21,15 @@ public sealed class GetOwnerNotesHandler(INoteRepository noteRepository)
     }
 }
 
+public sealed class GetOwnerNoteByIdHandler(INoteRepository noteRepository)
+{
+    public async Task<PublicNoteDetail?> HandleAsync(Guid noteId, CancellationToken cancellationToken)
+    {
+        var note = await noteRepository.GetByIdAsync(NoteId.From(noteId), cancellationToken);
+        return note is null ? null : PublicNoteDetail.FromDomain(note);
+    }
+}
+
 public sealed class GetPublicNoteBySlugHandler(INoteRepository noteRepository)
 {
     public async Task<PublicNoteDetail?> HandleAsync(string slug, CancellationToken cancellationToken)

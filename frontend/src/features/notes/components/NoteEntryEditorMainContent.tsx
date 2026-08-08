@@ -1,22 +1,18 @@
 import { useId } from 'react';
+import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
 
 export type NoteEditorMode = 'edit' | 'preview';
 
-type TextInputChangeEvent = {
-  target: {
-    value: string;
-  };
-};
-
 interface NoteEntryEditorMainContentProps {
   bodyMarkdown: string;
+  bodyMarkdownError?: FieldError;
+  bodyMarkdownField: UseFormRegisterReturn;
   mode: NoteEditorMode;
-  title: string;
-  onBodyMarkdownChange: (bodyMarkdown: string) => void;
+  titleError?: FieldError;
+  titleField: UseFormRegisterReturn;
   onModeChange: (mode: NoteEditorMode) => void;
-  onTitleChange: (title: string) => void;
 }
 
 const renderMarkdownPreview = (markdown: string) => {
@@ -59,7 +55,7 @@ const renderMarkdownPreview = (markdown: string) => {
   });
 };
 
-export const NoteEntryEditorMainContent = ({ bodyMarkdown, mode, title, onBodyMarkdownChange, onModeChange, onTitleChange }: NoteEntryEditorMainContentProps) => {
+export const NoteEntryEditorMainContent = ({ bodyMarkdown, bodyMarkdownError, bodyMarkdownField, mode, titleError, titleField, onModeChange }: NoteEntryEditorMainContentProps) => {
   const editorId = useId();
 
   return (
@@ -68,11 +64,11 @@ export const NoteEntryEditorMainContent = ({ bodyMarkdown, mode, title, onBodyMa
         <div className="border-b border-border pb-5">
           <p className="text-xs font-extrabold uppercase text-primary">New note</p>
           <AppInputText
+            {...titleField}
             className="mt-3 border-0 px-0 text-3xl font-extrabold leading-tight shadow-none focus:ring-0"
+            error={titleError?.message}
             id="note-title"
-            value={title}
             placeholder="Untitled note"
-            onChange={(event: TextInputChangeEvent) => onTitleChange(event.target.value)}
           />
         </div>
 
@@ -88,12 +84,12 @@ export const NoteEntryEditorMainContent = ({ bodyMarkdown, mode, title, onBodyMa
 
           {mode === 'edit' ? (
             <AppInputTextArea
+              {...bodyMarkdownField}
               aria-label="Note body"
               className="min-h-[32rem] resize-none rounded-none border-0 font-mono text-sm leading-7 shadow-none focus:ring-0"
+              error={bodyMarkdownError?.message}
               id={editorId}
-              value={bodyMarkdown}
               placeholder="# Start writing"
-              onChange={(event: TextInputChangeEvent) => onBodyMarkdownChange(event.target.value)}
             />
           ) : (
             <div className="min-h-[32rem] space-y-6 px-5 py-6">{renderMarkdownPreview(bodyMarkdown)}</div>

@@ -79,6 +79,15 @@ export const mapPublicNoteDetailResponseToModel = (note: PublicNoteDetailRespons
   relatedProjects: note.relatedProjects.map(mapPublicRelatedProjectReferenceResponseToModel)
 });
 
+export const mapPublicNoteDetailResponseToEntryModel = (note: PublicNoteDetailResponse): NoteEntryModel => ({
+  title: note.title,
+  slug: note.slug,
+  summary: note.summary,
+  category: note.category.displayName,
+  tags: note.tags.map((tag) => tag.displayName).join(', '),
+  bodyMarkdown: note.bodyMarkdown
+});
+
 export const mapPublicNoteSearchDocumentResponseToModel = (document: PublicNoteSearchDocumentResponse): PublicNoteSearchDocumentModel => ({
   id: document.id,
   type: document.type,

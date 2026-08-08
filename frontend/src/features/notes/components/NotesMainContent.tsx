@@ -14,18 +14,7 @@ interface NotesMainContentProps {
   onLoadMore: () => void;
 }
 
-export const NotesMainContent = ({
-  notes,
-  searchTerm,
-  selectedNoteId,
-  isNotesLoading,
-  isNotesError,
-  hasNextPage,
-  isFetchingNextPage,
-  onSearchTermChange,
-  onSelectNote,
-  onLoadMore
-}: NotesMainContentProps) => (
+export const NotesMainContent = ({ notes, searchTerm, selectedNoteId, isNotesLoading, isNotesError, hasNextPage, isFetchingNextPage, onSearchTermChange, onSelectNote, onLoadMore }: NotesMainContentProps) => (
   <section className="min-h-0 min-w-0 overflow-y-auto xl:border-r">
     <NotesResultsList
       notes={notes}

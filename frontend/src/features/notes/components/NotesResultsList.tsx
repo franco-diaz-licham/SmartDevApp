@@ -31,7 +31,10 @@ export const NotesResultsList = ({ notes, searchTerm, selectedNoteId, isLoading,
         />
       </div>
 
-      <Link className="inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-4 text-sm font-extrabold text-primary-foreground no-underline hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30" to="/workspace/notes/new">
+      <Link
+        className="inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-4 text-sm font-extrabold text-primary-foreground no-underline hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30"
+        to="/workspace/notes/new"
+      >
         New note
       </Link>
     </div>

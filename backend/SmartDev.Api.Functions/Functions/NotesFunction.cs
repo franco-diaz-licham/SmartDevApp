@@ -8,6 +8,7 @@ namespace SmartDev.Api.Functions.Functions;
 public sealed class NotesFunction(
     GetPublicNotesHandler getPublicNotesHandler,
     GetOwnerNotesHandler getOwnerNotesHandler,
+    GetOwnerNoteByIdHandler getOwnerNoteByIdHandler,
     GetPublicNoteBySlugHandler getPublicNoteBySlugHandler,
     GetPublicNoteCategoriesHandler getPublicNoteCategoriesHandler,
     GetPublicNoteTagsHandler getPublicNoteTagsHandler,
@@ -77,18 +78,38 @@ public sealed class NotesFunction(
         }
     }
 
-    [Function(nameof(UpdateOwnerNote))]
-    public async Task<HttpResponseData> UpdateOwnerNote([HttpTrigger(AuthorizationLevel.Anonymous, "put", "options", Route = "owner/notes/{noteId}")] HttpRequestData request, string noteId, CancellationToken cancellationToken)
+    [Function(nameof(OwnerNote))]
+    public async Task<HttpResponseData> OwnerNote([HttpTrigger(AuthorizationLevel.Anonymous, "get", "put", "options", Route = "owner/notes/{noteId}")] HttpRequestData request, string noteId, CancellationToken cancellationToken)
     {
         if (!Guid.TryParse(noteId, out var parsedNoteId)) return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse("Note id must be a valid GUID."), cancellationToken);
 
+        if (string.Equals(request.Method, "GET", StringComparison.OrdinalIgnoreCase)) {
+            return await GetOwnerNoteByIdAsync(request, parsedNoteId, cancellationToken);
+        }
+
+        if (string.Equals(request.Method, "PUT", StringComparison.OrdinalIgnoreCase)) {
+            return await UpdateOwnerNoteAsync(request, parsedNoteId, cancellationToken);
+        }
+
+        return request.CreateResponse(HttpStatusCode.NoContent);
+    }
+
+    private async Task<HttpResponseData> GetOwnerNoteByIdAsync(HttpRequestData request, Guid noteId, CancellationToken cancellationToken)
+    {
+        var note = await getOwnerNoteByIdHandler.HandleAsync(noteId, cancellationToken);
+        if (note is null) return await request.CreateJsonResponseAsync(HttpStatusCode.NotFound, new NotesErrorResponse("Note was not found."), cancellationToken);
+        return await request.CreateJsonResponseAsync(HttpStatusCode.OK, note, cancellationToken);
+    }
+
+    private async Task<HttpResponseData> UpdateOwnerNoteAsync(HttpRequestData request, Guid noteId, CancellationToken cancellationToken)
+    {
         var body = await request.ReadFromJsonAsync<UpdateNoteRequest>(cancellationToken);
         if (body is null) return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse("Request body is required."), cancellationToken);
 
         try {
             var result = await updateNoteHandler.HandleAsync(
                 new UpdateNoteCommand(
-                    parsedNoteId,
+                    noteId,
                     body.Title,
                     body.Slug,
                     body.Summary,
