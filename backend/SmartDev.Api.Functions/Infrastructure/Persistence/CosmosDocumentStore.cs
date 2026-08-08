@@ -60,11 +60,7 @@ public sealed class CosmosDocumentStore(CosmosClient client, IOptions<CosmosDbOp
 
         if (!string.IsNullOrWhiteSpace(partitionKey)) requestOptions.PartitionKey = new PartitionKey(partitionKey);
 
-        using var iterator = GetContainer(containerName).GetItemQueryIterator<TDocument>(
-            query,
-            continuationToken,
-            requestOptions);
-
+        using var iterator = GetContainer(containerName).GetItemQueryIterator<TDocument>(query, continuationToken, requestOptions);
         if (!iterator.HasMoreResults) return new DocumentPage<TDocument>([], null);
         var response = await iterator.ReadNextAsync(cancellationToken);
         return new DocumentPage<TDocument>(response.ToArray(), response.ContinuationToken);

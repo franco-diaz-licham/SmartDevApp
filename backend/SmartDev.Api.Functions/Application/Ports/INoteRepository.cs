@@ -8,6 +8,11 @@ public interface INoteRepository
 
     Task<Note?> GetBySlugAsync(NoteSlug slug, CancellationToken cancellationToken);
 
+    Task<DocumentPage<Note>> GetPublishedPublicNotesAsync(
+        int pageSize,
+        string? continuationToken,
+        CancellationToken cancellationToken);
+
     Task<IReadOnlyCollection<Note>> GetPublishedPublicNotesAsync(CancellationToken cancellationToken);
 
     Task<IReadOnlyCollection<Note>> GetAllForOwnerAsync(CancellationToken cancellationToken);

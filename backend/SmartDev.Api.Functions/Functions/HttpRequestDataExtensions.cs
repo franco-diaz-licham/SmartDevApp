@@ -1,3 +1,4 @@
+using System.Net;
 using System.Web;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -32,6 +33,20 @@ internal static class HttpRequestDataExtensions
 
         return pageSize;
     }
+
+    public static async Task<HttpResponseData> CreateJsonResponseAsync<TResponse>(this HttpRequestData request, HttpStatusCode statusCode, TResponse body, CancellationToken cancellationToken)
+    {
+        var response = request.CreateResponse(statusCode);
+        await response.WriteAsJsonAsync(body, cancellationToken);
+        return response;
+    }
 }
 
 internal sealed record CursorPageRequest(int PageSize, string? ContinuationToken);
+
+
+public sealed record CursorPage<TItem>(IReadOnlyCollection<TItem> Items, string? ContinuationToken)
+{
+    public bool HasMore => !string.IsNullOrWhiteSpace(ContinuationToken);
+}
+
