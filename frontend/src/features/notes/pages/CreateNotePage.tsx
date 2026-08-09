@@ -54,7 +54,7 @@ export const CreateNotePage = () => {
     createNoteMutation.mutate(note, {
       onSuccess: (savedNote) => {
         setSavedMessage('Draft saved.');
-        void navigate(`/workspace/notes/${encodeURIComponent(savedNote.noteId)}/edit`, { replace: true });
+        void navigate(`/workspace/notes/${encodeURIComponent(savedNote.noteId)}`, { replace: true });
       }
     });
   };

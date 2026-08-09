@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { appConfig } from '@/app/appConfig';
 import { WorkspacePageWrapper } from '@/components/common/WorkspacePageWrapper';
 import { NotesCategoryPane } from '../components/NotesCategoryPane';
@@ -11,7 +10,6 @@ export const NotesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(allNotesCategory);
   const [selectedNoteId, setSelectedNoteId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
 
   const notesQueryParams = useMemo(() => ({ pageSize: 30 }), []);
   const notesQuery = useOwnerNotesQuery(notesQueryParams);
@@ -36,7 +34,6 @@ export const NotesPage = () => {
 
   const handleSelectNote = (noteId: string) => {
     setSelectedNoteId(noteId);
-    void navigate(`/workspace/notes/${encodeURIComponent(noteId)}/edit`);
   };
 
   return (

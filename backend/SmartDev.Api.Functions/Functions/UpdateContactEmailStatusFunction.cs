@@ -8,9 +8,7 @@ using SmartDev.Shared.Options;
 
 namespace SmartDev.Api.Functions.Functions;
 
-public sealed class UpdateContactEmailStatusFunction(
-    UpdateContactEmailStatusHandler handler,
-    ILogger<UpdateContactEmailStatusFunction> logger)
+public sealed class UpdateContactEmailStatusFunction(UpdateContactEmailStatusHandler handler, ILogger<UpdateContactEmailStatusFunction> logger)
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 

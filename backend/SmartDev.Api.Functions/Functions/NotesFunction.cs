@@ -82,15 +82,8 @@ public sealed class NotesFunction(
     public async Task<HttpResponseData> OwnerNote([HttpTrigger(AuthorizationLevel.Anonymous, "get", "put", "options", Route = "owner/notes/{noteId}")] HttpRequestData request, string noteId, CancellationToken cancellationToken)
     {
         if (!Guid.TryParse(noteId, out var parsedNoteId)) return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse("Note id must be a valid GUID."), cancellationToken);
-
-        if (string.Equals(request.Method, "GET", StringComparison.OrdinalIgnoreCase)) {
-            return await GetOwnerNoteByIdAsync(request, parsedNoteId, cancellationToken);
-        }
-
-        if (string.Equals(request.Method, "PUT", StringComparison.OrdinalIgnoreCase)) {
-            return await UpdateOwnerNoteAsync(request, parsedNoteId, cancellationToken);
-        }
-
+        if (string.Equals(request.Method, "GET", StringComparison.OrdinalIgnoreCase)) return await GetOwnerNoteByIdAsync(request, parsedNoteId, cancellationToken);
+        if (string.Equals(request.Method, "PUT", StringComparison.OrdinalIgnoreCase)) return await UpdateOwnerNoteAsync(request, parsedNoteId, cancellationToken);
         return request.CreateResponse(HttpStatusCode.NoContent);
     }
 

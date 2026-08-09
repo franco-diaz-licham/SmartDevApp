@@ -22,6 +22,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/home" replace /> },
       { path: 'home', element: <HomePage /> },
+      { path: 'notes/:slug/read', element: <NoteArticlePage /> },
       { path: 'portfolio/professional/:itemId', element: <ProfessionalWorkPage /> },
       { path: 'portfolio/personal/:itemId', element: <PersonalProjectPage /> }
     ]
@@ -35,8 +36,9 @@ export const router = createBrowserRouter([
           { path: '/admin', element: <AdminHomePage /> },
           { path: '/workspace', element: <NotesPage /> },
           { path: '/workspace/notes/new', element: <CreateNotePage /> },
-          { path: '/workspace/notes/:noteId/edit', element: <CreateNotePage /> },
-          { path: '/workspace/notes/:slug', element: <NoteArticlePage /> },
+          { path: '/workspace/notes/:noteId', element: <NoteArticlePage /> },
+          { path: '/workspace/notes/:noteId/read', element: <NoteArticlePage /> },
+          { path: '/workspace/notes/:noteId/edit', element: <NoteArticlePage /> },
           { path: '/notes', element: <Navigate to="/workspace" replace /> }
         ]
       }

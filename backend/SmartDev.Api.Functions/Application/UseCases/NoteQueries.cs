@@ -170,7 +170,7 @@ public sealed record PublicNoteSearchDocument(
             note.Category.DisplayName,
             note.Tags.Select(tag => tag.DisplayName).ToArray(),
             note.Body.Value,
-            $"/notes/{note.Slug.Value}",
+            $"/notes/{note.Slug.Value}/read",
             note.UpdatedAt,
             note.PublishedAt);
     }

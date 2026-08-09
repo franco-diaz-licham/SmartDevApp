@@ -65,7 +65,7 @@ describe('note mapper', () => {
           category: 'Backend',
           tags: ['.NET'],
           bodyText: 'Cosmos DB notes.',
-          url: '/notes/cosmos-notes',
+          url: '/notes/cosmos-notes/read',
           updatedAt: '2026-08-06T09:30:00Z',
           publishedAt: null
         }

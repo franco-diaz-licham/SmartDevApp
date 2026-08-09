@@ -1,10 +1,26 @@
+import type { KeyboardEvent } from 'react';
+import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
+import { AppInputText } from '@/components/ui/AppInputText';
+import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
 import type { PublicNoteDetailModel } from '../types/note.types';
 import { formatNoteDate, getNoteSectionId } from '../utils/noteContent';
 
+export type EditableNoteArticleField = 'title' | 'summary' | 'bodyMarkdown' | 'slug' | 'category' | 'tags';
+
 interface NoteArticleContentProps {
+  bodyMarkdownField?: UseFormRegisterReturn;
+  bodyMarkdownError?: FieldError;
+  bodyMarkdownValue?: string;
+  editingField?: EditableNoteArticleField;
+  isEditable?: boolean;
   note: PublicNoteDetailModel | undefined;
   isLoading: boolean;
   isError: boolean;
+  summaryField?: UseFormRegisterReturn;
+  summaryError?: FieldError;
+  titleField?: UseFormRegisterReturn;
+  titleError?: FieldError;
+  onEditField?: (field: EditableNoteArticleField) => void;
 }
 
 const renderMarkdownBlock = (block: string, index: number) => {
@@ -63,22 +79,51 @@ const renderMarkdown = (markdown: string) => {
   return blocks.map(renderMarkdownBlock);
 };
 
-export const NoteArticleContent = ({ note, isLoading, isError }: NoteArticleContentProps) => (
-  <article className="min-h-0 min-w-0 overflow-y-auto px-5 py-7 sm:px-8 lg:px-10">
-    {isLoading && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">Loading note...</p>}
-    {isError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Note could not be loaded.</p>}
+export const NoteArticleContent = ({ bodyMarkdownField, bodyMarkdownError, bodyMarkdownValue, editingField, isEditable = false, note, isLoading, isError, summaryField, summaryError, titleField, titleError, onEditField }: NoteArticleContentProps) => {
+  const handleBodyKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!isEditable) return;
 
-    {note && (
-      <>
-        <header id="overview" className="scroll-mt-28">
-          <p className="text-sm font-extrabold uppercase text-primary">{note.category.displayName}</p>
-          <h1 className="mt-2 text-3xl font-extrabold leading-tight">{note.title}</h1>
-          <p className="mt-3 text-sm text-muted-foreground">Published {formatNoteDate(note.publishedAt)}</p>
-          <p className="mt-5 text-lg leading-8 text-muted-foreground">{note.summary}</p>
-        </header>
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onEditField?.('bodyMarkdown');
+    }
+  };
 
-        <div className="mt-10 space-y-6 pb-16">{renderMarkdown(note.bodyMarkdown)}</div>
-      </>
-    )}
-  </article>
-);
+  return (
+    <article className="min-h-0 min-w-0 overflow-y-auto px-5 py-7 sm:px-8 lg:px-10">
+      {isLoading && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">Loading note...</p>}
+      {isError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Note could not be loaded.</p>}
+
+      {note && (
+        <>
+          <header id="overview" className="scroll-mt-28">
+            <p className="text-sm font-extrabold uppercase text-primary">{note.category.displayName}</p>
+            {isEditable && editingField === 'title' && titleField ? (
+              <AppInputText {...titleField} autoFocus className="mt-2 border-0 px-0 text-3xl font-extrabold leading-tight shadow-none focus:ring-0" error={titleError?.message} />
+            ) : (
+              <button className="mt-2 block w-full bg-transparent p-0 text-left text-3xl font-extrabold leading-tight text-foreground disabled:cursor-default" type="button" disabled={!isEditable} onClick={() => onEditField?.('title')}>
+                {note.title}
+              </button>
+            )}
+            <p className="mt-3 text-sm text-muted-foreground">Published {formatNoteDate(note.publishedAt)}</p>
+            {isEditable && editingField === 'summary' && summaryField ? (
+              <AppInputTextArea {...summaryField} autoFocus className="mt-5 min-h-32 text-lg leading-8" error={summaryError?.message} />
+            ) : (
+              <button className="mt-5 block w-full bg-transparent p-0 text-left text-lg leading-8 text-muted-foreground disabled:cursor-default" type="button" disabled={!isEditable} onClick={() => onEditField?.('summary')}>
+                {note.summary}
+              </button>
+            )}
+          </header>
+
+          {isEditable && editingField === 'bodyMarkdown' && bodyMarkdownField ? (
+            <AppInputTextArea {...bodyMarkdownField} autoFocus className="mt-10 min-h-[36rem] font-mono text-sm leading-7" error={bodyMarkdownError?.message} />
+          ) : (
+            <div className={isEditable ? 'mt-10 cursor-text' : 'mt-10'} role={isEditable ? 'button' : undefined} tabIndex={isEditable ? 0 : undefined} onClick={() => onEditField?.('bodyMarkdown')} onKeyDown={handleBodyKeyDown}>
+              <div className="space-y-6 pb-16">{renderMarkdown(bodyMarkdownValue ?? note.bodyMarkdown)}</div>
+            </div>
+          )}
+        </>
+      )}
+    </article>
+  );
+};
