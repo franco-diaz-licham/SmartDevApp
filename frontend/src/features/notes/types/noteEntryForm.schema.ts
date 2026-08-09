@@ -1,4 +1,3 @@
-import type { FieldErrors, Resolver } from 'react-hook-form';
 import { z } from 'zod';
 import type { NoteEntryModel } from './note.types';
 
@@ -34,22 +33,4 @@ export const defaultNoteEntryFormValues: NoteEntryModel = {
   bodyMarkdown: ''
 };
 
-export const noteEntryFormResolver: Resolver<NoteEntryModel> = async (values) => {
-  const result = noteEntryFormSchema.safeParse(values);
-  if (result.success) return { values: result.data, errors: {} };
-
-  const errors: FieldErrors<NoteEntryModel> = {};
-  for (const issue of result.error.issues) {
-    const fieldName = issue.path[0];
-    if (typeof fieldName !== 'string') continue;
-    errors[fieldName as keyof NoteEntryModel] = {
-      type: 'validation',
-      message: issue.message
-    };
-  }
-
-  return {
-    values: {},
-    errors
-  };
-};
+export type NoteEntryFormErrors = Partial<Record<keyof NoteEntryModel, string>>;

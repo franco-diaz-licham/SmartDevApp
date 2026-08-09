@@ -6,10 +6,11 @@ import { cn } from '@/lib/cn';
 
 interface AppInputTextProps extends InputTextProps {
   error?: ReactNode;
+  inline?: boolean;
   label?: ReactNode;
 }
 
-export const AppInputText = ({ className, error, id, label, required, type = 'text', ...inputProps }: AppInputTextProps) => {
+export const AppInputText = ({ className, error, id, inline = false, label, required, type = 'text', ...inputProps }: AppInputTextProps) => {
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const errorId = `${inputId}-error`;
@@ -25,6 +26,7 @@ export const AppInputText = ({ className, error, id, label, required, type = 'te
       className={cn(
         'min-h-10 w-full rounded-md border border-border bg-background px-4 py-2 text-foreground transition placeholder:text-muted-foreground',
         'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
+        inline && 'rounded-md border-transparent bg-muted/35 px-2 py-1 shadow-none hover:border-primary/35 focus:border-primary',
         'disabled:cursor-not-allowed disabled:opacity-60',
         className
       )}

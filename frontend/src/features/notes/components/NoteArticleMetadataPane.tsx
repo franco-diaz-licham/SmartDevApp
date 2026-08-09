@@ -1,41 +1,66 @@
-import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
+import type { ChangeEvent } from 'react';
+import UilPen from '@iconscout/react-unicons/icons/uil-pen';
+import { AppButton } from '@/components/ui/AppButton';
 import { AppInputText } from '@/components/ui/AppInputText';
-import type { PublicNoteDetailModel } from '../types/note.types';
+import type { NoteEntryModel, PublicNoteDetailModel } from '../types/note.types';
 import { formatNoteDate } from '../utils/noteContent';
 import type { EditableNoteArticleField } from './NoteArticleContent';
 
 interface NoteArticleMetadataPaneProps {
-  categoryField?: UseFormRegisterReturn;
-  categoryError?: FieldError;
+  categoryError?: string;
+  categoryValue?: string;
   editingField?: EditableNoteArticleField;
-  isDirty?: boolean;
   isEditable?: boolean;
   isSaving?: boolean;
   note: PublicNoteDetailModel | undefined;
   savedMessage?: string;
   errorMessage?: string;
-  slugField?: UseFormRegisterReturn;
-  slugError?: FieldError;
-  tagsField?: UseFormRegisterReturn;
-  tagsError?: FieldError;
+  isDirty?: boolean;
+  slugError?: string;
+  slugValue?: string;
+  tagsError?: string;
+  tagsValue?: string;
   onCancel?: () => void;
+  onFieldBlur?: () => void;
+  onFieldChange?: <TField extends keyof Pick<NoteEntryModel, 'category' | 'slug' | 'tags'>>(field: TField, value: NoteEntryModel[TField]) => void;
   onEditField?: (field: EditableNoteArticleField) => void;
 }
 
-export const NoteArticleMetadataPane = ({ categoryField, categoryError, editingField, isDirty = false, isEditable = false, isSaving = false, note, savedMessage, errorMessage, slugField, slugError, tagsField, tagsError, onCancel, onEditField }: NoteArticleMetadataPaneProps) => (
-  <aside className="min-h-0 overflow-y-auto border-b border-border px-5 py-6 lg:border-b-0 lg:border-r xl:px-6">
+const getInputValue = (event: ChangeEvent<HTMLInputElement>) => event.target.value;
+const InlineEditIcon = () => <UilPen aria-hidden="true" className="ml-2 inline size-3.5 opacity-0 transition group-hover:opacity-70 group-focus:opacity-70" />;
+
+export const NoteArticleMetadataPane = ({
+  categoryError,
+  categoryValue,
+  editingField,
+  isDirty: isPageDirty = false,
+  isEditable = false,
+  isSaving = false,
+  note,
+  savedMessage,
+  errorMessage,
+  slugError,
+  slugValue,
+  tagsError,
+  tagsValue,
+  onCancel,
+  onFieldBlur,
+  onFieldChange,
+  onEditField
+}: NoteArticleMetadataPaneProps) => (
+  <aside className="min-h-0 overflow-y-auto border-t border-border px-5 py-6 lg:border-l lg:border-t-0 xl:px-6">
     <div className="border-b border-border pb-4">
       <p className="text-xs font-extrabold uppercase text-primary">Metadata</p>
       <h2 className="mt-1 text-lg font-extrabold">Note details</h2>
 
       {isEditable ? (
         <div className="mt-4 flex gap-2">
-          <button className="rounded-md bg-primary px-3 py-2 text-sm font-extrabold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={!isDirty || isSaving}>
+          <AppButton className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold" type="submit" disabled={!isPageDirty || isSaving}>
             {isSaving ? 'Saving...' : 'Save'}
-          </button>
-          <button className="rounded-md border border-border px-3 py-2 text-sm font-extrabold disabled:cursor-not-allowed disabled:opacity-60" type="button" disabled={!isDirty || isSaving} onClick={onCancel}>
+          </AppButton>
+          <AppButton appearance="secondary" className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold" type="button" disabled={!isPageDirty || isSaving} onClick={onCancel}>
             Cancel
-          </button>
+          </AppButton>
         </div>
       ) : null}
     </div>
@@ -50,12 +75,23 @@ export const NoteArticleMetadataPane = ({ categoryField, categoryError, editingF
         <div>
           <dt className="font-extrabold text-foreground">Category</dt>
           <dd className="mt-1 text-muted-foreground">
-            {isEditable && editingField === 'category' && categoryField ? (
-              <AppInputText {...categoryField} autoFocus error={categoryError?.message} />
+            {isEditable && editingField === 'category' ? (
+              <AppInputText
+                autoFocus
+                inline
+                error={categoryError}
+                name="category"
+                value={categoryValue ?? note.category.displayName}
+                onBlur={onFieldBlur}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  onFieldChange?.('category', getInputValue(event));
+                }}
+              />
             ) : (
-              <button className="bg-transparent p-0 text-left text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('category')}>
-                {note.category.displayName}
-              </button>
+              <AppButton inline className="block w-full p-1 text-muted-foreground leading-tight" type="button" disabled={!isEditable} onClick={() => onEditField?.('category')}>
+                {categoryValue ?? note.category.displayName}
+                {isEditable ? <InlineEditIcon /> : null}
+              </AppButton>
             )}
           </dd>
         </div>
@@ -73,12 +109,23 @@ export const NoteArticleMetadataPane = ({ categoryField, categoryError, editingF
         <div>
           <dt className="font-extrabold text-foreground">Slug</dt>
           <dd className="mt-1 break-all text-muted-foreground">
-            {isEditable && editingField === 'slug' && slugField ? (
-              <AppInputText {...slugField} autoFocus error={slugError?.message} />
+            {isEditable && editingField === 'slug' ? (
+              <AppInputText
+                autoFocus
+                inline
+                error={slugError}
+                name="slug"
+                value={slugValue ?? note.slug}
+                onBlur={onFieldBlur}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  onFieldChange?.('slug', getInputValue(event));
+                }}
+              />
             ) : (
-              <button className="break-all bg-transparent p-0 text-left text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('slug')}>
-                {note.slug}
-              </button>
+              <AppButton inline className="break-all p-1 text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('slug')}>
+                {slugValue ?? note.slug}
+                {isEditable ? <InlineEditIcon /> : null}
+              </AppButton>
             )}
           </dd>
         </div>
@@ -86,16 +133,31 @@ export const NoteArticleMetadataPane = ({ categoryField, categoryError, editingF
         <div>
           <dt className="font-extrabold text-foreground">Tags</dt>
           <dd className="mt-2">
-            {isEditable && editingField === 'tags' && tagsField ? (
-              <AppInputText {...tagsField} autoFocus error={tagsError?.message} />
+            {isEditable && editingField === 'tags' ? (
+              <AppInputText
+                autoFocus
+                inline
+                error={tagsError}
+                name="tags"
+                value={tagsValue ?? note.tags.map((tag) => tag.displayName).join(', ')}
+                onBlur={onFieldBlur}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  onFieldChange?.('tags', getInputValue(event));
+                }}
+              />
             ) : (
-              <button className="flex flex-wrap gap-2 bg-transparent p-0 text-left" type="button" disabled={!isEditable} onClick={() => onEditField?.('tags')}>
-                {note.tags.map((tag) => (
-                  <span key={tag.slug} className="rounded bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
-                    {tag.displayName}
-                  </span>
-                ))}
-              </button>
+              <AppButton inline className="flex flex-wrap gap-2 p-1" type="button" disabled={!isEditable} onClick={() => onEditField?.('tags')}>
+                {(tagsValue ?? note.tags.map((tag) => tag.displayName).join(', '))
+                  .split(',')
+                  .map((tag) => tag.trim())
+                  .filter((tag) => tag.length > 0)
+                  .map((tag) => (
+                    <span key={tag} className="rounded bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
+                      {tag}
+                    </span>
+                  ))}
+                {isEditable ? <InlineEditIcon /> : null}
+              </AppButton>
             )}
           </dd>
         </div>

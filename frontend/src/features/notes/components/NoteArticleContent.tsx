@@ -1,92 +1,75 @@
-import type { KeyboardEvent } from 'react';
-import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
+import type { ChangeEvent, FocusEvent, KeyboardEvent } from 'react';
+import { useRef } from 'react';
+import UilPen from '@iconscout/react-unicons/icons/uil-pen';
+import { AppButton } from '@/components/ui/AppButton';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
+import { NoteMarkdown } from './NoteMarkdown';
 import type { PublicNoteDetailModel } from '../types/note.types';
-import { formatNoteDate, getNoteSectionId } from '../utils/noteContent';
+import { formatNoteDate } from '../utils/noteContent';
 
 export type EditableNoteArticleField = 'title' | 'summary' | 'bodyMarkdown' | 'slug' | 'category' | 'tags';
 
 interface NoteArticleContentProps {
-  bodyMarkdownField?: UseFormRegisterReturn;
-  bodyMarkdownError?: FieldError;
+  bodyMarkdownError?: string;
   bodyMarkdownValue?: string;
   editingField?: EditableNoteArticleField;
   isEditable?: boolean;
   note: PublicNoteDetailModel | undefined;
   isLoading: boolean;
   isError: boolean;
-  summaryField?: UseFormRegisterReturn;
-  summaryError?: FieldError;
-  titleField?: UseFormRegisterReturn;
-  titleError?: FieldError;
+  summaryError?: string;
+  summaryValue?: string;
+  titleError?: string;
+  titleValue?: string;
+  onBodyMarkdownChange?: (value: string) => void;
+  onFieldBlur?: () => void;
   onEditField?: (field: EditableNoteArticleField) => void;
+  onSummaryChange?: (value: string) => void;
+  onTitleChange?: (value: string) => void;
 }
 
-const renderMarkdownBlock = (block: string, index: number) => {
-  const trimmedBlock = block.trim();
-  const heading = /^(#{1,4})\s+(.+)$/.exec(trimmedBlock);
+const getInputValue = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => event.target.value;
+const editableBodyClassName = 'group relative rounded-md bg-transparent transition hover:bg-muted/45 hover:ring-1 hover:ring-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/25 disabled:hover:bg-transparent disabled:hover:ring-0';
 
-  if (heading) {
-    const level = heading[1].length;
-    const title = heading[2];
-    const HeadingTag = `h${Math.min(level + 1, 4)}` as 'h2' | 'h3' | 'h4';
+const InlineEditIcon = () => <UilPen aria-hidden="true" className="absolute right-2 top-2 size-4 opacity-0 transition group-hover:opacity-70 group-focus:opacity-70" />;
 
-    return (
-      <HeadingTag key={`${title}-${index}`} id={getNoteSectionId(title) || 'overview'} className="scroll-mt-28 border-t border-border pt-8 text-xl font-extrabold leading-tight first:border-t-0 first:pt-0">
-        {title}
-      </HeadingTag>
-    );
-  }
+export const NoteArticleContent = ({
+  bodyMarkdownError,
+  bodyMarkdownValue,
+  editingField,
+  isEditable = false,
+  note,
+  isLoading,
+  isError,
+  summaryError,
+  summaryValue,
+  titleError,
+  titleValue,
+  onBodyMarkdownChange,
+  onFieldBlur,
+  onEditField,
+  onSummaryChange,
+  onTitleChange
+}: NoteArticleContentProps) => {
+  const bodyEditorRef = useRef<HTMLDivElement>(null);
 
-  if (trimmedBlock.startsWith('```')) {
-    return (
-      <pre key={index} className="overflow-x-auto rounded-md bg-foreground p-4 text-sm leading-6 text-background">
-        <code>
-          {trimmedBlock
-            .replace(/^```[a-zA-Z]*\n?/, '')
-            .replace(/```$/, '')
-            .trim()}
-        </code>
-      </pre>
-    );
-  }
+  const handleBodyEdit = () => {
+    onEditField?.('bodyMarkdown');
+  };
 
-  const listItemMatches = trimmedBlock
-    .split('\n')
-    .map((line) => /^[-*]\s+(.+)$/.exec(line.trim()))
-    .filter((match): match is RegExpExecArray => match !== null);
-
-  if (listItemMatches.length > 0) {
-    return (
-      <ul key={index} className="list-disc space-y-2 pl-5 text-base leading-7 text-foreground">
-        {listItemMatches.map((item) => (
-          <li key={item[1]}>{item[1]}</li>
-        ))}
-      </ul>
-    );
-  }
-
-  return (
-    <p key={index} className="text-base leading-8 text-foreground">
-      {trimmedBlock}
-    </p>
-  );
-};
-
-const renderMarkdown = (markdown: string) => {
-  const blocks = markdown.split(/\n{2,}/).filter((block) => block.trim().length > 0);
-  return blocks.map(renderMarkdownBlock);
-};
-
-export const NoteArticleContent = ({ bodyMarkdownField, bodyMarkdownError, bodyMarkdownValue, editingField, isEditable = false, note, isLoading, isError, summaryField, summaryError, titleField, titleError, onEditField }: NoteArticleContentProps) => {
   const handleBodyKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (!isEditable) return;
 
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      onEditField?.('bodyMarkdown');
+      handleBodyEdit();
     }
+  };
+
+  const handleBodyEditorBlur = (event: FocusEvent<HTMLDivElement>) => {
+    if (bodyEditorRef.current?.contains(event.relatedTarget)) return;
+    onFieldBlur?.();
   };
 
   return (
@@ -98,28 +81,68 @@ export const NoteArticleContent = ({ bodyMarkdownField, bodyMarkdownError, bodyM
         <>
           <header id="overview" className="scroll-mt-28">
             <p className="text-sm font-extrabold uppercase text-primary">{note.category.displayName}</p>
-            {isEditable && editingField === 'title' && titleField ? (
-              <AppInputText {...titleField} autoFocus className="mt-2 border-0 px-0 text-3xl font-extrabold leading-tight shadow-none focus:ring-0" error={titleError?.message} />
+            {isEditable && editingField === 'title' ? (
+              <AppInputText
+                autoFocus
+                inline
+                className="mt-2 text-3xl font-extrabold leading-tight"
+                error={titleError}
+                name="title"
+                value={titleValue ?? note.title}
+                onBlur={onFieldBlur}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  onTitleChange?.(getInputValue(event));
+                }}
+              />
             ) : (
-              <button className="mt-2 block w-full bg-transparent p-0 text-left text-3xl font-extrabold leading-tight text-foreground disabled:cursor-default" type="button" disabled={!isEditable} onClick={() => onEditField?.('title')}>
-                {note.title}
-              </button>
+              <AppButton inline className="mt-2 block w-full p-2 pr-8 text-3xl font-extrabold leading-tight text-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('title')}>
+                {titleValue ?? note.title}
+                {isEditable ? <InlineEditIcon /> : null}
+              </AppButton>
             )}
             <p className="mt-3 text-sm text-muted-foreground">Published {formatNoteDate(note.publishedAt)}</p>
-            {isEditable && editingField === 'summary' && summaryField ? (
-              <AppInputTextArea {...summaryField} autoFocus className="mt-5 min-h-32 text-lg leading-8" error={summaryError?.message} />
+            {isEditable && editingField === 'summary' ? (
+              <AppInputTextArea
+                autoFocus
+                inline
+                className="mt-5 min-h-32 text-lg leading-8"
+                error={summaryError}
+                name="summary"
+                value={summaryValue ?? note.summary}
+                onBlur={onFieldBlur}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+                  onSummaryChange?.(getInputValue(event));
+                }}
+              />
             ) : (
-              <button className="mt-5 block w-full bg-transparent p-0 text-left text-lg leading-8 text-muted-foreground disabled:cursor-default" type="button" disabled={!isEditable} onClick={() => onEditField?.('summary')}>
-                {note.summary}
-              </button>
+              <AppButton inline className="mt-5 block w-full p-2 pr-8 text-lg leading-8 text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('summary')}>
+                {summaryValue ?? note.summary}
+                {isEditable ? <InlineEditIcon /> : null}
+              </AppButton>
             )}
           </header>
 
-          {isEditable && editingField === 'bodyMarkdown' && bodyMarkdownField ? (
-            <AppInputTextArea {...bodyMarkdownField} autoFocus className="mt-10 min-h-[36rem] font-mono text-sm leading-7" error={bodyMarkdownError?.message} />
+          {isEditable && editingField === 'bodyMarkdown' ? (
+            <div ref={bodyEditorRef} className="mt-10 rounded-md border border-border bg-background" onBlur={handleBodyEditorBlur}>
+              <AppInputTextArea
+                autoFocus
+                aria-label="Note body"
+                inline
+                className="min-h-[36rem] resize-none overflow-hidden border-0 font-mono text-sm leading-7 shadow-none [field-sizing:content] focus:ring-0"
+                error={bodyMarkdownError}
+                name="bodyMarkdown"
+                value={bodyMarkdownValue ?? note.bodyMarkdown}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+                  onBodyMarkdownChange?.(getInputValue(event));
+                }}
+              />
+            </div>
           ) : (
-            <div className={isEditable ? 'mt-10 cursor-text' : 'mt-10'} role={isEditable ? 'button' : undefined} tabIndex={isEditable ? 0 : undefined} onClick={() => onEditField?.('bodyMarkdown')} onKeyDown={handleBodyKeyDown}>
-              <div className="space-y-6 pb-16">{renderMarkdown(bodyMarkdownValue ?? note.bodyMarkdown)}</div>
+            <div className={`${isEditable ? `mt-10 cursor-text p-2 pr-8 ${editableBodyClassName}` : 'mt-10'}`} role={isEditable ? 'button' : undefined} tabIndex={isEditable ? 0 : undefined} onClick={handleBodyEdit} onKeyDown={handleBodyKeyDown}>
+              {isEditable ? <InlineEditIcon /> : null}
+              <div className="space-y-6 pb-16">
+                <NoteMarkdown markdown={bodyMarkdownValue ?? note.bodyMarkdown} />
+              </div>
             </div>
           )}
         </>

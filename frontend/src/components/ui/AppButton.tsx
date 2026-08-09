@@ -28,11 +28,21 @@ const buttonVariants = cva(
 type AppButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> &
   VariantProps<typeof buttonVariants> & {
     className?: string;
+    inline?: boolean;
   };
 
-export const AppButton = ({ children, className, appearance, type = 'button', ...buttonProps }: AppButtonProps) => {
+export const AppButton = ({ children, className, appearance, inline = false, type = 'button', ...buttonProps }: AppButtonProps) => {
   return (
-    <Button {...buttonProps} type={type} className={cn(buttonVariants({ appearance }), className)}>
+    <Button
+      {...buttonProps}
+      type={type}
+      className={cn(
+        buttonVariants({ appearance }),
+        inline &&
+          'group relative mb-0 mt-0 min-h-0 justify-start rounded-md border-transparent bg-transparent p-1 text-left font-normal text-current shadow-none enabled:hover:bg-muted/45 enabled:hover:ring-1 enabled:hover:ring-primary/20 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 disabled:cursor-default disabled:opacity-100 disabled:hover:bg-transparent disabled:hover:ring-0',
+        className
+      )}
+    >
       {children}
     </Button>
   );

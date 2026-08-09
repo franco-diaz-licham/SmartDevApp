@@ -6,10 +6,11 @@ import { cn } from '@/lib/cn';
 
 interface AppInputTextAreaProps extends TextareaProps {
   error?: ReactNode;
+  inline?: boolean;
   label?: ReactNode;
 }
 
-export const AppInputTextArea = ({ className, error, id, label, required, ...textareaProps }: AppInputTextAreaProps) => {
+export const AppInputTextArea = ({ className, error, id, inline = false, label, required, ...textareaProps }: AppInputTextAreaProps) => {
   const generatedId = useId();
   const textareaId = id ?? generatedId;
   const errorId = `${textareaId}-error`;
@@ -24,6 +25,7 @@ export const AppInputTextArea = ({ className, error, id, label, required, ...tex
       className={cn(
         'min-h-32 w-full rounded-md border border-border bg-background px-4 py-3 text-foreground transition placeholder:text-muted-foreground',
         'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
+        inline && 'rounded-md border-transparent bg-muted/35 px-2 py-1 shadow-none hover:border-primary/35 focus:border-primary',
         'disabled:cursor-not-allowed disabled:opacity-60',
         className
       )}

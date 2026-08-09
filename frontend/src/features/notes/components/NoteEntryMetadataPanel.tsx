@@ -1,22 +1,24 @@
-import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
+import type { ChangeEvent } from 'react';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
+import type { NoteEntryModel } from '../types/note.types';
 
 interface NoteEntryMetadataPanelProps {
-  categoryError?: FieldError;
-  categoryField: UseFormRegisterReturn;
+  categoryError?: string;
   errorMessage?: string;
   isSaving: boolean;
+  note: Pick<NoteEntryModel, 'category' | 'slug' | 'summary' | 'tags'>;
   savedMessage?: string;
-  slugError?: FieldError;
-  slugField: UseFormRegisterReturn;
-  summaryError?: FieldError;
-  summaryField: UseFormRegisterReturn;
-  tagsError?: FieldError;
-  tagsField: UseFormRegisterReturn;
+  slugError?: string;
+  summaryError?: string;
+  tagsError?: string;
+  onFieldBlur: (field: keyof Pick<NoteEntryModel, 'category' | 'slug' | 'summary' | 'tags'>) => void;
+  onFieldChange: <TField extends keyof Pick<NoteEntryModel, 'category' | 'slug' | 'summary' | 'tags'>>(field: TField, value: NoteEntryModel[TField]) => void;
 }
 
-export const NoteEntryMetadataPanel = ({ categoryError, categoryField, errorMessage, isSaving, savedMessage, slugError, slugField, summaryError, summaryField, tagsError, tagsField }: NoteEntryMetadataPanelProps) => (
+const getInputValue = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => event.target.value;
+
+export const NoteEntryMetadataPanel = ({ categoryError, errorMessage, isSaving, note, savedMessage, slugError, summaryError, tagsError, onFieldBlur, onFieldChange }: NoteEntryMetadataPanelProps) => (
   <aside className="min-h-0 overflow-y-auto border-t border-border px-5 py-6 lg:border-l lg:border-t-0 xl:px-6">
     <div className="flex items-center justify-between border-b border-border pb-4">
       <div>
@@ -32,10 +34,51 @@ export const NoteEntryMetadataPanel = ({ categoryError, categoryField, errorMess
     {errorMessage ? <p className="mt-4 rounded-md border border-error-border bg-error p-3 text-sm font-bold text-error-heading">{errorMessage}</p> : null}
 
     <div className="mt-6 space-y-5">
-      <AppInputText {...slugField} error={slugError?.message} label="Slug" placeholder="azure-functions-notes" />
-      <AppInputText {...categoryField} error={categoryError?.message} label="Category" placeholder="Backend" />
-      <AppInputText {...tagsField} error={tagsError?.message} label="Tags" placeholder="dotnet, azure-functions" />
-      <AppInputTextArea {...summaryField} className="min-h-36" error={summaryError?.message} label="Summary" placeholder="Short article summary" />
+      <AppInputText
+        error={slugError}
+        label="Slug"
+        name="slug"
+        placeholder="azure-functions-notes"
+        value={note.slug}
+        onBlur={() => onFieldBlur('slug')}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          onFieldChange('slug', getInputValue(event));
+        }}
+      />
+      <AppInputText
+        error={categoryError}
+        label="Category"
+        name="category"
+        placeholder="Backend"
+        value={note.category}
+        onBlur={() => onFieldBlur('category')}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          onFieldChange('category', getInputValue(event));
+        }}
+      />
+      <AppInputText
+        error={tagsError}
+        label="Tags"
+        name="tags"
+        placeholder="dotnet, azure-functions"
+        value={note.tags}
+        onBlur={() => onFieldBlur('tags')}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          onFieldChange('tags', getInputValue(event));
+        }}
+      />
+      <AppInputTextArea
+        className="min-h-36"
+        error={summaryError}
+        label="Summary"
+        name="summary"
+        placeholder="Short article summary"
+        value={note.summary}
+        onBlur={() => onFieldBlur('summary')}
+        onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+          onFieldChange('summary', getInputValue(event));
+        }}
+      />
 
       <div className="rounded-md border border-border bg-muted/40 p-4">
         <p className="text-sm font-extrabold">Publishing</p>
