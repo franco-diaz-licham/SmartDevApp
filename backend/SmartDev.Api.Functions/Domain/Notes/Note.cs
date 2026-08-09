@@ -238,6 +238,39 @@ public sealed class Note : Entity<NoteId>
         RaiseDomainEvent(new NotePublishedEvent(Id, now));
     }
 
+    public void ChangePublication(NoteStatus status, NoteVisibility visibility, DateTimeOffset now)
+    {
+        if (Status == status && Visibility == visibility) return;
+
+        var previousStatus = Status;
+        Status = status;
+        Visibility = visibility;
+
+        if (Status == NoteStatus.Published && PublishedAt is null) {
+            PublishedAt = now;
+        }
+
+        if (Status == NoteStatus.Archived) {
+            ArchivedAt ??= now;
+        } else {
+            ArchivedAt = null;
+        }
+
+        if (Status == NoteStatus.Draft) {
+            PublishedAt = null;
+        }
+
+        MarkUpdated(now);
+
+        if (previousStatus != NoteStatus.Published && Status == NoteStatus.Published) {
+            RaiseDomainEvent(new NotePublishedEvent(Id, now));
+        }
+
+        if (previousStatus != NoteStatus.Archived && Status == NoteStatus.Archived) {
+            RaiseDomainEvent(new NoteArchivedEvent(Id, now));
+        }
+    }
+
     public void MakePrivate(DateTimeOffset now)
     {
         Visibility = NoteVisibility.Private;

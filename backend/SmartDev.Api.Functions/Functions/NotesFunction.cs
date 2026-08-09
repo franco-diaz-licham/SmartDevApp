@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using SmartDev.Api.Functions.Application.UsesCases;
+using SmartDev.Api.Functions.Domain.Notes;
 
 namespace SmartDev.Api.Functions.Functions;
 
@@ -67,7 +68,9 @@ public sealed class NotesFunction(
                     body.Summary,
                     new CreateNoteCategory(body.Category.Slug, body.Category.DisplayName),
                     body.Tags.Select(tag => new CreateNoteTag(tag.Slug, tag.DisplayName)).ToArray(),
-                    body.BodyMarkdown),
+                    body.BodyMarkdown,
+                    BindNoteStatus(body.Status),
+                    BindNoteVisibility(body.Visibility)),
                 cancellationToken);
 
             return await request.CreateJsonResponseAsync(HttpStatusCode.Created, new CreateNoteResponse(result.NoteId, result.Slug), cancellationToken);
@@ -108,7 +111,9 @@ public sealed class NotesFunction(
                     body.Summary,
                     new CreateNoteCategory(body.Category.Slug, body.Category.DisplayName),
                     body.Tags.Select(tag => new CreateNoteTag(tag.Slug, tag.DisplayName)).ToArray(),
-                    body.BodyMarkdown),
+                    body.BodyMarkdown,
+                    BindNoteStatus(body.Status),
+                    BindNoteVisibility(body.Visibility)),
                 cancellationToken);
 
             return await request.CreateJsonResponseAsync(HttpStatusCode.OK, new UpdateNoteResponse(result.NoteId, result.Slug), cancellationToken);
@@ -177,6 +182,19 @@ public sealed class NotesFunction(
     }
 
 
+    private static NoteStatus BindNoteStatus(string? status)
+    {
+        if (string.IsNullOrWhiteSpace(status)) return NoteStatus.Draft;
+        if (Enum.TryParse<NoteStatus>(status, ignoreCase: true, out var parsedStatus)) return parsedStatus;
+        throw new ArgumentException("Note status must be Draft, Published, or Archived.");
+    }
+
+    private static NoteVisibility BindNoteVisibility(string? visibility)
+    {
+        if (string.IsNullOrWhiteSpace(visibility)) return NoteVisibility.Private;
+        if (Enum.TryParse<NoteVisibility>(visibility, ignoreCase: true, out var parsedVisibility)) return parsedVisibility;
+        throw new ArgumentException("Note visibility must be Private or Public.");
+    }
 }
 
 public sealed record NotesErrorResponse(string Error);
@@ -187,7 +205,9 @@ public sealed record CreateNoteRequest(
     string Summary,
     CreateNoteCategoryRequest Category,
     IReadOnlyCollection<CreateNoteTagRequest> Tags,
-    string BodyMarkdown);
+    string BodyMarkdown,
+    string? Status,
+    string? Visibility);
 
 public sealed record CreateNoteCategoryRequest(string Slug, string DisplayName);
 
@@ -201,6 +221,8 @@ public sealed record UpdateNoteRequest(
     string Summary,
     CreateNoteCategoryRequest Category,
     IReadOnlyCollection<CreateNoteTagRequest> Tags,
-    string BodyMarkdown);
+    string BodyMarkdown,
+    string? Status,
+    string? Visibility);
 
 public sealed record UpdateNoteResponse(Guid NoteId, string Slug);

@@ -87,6 +87,8 @@ public sealed record PublicNoteListItem(
     string Summary,
     PublicNoteCategory Category,
     IReadOnlyCollection<PublicNoteTag> Tags,
+    string Status,
+    string Visibility,
     DateTimeOffset? UpdatedAt,
     DateTimeOffset PublishedAt)
 {
@@ -99,6 +101,8 @@ public sealed record PublicNoteListItem(
             note.Summary.Value,
             PublicNoteCategory.FromDomain(note.Category),
             note.Tags.Select(PublicNoteTag.FromDomain).ToArray(),
+            note.Status.ToString(),
+            note.Visibility.ToString(),
             note.UpdatedAt,
             note.PublishedAt ?? note.UpdatedAt ?? note.CreatedAt);
     }
@@ -111,6 +115,8 @@ public sealed record PublicNoteDetail(
     string Summary,
     PublicNoteCategory Category,
     IReadOnlyCollection<PublicNoteTag> Tags,
+    string Status,
+    string Visibility,
     string BodyMarkdown,
     IReadOnlyCollection<PublicRelatedProjectReference> RelatedProjects,
     DateTimeOffset? UpdatedAt,
@@ -125,6 +131,8 @@ public sealed record PublicNoteDetail(
             note.Summary.Value,
             PublicNoteCategory.FromDomain(note.Category),
             note.Tags.Select(PublicNoteTag.FromDomain).ToArray(),
+            note.Status.ToString(),
+            note.Visibility.ToString(),
             note.Body.Value,
             note.RelatedProjects.Select(project => new PublicRelatedProjectReference(project.ProjectId, project.Label)).ToArray(),
             note.UpdatedAt,

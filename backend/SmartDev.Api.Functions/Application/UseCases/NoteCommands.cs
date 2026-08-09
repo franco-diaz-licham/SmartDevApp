@@ -9,7 +9,9 @@ public sealed record CreateNoteCommand(
     string Summary,
     CreateNoteCategory Category,
     IReadOnlyCollection<CreateNoteTag> Tags,
-    string BodyMarkdown);
+    string BodyMarkdown,
+    NoteStatus Status,
+    NoteVisibility Visibility);
 
 public sealed record CreateNoteCategory(string Slug, string DisplayName);
 
@@ -24,7 +26,9 @@ public sealed record UpdateNoteCommand(
     string Summary,
     CreateNoteCategory Category,
     IReadOnlyCollection<CreateNoteTag> Tags,
-    string BodyMarkdown);
+    string BodyMarkdown,
+    NoteStatus Status,
+    NoteVisibility Visibility);
 
 public sealed record UpdateNoteResult(Guid NoteId, string Slug);
 
@@ -32,6 +36,7 @@ public sealed class CreateNoteHandler(INoteRepository noteRepository, IDomainEve
 {
     public async Task<CreateNoteResult> HandleAsync(CreateNoteCommand command, CancellationToken cancellationToken)
     {
+        var now = DateTimeOffset.UtcNow;
         var note = Note.CreateDraft(
             NoteId.New(),
             NoteTitle.Create(command.Title),
@@ -40,7 +45,10 @@ public sealed class CreateNoteHandler(INoteRepository noteRepository, IDomainEve
             NoteCategorySnapshot.Create(NoteCategorySlug.Create(command.Category.Slug), command.Category.DisplayName),
             MarkdownContent.Create(command.BodyMarkdown),
             command.Tags.Select(tag => NoteTagSnapshot.Create(NoteTagSlug.Create(tag.Slug), tag.DisplayName)),
-            relatedProjects: []);
+            relatedProjects: [],
+            now);
+
+        note.ChangePublication(command.Status, command.Visibility, now);
 
         await noteRepository.AddAsync(note, cancellationToken);
         await domainEventDispatcher.DispatchAsync(note.DomainEvents, cancellationToken);
@@ -63,6 +71,7 @@ public sealed class UpdateNoteHandler(INoteRepository noteRepository, IDomainEve
         note.ChangeCategory(NoteCategorySnapshot.Create(NoteCategorySlug.Create(command.Category.Slug), command.Category.DisplayName), now);
         note.ReplaceTags(command.Tags.Select(tag => NoteTagSnapshot.Create(NoteTagSlug.Create(tag.Slug), tag.DisplayName)), now);
         note.UpdateBody(MarkdownContent.Create(command.BodyMarkdown), now);
+        note.ChangePublication(command.Status, command.Visibility, now);
 
         await noteRepository.SaveAsync(note, cancellationToken);
         await domainEventDispatcher.DispatchAsync(note.DomainEvents, cancellationToken);
