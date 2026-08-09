@@ -2,13 +2,17 @@ import type { TextareaProps } from '@primereact/types/primitive/textarea';
 import { Textarea } from 'primereact/textarea';
 import type { ReactNode } from 'react';
 import { useId } from 'react';
+import { AppButton } from './AppButton';
 import { cn } from '@/lib/cn';
 
 interface AppInputTextAreaProps extends TextareaProps {
   error?: ReactNode;
   inline?: boolean;
+  inlineStatus?: 'edit' | 'read';
   inlineSize?: 'default' | 'summary';
   label?: ReactNode;
+  readValue?: ReactNode;
+  onInlineEdit?: () => void;
 }
 
 const inlineTextAreaSizeClassNames = {
@@ -16,12 +20,17 @@ const inlineTextAreaSizeClassNames = {
   summary: 'min-h-32'
 } as const;
 
-export const AppInputTextArea = ({ className, error, id, inline = false, inlineSize = 'default', label, required, ...textareaProps }: AppInputTextAreaProps) => {
+export const AppInputTextArea = ({ className, error, id, inline = false, inlineSize = 'default', inlineStatus = 'edit', label, readValue, required, onInlineEdit, ...textareaProps }: AppInputTextAreaProps) => {
   const generatedId = useId();
   const textareaId = id ?? generatedId;
   const errorId = `${textareaId}-error`;
+  const isInlineReadMode = inline && inlineStatus === 'read';
 
-  const textarea = (
+  const textarea = isInlineReadMode ? (
+    <AppButton inline inlineField="textArea" inlineSize={inlineSize} className={cn('w-full text-muted-foreground', className)} type="button" disabled={!onInlineEdit} onClick={onInlineEdit}>
+      {readValue ?? textareaProps.value}
+    </AppButton>
+  ) : (
     <Textarea
       {...textareaProps}
       aria-describedby={error ? errorId : textareaProps['aria-describedby']}

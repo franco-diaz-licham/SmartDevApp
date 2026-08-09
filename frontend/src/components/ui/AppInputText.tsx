@@ -2,13 +2,17 @@ import type { InputTextProps } from '@primereact/types/primitive/inputtext';
 import { InputText } from 'primereact/inputtext';
 import type { ReactNode } from 'react';
 import { useId } from 'react';
+import { AppButton } from './AppButton';
 import { cn } from '@/lib/cn';
 
 interface AppInputTextProps extends InputTextProps {
   error?: ReactNode;
   inline?: boolean;
+  inlineStatus?: 'edit' | 'read';
   inlineSize?: 'default' | 'title';
   label?: ReactNode;
+  readValue?: ReactNode;
+  onInlineEdit?: () => void;
 }
 
 const inlineInputSizeClassNames = {
@@ -16,12 +20,17 @@ const inlineInputSizeClassNames = {
   title: 'min-h-[3.75rem]'
 } as const;
 
-export const AppInputText = ({ className, error, id, inline = false, inlineSize = 'default', label, required, type = 'text', ...inputProps }: AppInputTextProps) => {
+export const AppInputText = ({ className, error, id, inline = false, inlineSize = 'default', inlineStatus = 'edit', label, readValue, required, type = 'text', onInlineEdit, ...inputProps }: AppInputTextProps) => {
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const errorId = `${inputId}-error`;
+  const isInlineReadMode = inline && inlineStatus === 'read';
 
-  const input = (
+  const input = isInlineReadMode ? (
+    <AppButton inline inlineSize={inlineSize} className={cn('w-full text-muted-foreground', className)} type="button" disabled={!onInlineEdit} onClick={onInlineEdit}>
+      {readValue ?? inputProps.value}
+    </AppButton>
+  ) : (
     <InputText
       {...inputProps}
       aria-describedby={error ? errorId : inputProps['aria-describedby']}

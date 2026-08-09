@@ -1,6 +1,6 @@
 import type { ChangeEvent, FocusEvent } from 'react';
 import { useRef } from 'react';
-import { AppButton, AppInlineEditSurface } from '@/components/ui/AppButton';
+import { AppInlineEditSurface } from '@/components/ui/AppButton';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
 import { NoteMarkdown } from './NoteMarkdown';
@@ -68,45 +68,39 @@ export const NoteArticleContent = ({
         <>
           <header id="overview" className="scroll-mt-28">
             <p className="text-sm font-extrabold uppercase text-primary">{note.category.displayName}</p>
-            {isEditable && editingField === 'title' ? (
-              <AppInputText
-                autoFocus
-                inline
-                inlineSize="title"
-                className="mt-2 p-2 pr-8 text-3xl font-extrabold leading-tight"
-                error={titleError}
-                name="title"
-                value={titleValue ?? note.title}
-                onBlur={onFieldBlur}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  onTitleChange?.(getInputValue(event));
-                }}
-              />
-            ) : (
-              <AppButton inline inlineSize="title" className="mt-2 block w-full p-2 pr-8 text-3xl font-extrabold leading-tight text-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('title')}>
-                {titleValue ?? note.title}
-              </AppButton>
-            )}
+            <AppInputText
+              autoFocus={isEditable && editingField === 'title'}
+              inline
+              inlineSize="title"
+              inlineStatus={isEditable && editingField === 'title' ? 'edit' : 'read'}
+              className="mt-2 p-2 pr-8 text-3xl font-extrabold leading-tight text-foreground"
+              error={titleError}
+              name="title"
+              readValue={titleValue ?? note.title}
+              value={titleValue ?? note.title}
+              onBlur={onFieldBlur}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                onTitleChange?.(getInputValue(event));
+              }}
+              onInlineEdit={isEditable ? () => onEditField?.('title') : undefined}
+            />
             <p className="mt-3 text-sm text-muted-foreground">Published {formatNoteDate(note.publishedAt)}</p>
-            {isEditable && editingField === 'summary' ? (
-              <AppInputTextArea
-                autoFocus
-                inline
-                inlineSize="summary"
-                className="mt-5 p-2 pr-8 text-lg leading-8"
-                error={summaryError}
-                name="summary"
-                value={summaryValue ?? note.summary}
-                onBlur={onFieldBlur}
-                onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
-                  onSummaryChange?.(getInputValue(event));
-                }}
-              />
-            ) : (
-              <AppButton inline inlineField="textArea" inlineSize="summary" className="mt-5 block w-full p-2 pr-8 text-lg leading-8 text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('summary')}>
-                {summaryValue ?? note.summary}
-              </AppButton>
-            )}
+            <AppInputTextArea
+              autoFocus={isEditable && editingField === 'summary'}
+              inline
+              inlineSize="summary"
+              inlineStatus={isEditable && editingField === 'summary' ? 'edit' : 'read'}
+              className="mt-5 p-2 pr-8 text-lg leading-8"
+              error={summaryError}
+              name="summary"
+              readValue={summaryValue ?? note.summary}
+              value={summaryValue ?? note.summary}
+              onBlur={onFieldBlur}
+              onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+                onSummaryChange?.(getInputValue(event));
+              }}
+              onInlineEdit={isEditable ? () => onEditField?.('summary') : undefined}
+            />
           </header>
 
           {isEditable && editingField === 'bodyMarkdown' ? (

@@ -32,9 +32,7 @@ interface NoteArticleMetadataPaneProps {
 }
 
 const getInputValue = (event: ChangeEvent<HTMLInputElement>) => event.target.value;
-
 const statusSelectOptions = noteStatusOptions.map((status) => ({ label: status, value: status }));
-
 const visibilitySelectOptions = noteVisibilityOptions.map((visibility) => ({ label: visibility, value: visibility }));
 
 export const NoteArticleMetadataPane = ({
@@ -83,145 +81,111 @@ export const NoteArticleMetadataPane = ({
     {!note ? (
       <p className="mt-6 rounded-md border border-border p-4 text-sm text-muted-foreground">Loading note details...</p>
     ) : (
-      <dl className="mt-6 space-y-5 text-sm">
+      <div className="mt-6 space-y-5 text-sm">
+        <AppSelect
+          error={statusError}
+          inline
+          inlineStatus={isEditable ? 'edit' : 'read'}
+          label="Status"
+          name="status"
+          options={statusSelectOptions}
+          value={statusValue ?? note.status}
+          onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+            onFieldChange?.('status', event.target.value as NoteStatusModel);
+          }}
+        />
+        <AppSelect
+          error={visibilityError}
+          inline
+          inlineStatus={isEditable ? 'edit' : 'read'}
+          label="Visibility"
+          name="visibility"
+          options={visibilitySelectOptions}
+          value={visibilityValue ?? note.visibility}
+          onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+            onFieldChange?.('visibility', event.target.value as NoteVisibilityModel);
+          }}
+        />
+        <AppInputText
+          autoFocus={isEditable && editingField === 'category'}
+          inline
+          inlineStatus={isEditable && editingField === 'category' ? 'edit' : 'read'}
+          className="px-2 py-1 pr-8 leading-tight"
+          error={categoryError}
+          label="Category"
+          name="category"
+          readValue={categoryValue ?? note.category.displayName}
+          value={categoryValue ?? note.category.displayName}
+          onBlur={onFieldBlur}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            onFieldChange?.('category', getInputValue(event));
+          }}
+          onInlineEdit={isEditable ? () => onEditField?.('category') : undefined}
+        />
+        <AppInputText
+          autoFocus={isEditable && editingField === 'slug'}
+          inline
+          inlineStatus={isEditable && editingField === 'slug' ? 'edit' : 'read'}
+          className="break-all px-2 py-1 pr-8"
+          error={slugError}
+          label="Slug"
+          name="slug"
+          readValue={slugValue ?? note.slug}
+          value={slugValue ?? note.slug}
+          onBlur={onFieldBlur}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            onFieldChange?.('slug', getInputValue(event));
+          }}
+          onInlineEdit={isEditable ? () => onEditField?.('slug') : undefined}
+        />
+        <AppInputText
+          autoFocus={isEditable && editingField === 'tags'}
+          inline
+          inlineStatus={isEditable && editingField === 'tags' ? 'edit' : 'read'}
+          className="flex flex-wrap gap-2 px-2 py-1 pr-8"
+          error={tagsError}
+          label="Tags"
+          name="tags"
+          readValue={(tagsValue ?? note.tags.map((tag) => tag.displayName).join(', '))
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter((tag) => tag.length > 0)
+            .map((tag) => (
+              <span key={tag} className="rounded bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
+                {tag}
+              </span>
+            ))}
+          value={tagsValue ?? note.tags.map((tag) => tag.displayName).join(', ')}
+          onBlur={onFieldBlur}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            onFieldChange?.('tags', getInputValue(event));
+          }}
+          onInlineEdit={isEditable ? () => onEditField?.('tags') : undefined}
+        />
+
         <div>
-          <dt className="font-extrabold text-foreground">Status</dt>
-          <dd className="mt-1 text-muted-foreground">
-            {isEditable ? (
-              <AppSelect
-                aria-label="Note status"
-                error={statusError}
-                name="status"
-                options={statusSelectOptions}
-                value={statusValue ?? note.status}
-                onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-                  onFieldChange?.('status', event.target.value as NoteStatusModel);
-                }}
-              />
-            ) : (
-              (statusValue ?? note.status)
-            )}
-          </dd>
+          <p className="font-extrabold text-foreground">Published</p>
+          <p className="mt-1 text-muted-foreground">{formatNoteDate(note.publishedAt)}</p>
         </div>
 
         <div>
-          <dt className="font-extrabold text-foreground">Visibility</dt>
-          <dd className="mt-1 text-muted-foreground">
-            {isEditable ? (
-              <AppSelect
-                aria-label="Note visibility"
-                error={visibilityError}
-                name="visibility"
-                options={visibilitySelectOptions}
-                value={visibilityValue ?? note.visibility}
-                onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-                  onFieldChange?.('visibility', event.target.value as NoteVisibilityModel);
-                }}
-              />
-            ) : (
-              (visibilityValue ?? note.visibility)
-            )}
-          </dd>
-        </div>
-
-        <div>
-          <dt className="font-extrabold text-foreground">Category</dt>
-          <dd className="mt-1 text-muted-foreground">
-            {isEditable && editingField === 'category' ? (
-              <AppInputText
-                autoFocus
-                inline
-                error={categoryError}
-                name="category"
-                value={categoryValue ?? note.category.displayName}
-                onBlur={onFieldBlur}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  onFieldChange?.('category', getInputValue(event));
-                }}
-              />
-            ) : (
-              <AppButton inline className="block w-full px-2 py-1 pr-8 leading-tight text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('category')}>
-                {categoryValue ?? note.category.displayName}
-              </AppButton>
-            )}
-          </dd>
-        </div>
-        <div>
-          <dt className="font-extrabold text-foreground">Slug</dt>
-          <dd className="mt-1 break-all text-muted-foreground">
-            {isEditable && editingField === 'slug' ? (
-              <AppInputText
-                autoFocus
-                inline
-                error={slugError}
-                name="slug"
-                value={slugValue ?? note.slug}
-                onBlur={onFieldBlur}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  onFieldChange?.('slug', getInputValue(event));
-                }}
-              />
-            ) : (
-              <AppButton inline className="w-full break-all px-2 py-1 pr-8 text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('slug')}>
-                {slugValue ?? note.slug}
-              </AppButton>
-            )}
-          </dd>
-        </div>
-
-        <div>
-          <dt className="font-extrabold text-foreground">Tags</dt>
-          <dd className="mt-2">
-            {isEditable && editingField === 'tags' ? (
-              <AppInputText
-                autoFocus
-                inline
-                error={tagsError}
-                name="tags"
-                value={tagsValue ?? note.tags.map((tag) => tag.displayName).join(', ')}
-                onBlur={onFieldBlur}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  onFieldChange?.('tags', getInputValue(event));
-                }}
-              />
-            ) : (
-              <AppButton inline className="flex w-full flex-wrap gap-2 px-2 py-1 pr-8" type="button" disabled={!isEditable} onClick={() => onEditField?.('tags')}>
-                {(tagsValue ?? note.tags.map((tag) => tag.displayName).join(', '))
-                  .split(',')
-                  .map((tag) => tag.trim())
-                  .filter((tag) => tag.length > 0)
-                  .map((tag) => (
-                    <span key={tag} className="rounded bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
-                      {tag}
-                    </span>
-                  ))}
-              </AppButton>
-            )}
-          </dd>
-        </div>
-        <div>
-          <dt className="font-extrabold text-foreground">Published</dt>
-          <dd className="mt-1 text-muted-foreground">{formatNoteDate(note.publishedAt)}</dd>
-        </div>
-
-        <div>
-          <dt className="font-extrabold text-foreground">Updated</dt>
-          <dd className="mt-1 text-muted-foreground">{formatNoteDate(note.updatedAt)}</dd>
+          <p className="font-extrabold text-foreground">Updated</p>
+          <p className="mt-1 text-muted-foreground">{formatNoteDate(note.updatedAt)}</p>
         </div>
 
         {note.relatedProjects.length > 0 ? (
           <div>
-            <dt className="font-extrabold text-foreground">Related projects</dt>
-            <dd className="mt-2 space-y-2 text-muted-foreground">
+            <p className="font-extrabold text-foreground">Related projects</p>
+            <div className="mt-2 space-y-2 text-muted-foreground">
               {note.relatedProjects.map((project) => (
                 <span key={project.projectId} className="block">
                   {project.label}
                 </span>
               ))}
-            </dd>
+            </div>
           </div>
         ) : null}
-      </dl>
+      </div>
     )}
   </aside>
 );
