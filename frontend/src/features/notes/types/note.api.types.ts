@@ -1,5 +1,9 @@
 import type { PageResult } from '@/lib/api/api.types';
 
+export type NoteStatusDto = 'Draft' | 'Published' | 'Archived';
+
+export type NoteVisibilityDto = 'Private' | 'Public';
+
 export interface PublicNoteCategoryResponse {
   slug: string;
   displayName: string;
@@ -22,6 +26,8 @@ export interface PublicNoteListItemResponse {
   summary: string;
   category: PublicNoteCategoryResponse;
   tags: PublicNoteTagResponse[];
+  status: NoteStatusDto;
+  visibility: NoteVisibilityDto;
   updatedAt: string | null;
   publishedAt: string;
 }
@@ -79,6 +85,8 @@ export interface CreateNoteRequestDto {
   category: CreateNoteCategoryDto;
   tags: CreateNoteTagDto[];
   bodyMarkdown: string;
+  status: NoteStatusDto;
+  visibility: NoteVisibilityDto;
 }
 
 export interface CreateNoteResponseDto {

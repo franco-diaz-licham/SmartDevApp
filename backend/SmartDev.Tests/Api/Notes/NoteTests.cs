@@ -44,6 +44,24 @@ public sealed class NoteTests
     }
 
     [Test]
+    public void ChangePublication_PublishedPrivateNote_KeepsVisibilityIndependent()
+    {
+        // Arrange
+        var note = CreateNote();
+        var changedAt = new DateTimeOffset(2026, 8, 5, 13, 30, 0, TimeSpan.Zero);
+
+        // Act
+        note.ChangePublication(NoteStatus.Published, NoteVisibility.Private, changedAt);
+
+        // Assert
+        note.Status.ShouldBe(NoteStatus.Published);
+        note.Visibility.ShouldBe(NoteVisibility.Private);
+        note.PublishedAt.ShouldBe(changedAt);
+        note.UpdatedAt.ShouldBe(changedAt);
+        note.DomainEvents.OfType<NotePublishedEvent>().Count().ShouldBe(1);
+    }
+
+    [Test]
     public void CreateDraft_DuplicateTags_StoresUniqueTags()
     {
         // Act

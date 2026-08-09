@@ -69,6 +69,8 @@ export const mapPublicNoteListItemResponseToModel = (note: PublicNoteListItemRes
   summary: note.summary,
   category: mapPublicNoteCategoryResponseToModel(note.category),
   tags: note.tags.map(mapPublicNoteTagResponseToModel),
+  status: note.status,
+  visibility: note.visibility,
   updatedAt: toNullableDate(note.updatedAt),
   publishedAt: new Date(note.publishedAt)
 });
@@ -85,7 +87,9 @@ export const mapPublicNoteDetailResponseToEntryModel = (note: PublicNoteDetailRe
   summary: note.summary,
   category: note.category.displayName,
   tags: note.tags.map((tag) => tag.displayName).join(', '),
-  bodyMarkdown: note.bodyMarkdown
+  bodyMarkdown: note.bodyMarkdown,
+  status: note.status,
+  visibility: note.visibility
 });
 
 export const mapPublicNoteSearchDocumentResponseToModel = (document: PublicNoteSearchDocumentResponse): PublicNoteSearchDocumentModel => ({
@@ -113,7 +117,9 @@ const mapNoteEntryModelToRequestDto = (note: NoteEntryModel): CreateNoteRequestD
   summary: note.summary,
   category: toCreateNoteCategoryDto(note.category),
   tags: mapTagTextToCreateNoteTagDtos(note.tags),
-  bodyMarkdown: note.bodyMarkdown
+  bodyMarkdown: note.bodyMarkdown,
+  status: note.status,
+  visibility: note.visibility
 });
 
 export const mapNoteEntryModelToCreateRequestDto = (note: NoteEntryModel): CreateNoteRequestDto => mapNoteEntryModelToRequestDto(note);

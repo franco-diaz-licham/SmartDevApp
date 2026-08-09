@@ -30,6 +30,7 @@ type AppButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'>
   VariantProps<typeof buttonVariants> & {
     className?: string;
     inline?: boolean;
+    inlineField?: 'textInput' | 'textArea';
     inlineSize?: 'default' | 'title' | 'summary';
   };
 
@@ -48,13 +49,18 @@ export const AppInlineEditIcon = ({ className }: AppInlineEditIconProps) => (
   <UilPen aria-hidden="true" className={cn('pointer-events-none absolute right-2 top-2 size-3.5 opacity-0 transition group-hover:opacity-70 group-focus:opacity-70', className)} />
 );
 
+const inlineButtonFieldClassNames = {
+  textInput: '!items-center',
+  textArea: '!items-start'
+} as const;
+
 const inlineButtonSizeClassNames = {
   default: 'min-h-10',
   title: 'min-h-[3.75rem]',
   summary: 'min-h-32'
 } as const;
 
-export const AppButton = ({ children, className, appearance, inline = false, inlineSize = 'default', type = 'button', ...buttonProps }: AppButtonProps) => {
+export const AppButton = ({ children, className, appearance, inline = false, inlineField = 'textInput', inlineSize = 'default', type = 'button', ...buttonProps }: AppButtonProps) => {
   const isDisabled = Boolean(buttonProps.disabled);
 
   return (
@@ -65,7 +71,8 @@ export const AppButton = ({ children, className, appearance, inline = false, inl
         buttonVariants({ appearance }),
         inline &&
           cn(
-            'group relative mb-0 mt-0 !inline-flex !items-start !justify-start rounded-md border-transparent bg-transparent p-1 text-left font-normal text-current shadow-none enabled:hover:bg-muted/45 enabled:hover:ring-1 enabled:hover:ring-primary/20 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 disabled:cursor-default disabled:opacity-100 disabled:hover:bg-transparent disabled:hover:ring-0',
+            'group relative mb-0 mt-0 !inline-flex !justify-start rounded-md border-transparent bg-transparent p-1 text-left font-normal text-current shadow-none enabled:hover:bg-muted/45 enabled:hover:ring-1 enabled:hover:ring-primary/20 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 disabled:cursor-default disabled:opacity-100 disabled:hover:bg-transparent disabled:hover:ring-0',
+            inlineButtonFieldClassNames[inlineField],
             inlineButtonSizeClassNames[inlineSize]
           ),
         className

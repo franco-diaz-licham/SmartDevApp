@@ -1,7 +1,9 @@
 import type { ChangeEvent } from 'react';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppInputText } from '@/components/ui/AppInputText';
-import type { NoteEntryModel, PublicNoteDetailModel } from '../types/note.types';
+import { AppSelect } from '@/components/ui/AppSelect';
+import type { NoteEntryModel, NoteStatusModel, NoteVisibilityModel, PublicNoteDetailModel } from '../types/note.types';
+import { noteStatusOptions, noteVisibilityOptions } from '../types/noteEntryForm.schema';
 import { formatNoteDate } from '../utils/noteContent';
 import type { EditableNoteArticleField } from './NoteArticleContent';
 
@@ -17,15 +19,23 @@ interface NoteArticleMetadataPaneProps {
   isDirty?: boolean;
   slugError?: string;
   slugValue?: string;
+  statusError?: string;
+  statusValue?: NoteStatusModel;
   tagsError?: string;
   tagsValue?: string;
+  visibilityError?: string;
+  visibilityValue?: NoteVisibilityModel;
   onCancel?: () => void;
   onFieldBlur?: () => void;
-  onFieldChange?: <TField extends keyof Pick<NoteEntryModel, 'category' | 'slug' | 'tags'>>(field: TField, value: NoteEntryModel[TField]) => void;
+  onFieldChange?: <TField extends keyof Pick<NoteEntryModel, 'category' | 'slug' | 'status' | 'tags' | 'visibility'>>(field: TField, value: NoteEntryModel[TField]) => void;
   onEditField?: (field: EditableNoteArticleField) => void;
 }
 
 const getInputValue = (event: ChangeEvent<HTMLInputElement>) => event.target.value;
+
+const statusSelectOptions = noteStatusOptions.map((status) => ({ label: status, value: status }));
+
+const visibilitySelectOptions = noteVisibilityOptions.map((visibility) => ({ label: visibility, value: visibility }));
 
 export const NoteArticleMetadataPane = ({
   categoryError,
@@ -39,8 +49,12 @@ export const NoteArticleMetadataPane = ({
   errorMessage,
   slugError,
   slugValue,
+  statusError,
+  statusValue,
   tagsError,
   tagsValue,
+  visibilityError,
+  visibilityValue,
   onCancel,
   onFieldBlur,
   onFieldChange,
@@ -70,6 +84,46 @@ export const NoteArticleMetadataPane = ({
       <p className="mt-6 rounded-md border border-border p-4 text-sm text-muted-foreground">Loading note details...</p>
     ) : (
       <dl className="mt-6 space-y-5 text-sm">
+        <div>
+          <dt className="font-extrabold text-foreground">Status</dt>
+          <dd className="mt-1 text-muted-foreground">
+            {isEditable ? (
+              <AppSelect
+                aria-label="Note status"
+                error={statusError}
+                name="status"
+                options={statusSelectOptions}
+                value={statusValue ?? note.status}
+                onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+                  onFieldChange?.('status', event.target.value as NoteStatusModel);
+                }}
+              />
+            ) : (
+              (statusValue ?? note.status)
+            )}
+          </dd>
+        </div>
+
+        <div>
+          <dt className="font-extrabold text-foreground">Visibility</dt>
+          <dd className="mt-1 text-muted-foreground">
+            {isEditable ? (
+              <AppSelect
+                aria-label="Note visibility"
+                error={visibilityError}
+                name="visibility"
+                options={visibilitySelectOptions}
+                value={visibilityValue ?? note.visibility}
+                onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+                  onFieldChange?.('visibility', event.target.value as NoteVisibilityModel);
+                }}
+              />
+            ) : (
+              (visibilityValue ?? note.visibility)
+            )}
+          </dd>
+        </div>
+
         <div>
           <dt className="font-extrabold text-foreground">Category</dt>
           <dd className="mt-1 text-muted-foreground">

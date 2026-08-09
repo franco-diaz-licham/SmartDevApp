@@ -26,7 +26,14 @@ const getVisibleNoteEntryFormErrors = (validationErrors: NoteEntryFormErrors, to
 };
 
 const isSameNoteEntryForm = (left: NoteEntryModel, right: NoteEntryModel) =>
-  left.title === right.title && left.slug === right.slug && left.summary === right.summary && left.category === right.category && left.tags === right.tags && left.bodyMarkdown === right.bodyMarkdown;
+  left.title === right.title &&
+  left.slug === right.slug &&
+  left.summary === right.summary &&
+  left.category === right.category &&
+  left.tags === right.tags &&
+  left.bodyMarkdown === right.bodyMarkdown &&
+  left.status === right.status &&
+  left.visibility === right.visibility;
 
 const getNoteEntryFormValues = (note: PublicNoteDetailModel): NoteEntryModel => ({
   title: note.title,
@@ -34,7 +41,9 @@ const getNoteEntryFormValues = (note: PublicNoteDetailModel): NoteEntryModel => 
   summary: note.summary,
   category: note.category.displayName,
   tags: note.tags.map((tag) => tag.displayName).join(', '),
-  bodyMarkdown: note.bodyMarkdown
+  bodyMarkdown: note.bodyMarkdown,
+  status: note.status,
+  visibility: note.visibility
 });
 
 const getDraftNote = (draft: NoteEntryModel): PublicNoteDetailModel => ({
@@ -57,6 +66,8 @@ const getDraftNote = (draft: NoteEntryModel): PublicNoteDetailModel => ({
   updatedAt: null,
   publishedAt: new Date(),
   bodyMarkdown: draft.bodyMarkdown || 'Click to start writing.',
+  status: draft.status,
+  visibility: draft.visibility,
   relatedProjects: []
 });
 

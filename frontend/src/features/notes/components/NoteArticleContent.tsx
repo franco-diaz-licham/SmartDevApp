@@ -103,7 +103,7 @@ export const NoteArticleContent = ({
                 }}
               />
             ) : (
-              <AppButton inline inlineSize="summary" className="mt-5 block w-full p-2 pr-8 text-lg leading-8 text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('summary')}>
+              <AppButton inline inlineField="textArea" inlineSize="summary" className="mt-5 block w-full p-2 pr-8 text-lg leading-8 text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('summary')}>
                 {summaryValue ?? note.summary}
               </AppButton>
             )}

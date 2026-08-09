@@ -1,3 +1,7 @@
+export type NoteStatusModel = 'Draft' | 'Published' | 'Archived';
+
+export type NoteVisibilityModel = 'Private' | 'Public';
+
 export interface PublicNoteCategoryModel {
   slug: string;
   displayName: string;
@@ -20,6 +24,8 @@ export interface PublicNoteListItemModel {
   summary: string;
   category: PublicNoteCategoryModel;
   tags: PublicNoteTagModel[];
+  status: NoteStatusModel;
+  visibility: NoteVisibilityModel;
   updatedAt: Date | null;
   publishedAt: Date;
 }
@@ -55,6 +61,8 @@ export interface NoteEntryModel {
   category: string;
   tags: string;
   bodyMarkdown: string;
+  status: NoteStatusModel;
+  visibility: NoteVisibilityModel;
 }
 
 export interface NoteSaveResultModel {

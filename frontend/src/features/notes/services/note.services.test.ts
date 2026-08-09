@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi, type Mock } from 'vitest';
 import { apiClient } from '@/lib/api/apiClient';
-import type { PublicNoteDetailResponse, PublicNoteListItemResponse, PublicSearchIndexResponse } from '../types/note.api.types';
+import type { CreateNoteRequestDto, PublicNoteDetailResponse, PublicNoteListItemResponse, PublicSearchIndexResponse, UpdateNoteRequestDto } from '../types/note.api.types';
 import { noteService } from './note.services';
 
 vi.mock('@/lib/api/apiClient', () => ({
@@ -36,6 +36,8 @@ const noteListItemResponse: PublicNoteListItemResponse = {
       displayName: '.NET'
     }
   ],
+  status: 'Published',
+  visibility: 'Public',
   updatedAt: null,
   publishedAt: '2026-08-06T08:00:00Z'
 };
@@ -214,7 +216,7 @@ describe('noteService', () => {
 
   test('creates an owner note', async () => {
     // Arrange
-    const request = {
+    const request: CreateNoteRequestDto = {
       title: 'Cosmos Notes',
       slug: 'cosmos-notes',
       summary: 'Notes about Cosmos DB.',
@@ -228,7 +230,9 @@ describe('noteService', () => {
           displayName: '.NET'
         }
       ],
-      bodyMarkdown: '# Cosmos DB'
+      bodyMarkdown: '# Cosmos DB',
+      status: 'Draft',
+      visibility: 'Private'
     };
 
     const response = {
@@ -248,7 +252,7 @@ describe('noteService', () => {
 
   test('updates an owner note by id', async () => {
     // Arrange
-    const request = {
+    const request: UpdateNoteRequestDto = {
       title: 'Updated Cosmos Notes',
       slug: 'updated-cosmos-notes',
       summary: 'Updated notes about Cosmos DB.',
@@ -262,7 +266,9 @@ describe('noteService', () => {
           displayName: '.NET'
         }
       ],
-      bodyMarkdown: '# Updated Cosmos DB'
+      bodyMarkdown: '# Updated Cosmos DB',
+      status: 'Published',
+      visibility: 'Public'
     };
 
     const response = {

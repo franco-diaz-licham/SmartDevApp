@@ -20,6 +20,8 @@ describe('note mapper', () => {
           displayName: '.NET'
         }
       ],
+      status: 'Published',
+      visibility: 'Public',
       bodyMarkdown: '# Cosmos DB',
       relatedProjects: [
         {
@@ -44,6 +46,8 @@ describe('note mapper', () => {
         displayName: 'Backend'
       },
       tags: [{ slug: 'dotnet', displayName: '.NET' }],
+      status: 'Published',
+      visibility: 'Public',
       bodyMarkdown: '# Cosmos DB',
       relatedProjects: [{ projectId: 'smartdev', label: 'SmartDevApp' }],
       updatedAt: null

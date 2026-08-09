@@ -126,8 +126,12 @@ export const NoteArticlePage = () => {
         savedMessage={savedMessage}
         slugError={errors.slug}
         slugValue={isOwnerArticle ? draft.slug : undefined}
+        statusError={errors.status}
+        statusValue={isOwnerArticle ? draft.status : undefined}
         tagsError={errors.tags}
         tagsValue={isOwnerArticle ? draft.tags : undefined}
+        visibilityError={errors.visibility}
+        visibilityValue={isOwnerArticle ? draft.visibility : undefined}
         onCancel={handleCancel}
         onFieldBlur={handleFieldBlur}
         onEditField={handleEditField}
