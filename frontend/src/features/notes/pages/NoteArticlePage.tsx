@@ -1,47 +1,47 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import { useParams } from 'react-router-dom';
+import { useMatch, useNavigate, useParams } from 'react-router-dom';
 import { appConfig } from '@/app/appConfig';
 import { WorkspacePageWrapper } from '@/components/common/WorkspacePageWrapper';
 import { NoteArticleContent, type EditableNoteArticleField } from '../components/NoteArticleContent';
 import { NoteArticleMetadataPane } from '../components/NoteArticleMetadataPane';
 import { NotesSectionsPane } from '../components/NotesSectionsPane';
 import { useNoteEntryForm } from '../hooks/useNoteEntryForm';
-import { useUpdateNoteMutation } from '../queries/note.mutations';
+import { useCreateNoteMutation, useUpdateNoteMutation } from '../queries/note.mutations';
 import { useOwnerNoteQuery, usePublicNoteQuery } from '../queries/note.queries';
 import { getNoteSections } from '../utils/noteContent';
 
 export const NoteArticlePage = () => {
   const [editingField, setEditingField] = useState<EditableNoteArticleField | undefined>();
   const [savedMessage, setSavedMessage] = useState('');
+  const navigate = useNavigate();
+  const newArticleMatch = useMatch('/workspace/notes/new');
   const { noteId = '', slug = '' } = useParams();
-  const isOwnerArticle = noteId.trim().length > 0;
+  const isNewArticle = Boolean(newArticleMatch);
+  const isExistingOwnerArticle = noteId.trim().length > 0 && !isNewArticle;
+  const isOwnerArticle = isNewArticle || isExistingOwnerArticle;
   const form = useNoteEntryForm();
-  const { draft, errors } = form;
-  const { getValidForm, reset, updateField } = form;
+  const { draft, draftNote, errors } = form;
+  const { getValidForm, reset, resetFromNote, updateField } = form;
   const publicNoteQuery = usePublicNoteQuery(isOwnerArticle ? '' : slug);
-  const ownerNoteQuery = useOwnerNoteQuery(noteId);
+  const ownerNoteQuery = useOwnerNoteQuery(isExistingOwnerArticle ? noteId : '');
+  const createNoteMutation = useCreateNoteMutation();
   const updateNoteMutation = useUpdateNoteMutation(noteId);
-  const noteQuery = isOwnerArticle ? ownerNoteQuery : publicNoteQuery;
-  const note = noteQuery.data;
+  const activeMutation = isNewArticle ? createNoteMutation : updateNoteMutation;
+  const noteQuery = isExistingOwnerArticle ? ownerNoteQuery : publicNoteQuery;
+  const persistedNote = isExistingOwnerArticle || !isOwnerArticle ? noteQuery.data : undefined;
+  const note = isNewArticle ? draftNote : persistedNote;
   const articleMarkdown = isOwnerArticle ? draft.bodyMarkdown : (note?.bodyMarkdown ?? '');
   const sections = useMemo(() => getNoteSections(articleMarkdown), [articleMarkdown]);
 
   useEffect(() => {
-    document.title = `${note?.title ?? 'Note'} | ${appConfig.appName}`;
-  }, [note?.title]);
+    document.title = `${isNewArticle ? 'New note' : (note?.title ?? 'Note')} | ${appConfig.appName}`;
+  }, [isNewArticle, note?.title]);
 
   useEffect(() => {
-    if (!note || !isOwnerArticle) return;
+    if (!persistedNote || !isExistingOwnerArticle) return;
 
-    reset({
-      title: note.title,
-      slug: note.slug,
-      summary: note.summary,
-      category: note.category.displayName,
-      tags: note.tags.map((tag) => tag.displayName).join(', '),
-      bodyMarkdown: note.bodyMarkdown
-    });
-  }, [isOwnerArticle, note, reset]);
+    resetFromNote(persistedNote);
+  }, [isExistingOwnerArticle, persistedNote, resetFromNote]);
 
   const handleEditField = (field: EditableNoteArticleField) => {
     if (!isOwnerArticle) return;
@@ -54,15 +54,10 @@ export const NoteArticlePage = () => {
   };
 
   const handleCancel = () => {
-    if (note) {
-      reset({
-        title: note.title,
-        slug: note.slug,
-        summary: note.summary,
-        category: note.category.displayName,
-        tags: note.tags.map((tag) => tag.displayName).join(', '),
-        bodyMarkdown: note.bodyMarkdown
-      });
+    if (persistedNote) {
+      resetFromNote(persistedNote);
+    } else {
+      reset();
     }
 
     setEditingField(undefined);
@@ -75,6 +70,19 @@ export const NoteArticlePage = () => {
     setSavedMessage('');
     const entry = getValidForm();
     if (!entry) return;
+
+    if (isNewArticle) {
+      createNoteMutation.mutate(entry, {
+        onSuccess: (savedNote) => {
+          reset(entry);
+          setEditingField(undefined);
+          setSavedMessage('Saved.');
+          void navigate(`/workspace/notes/${encodeURIComponent(savedNote.noteId)}`, { replace: true });
+        }
+      });
+
+      return;
+    }
 
     updateNoteMutation.mutate(entry, {
       onSuccess: () => {
@@ -93,8 +101,8 @@ export const NoteArticlePage = () => {
         bodyMarkdownValue={isOwnerArticle ? draft.bodyMarkdown : undefined}
         editingField={editingField}
         isEditable={isOwnerArticle}
-        isLoading={noteQuery.isLoading}
-        isError={noteQuery.isError}
+        isLoading={!isNewArticle && noteQuery.isLoading}
+        isError={!isNewArticle && noteQuery.isError}
         note={note}
         summaryError={errors.summary}
         summaryValue={isOwnerArticle ? draft.summary : undefined}
@@ -110,10 +118,10 @@ export const NoteArticlePage = () => {
         categoryError={errors.category}
         categoryValue={isOwnerArticle ? draft.category : undefined}
         editingField={editingField}
-        errorMessage={updateNoteMutation.error instanceof Error ? updateNoteMutation.error.message : undefined}
+        errorMessage={activeMutation.error instanceof Error ? activeMutation.error.message : noteQuery.error instanceof Error ? noteQuery.error.message : undefined}
         isDirty={form.isDirty}
         isEditable={isOwnerArticle}
-        isSaving={updateNoteMutation.isPending}
+        isSaving={activeMutation.isPending || (!isNewArticle && noteQuery.isLoading)}
         note={note}
         savedMessage={savedMessage}
         slugError={errors.slug}

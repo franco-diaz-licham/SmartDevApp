@@ -7,10 +7,16 @@ import { cn } from '@/lib/cn';
 interface AppInputTextProps extends InputTextProps {
   error?: ReactNode;
   inline?: boolean;
+  inlineSize?: 'default' | 'title';
   label?: ReactNode;
 }
 
-export const AppInputText = ({ className, error, id, inline = false, label, required, type = 'text', ...inputProps }: AppInputTextProps) => {
+const inlineInputSizeClassNames = {
+  default: 'min-h-10',
+  title: 'min-h-[3.75rem]'
+} as const;
+
+export const AppInputText = ({ className, error, id, inline = false, inlineSize = 'default', label, required, type = 'text', ...inputProps }: AppInputTextProps) => {
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const errorId = `${inputId}-error`;
@@ -24,7 +30,8 @@ export const AppInputText = ({ className, error, id, inline = false, label, requ
       required={required}
       type={type}
       className={cn(
-        'min-h-10 w-full rounded-md border border-border bg-background px-4 py-2 text-foreground transition placeholder:text-muted-foreground',
+        'w-full rounded-md border border-border bg-background px-4 py-2 text-foreground transition placeholder:text-muted-foreground',
+        inline ? inlineInputSizeClassNames[inlineSize] : 'min-h-10',
         'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
         inline && 'rounded-md border-transparent bg-muted/35 px-2 py-1 shadow-none hover:border-primary/35 focus:border-primary',
         'disabled:cursor-not-allowed disabled:opacity-60',

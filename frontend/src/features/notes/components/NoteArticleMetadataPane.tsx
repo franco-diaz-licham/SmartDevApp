@@ -1,5 +1,4 @@
 import type { ChangeEvent } from 'react';
-import UilPen from '@iconscout/react-unicons/icons/uil-pen';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppInputText } from '@/components/ui/AppInputText';
 import type { NoteEntryModel, PublicNoteDetailModel } from '../types/note.types';
@@ -27,7 +26,6 @@ interface NoteArticleMetadataPaneProps {
 }
 
 const getInputValue = (event: ChangeEvent<HTMLInputElement>) => event.target.value;
-const InlineEditIcon = () => <UilPen aria-hidden="true" className="ml-2 inline size-3.5 opacity-0 transition group-hover:opacity-70 group-focus:opacity-70" />;
 
 export const NoteArticleMetadataPane = ({
   categoryError,
@@ -55,10 +53,10 @@ export const NoteArticleMetadataPane = ({
 
       {isEditable ? (
         <div className="mt-4 flex gap-2">
-          <AppButton className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold" type="submit" disabled={!isPageDirty || isSaving}>
+          <AppButton className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold w-1/2" type="submit" disabled={!isPageDirty || isSaving}>
             {isSaving ? 'Saving...' : 'Save'}
           </AppButton>
-          <AppButton appearance="secondary" className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold" type="button" disabled={!isPageDirty || isSaving} onClick={onCancel}>
+          <AppButton appearance="secondary" className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold w-1/2" type="button" disabled={!isPageDirty || isSaving} onClick={onCancel}>
             Cancel
           </AppButton>
         </div>
@@ -88,24 +86,12 @@ export const NoteArticleMetadataPane = ({
                 }}
               />
             ) : (
-              <AppButton inline className="block w-full p-1 text-muted-foreground leading-tight" type="button" disabled={!isEditable} onClick={() => onEditField?.('category')}>
+              <AppButton inline className="block w-full px-2 py-1 pr-8 leading-tight text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('category')}>
                 {categoryValue ?? note.category.displayName}
-                {isEditable ? <InlineEditIcon /> : null}
               </AppButton>
             )}
           </dd>
         </div>
-
-        <div>
-          <dt className="font-extrabold text-foreground">Published</dt>
-          <dd className="mt-1 text-muted-foreground">{formatNoteDate(note.publishedAt)}</dd>
-        </div>
-
-        <div>
-          <dt className="font-extrabold text-foreground">Updated</dt>
-          <dd className="mt-1 text-muted-foreground">{formatNoteDate(note.updatedAt)}</dd>
-        </div>
-
         <div>
           <dt className="font-extrabold text-foreground">Slug</dt>
           <dd className="mt-1 break-all text-muted-foreground">
@@ -122,9 +108,8 @@ export const NoteArticleMetadataPane = ({
                 }}
               />
             ) : (
-              <AppButton inline className="break-all p-1 text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('slug')}>
+              <AppButton inline className="w-full break-all px-2 py-1 pr-8 text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('slug')}>
                 {slugValue ?? note.slug}
-                {isEditable ? <InlineEditIcon /> : null}
               </AppButton>
             )}
           </dd>
@@ -146,7 +131,7 @@ export const NoteArticleMetadataPane = ({
                 }}
               />
             ) : (
-              <AppButton inline className="flex flex-wrap gap-2 p-1" type="button" disabled={!isEditable} onClick={() => onEditField?.('tags')}>
+              <AppButton inline className="flex w-full flex-wrap gap-2 px-2 py-1 pr-8" type="button" disabled={!isEditable} onClick={() => onEditField?.('tags')}>
                 {(tagsValue ?? note.tags.map((tag) => tag.displayName).join(', '))
                   .split(',')
                   .map((tag) => tag.trim())
@@ -156,10 +141,18 @@ export const NoteArticleMetadataPane = ({
                       {tag}
                     </span>
                   ))}
-                {isEditable ? <InlineEditIcon /> : null}
               </AppButton>
             )}
           </dd>
+        </div>
+        <div>
+          <dt className="font-extrabold text-foreground">Published</dt>
+          <dd className="mt-1 text-muted-foreground">{formatNoteDate(note.publishedAt)}</dd>
+        </div>
+
+        <div>
+          <dt className="font-extrabold text-foreground">Updated</dt>
+          <dd className="mt-1 text-muted-foreground">{formatNoteDate(note.updatedAt)}</dd>
         </div>
 
         {note.relatedProjects.length > 0 ? (

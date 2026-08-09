@@ -7,10 +7,16 @@ import { cn } from '@/lib/cn';
 interface AppInputTextAreaProps extends TextareaProps {
   error?: ReactNode;
   inline?: boolean;
+  inlineSize?: 'default' | 'summary';
   label?: ReactNode;
 }
 
-export const AppInputTextArea = ({ className, error, id, inline = false, label, required, ...textareaProps }: AppInputTextAreaProps) => {
+const inlineTextAreaSizeClassNames = {
+  default: 'min-h-32',
+  summary: 'min-h-32'
+} as const;
+
+export const AppInputTextArea = ({ className, error, id, inline = false, inlineSize = 'default', label, required, ...textareaProps }: AppInputTextAreaProps) => {
   const generatedId = useId();
   const textareaId = id ?? generatedId;
   const errorId = `${textareaId}-error`;
@@ -23,7 +29,8 @@ export const AppInputTextArea = ({ className, error, id, inline = false, label, 
       id={textareaId}
       required={required}
       className={cn(
-        'min-h-32 w-full rounded-md border border-border bg-background px-4 py-3 text-foreground transition placeholder:text-muted-foreground',
+        'w-full rounded-md border border-border bg-background px-4 py-3 text-foreground transition placeholder:text-muted-foreground',
+        inline ? inlineTextAreaSizeClassNames[inlineSize] : 'min-h-32',
         'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
         inline && 'rounded-md border-transparent bg-muted/35 px-2 py-1 shadow-none hover:border-primary/35 focus:border-primary',
         'disabled:cursor-not-allowed disabled:opacity-60',

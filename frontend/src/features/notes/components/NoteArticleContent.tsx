@@ -1,7 +1,6 @@
-import type { ChangeEvent, FocusEvent, KeyboardEvent } from 'react';
+import type { ChangeEvent, FocusEvent } from 'react';
 import { useRef } from 'react';
-import UilPen from '@iconscout/react-unicons/icons/uil-pen';
-import { AppButton } from '@/components/ui/AppButton';
+import { AppButton, AppInlineEditSurface } from '@/components/ui/AppButton';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
 import { NoteMarkdown } from './NoteMarkdown';
@@ -30,9 +29,6 @@ interface NoteArticleContentProps {
 }
 
 const getInputValue = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => event.target.value;
-const editableBodyClassName = 'group relative rounded-md bg-transparent transition hover:bg-muted/45 hover:ring-1 hover:ring-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/25 disabled:hover:bg-transparent disabled:hover:ring-0';
-
-const InlineEditIcon = () => <UilPen aria-hidden="true" className="absolute right-2 top-2 size-4 opacity-0 transition group-hover:opacity-70 group-focus:opacity-70" />;
 
 export const NoteArticleContent = ({
   bodyMarkdownError,
@@ -58,15 +54,6 @@ export const NoteArticleContent = ({
     onEditField?.('bodyMarkdown');
   };
 
-  const handleBodyKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (!isEditable) return;
-
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleBodyEdit();
-    }
-  };
-
   const handleBodyEditorBlur = (event: FocusEvent<HTMLDivElement>) => {
     if (bodyEditorRef.current?.contains(event.relatedTarget)) return;
     onFieldBlur?.();
@@ -85,7 +72,8 @@ export const NoteArticleContent = ({
               <AppInputText
                 autoFocus
                 inline
-                className="mt-2 text-3xl font-extrabold leading-tight"
+                inlineSize="title"
+                className="mt-2 p-2 pr-8 text-3xl font-extrabold leading-tight"
                 error={titleError}
                 name="title"
                 value={titleValue ?? note.title}
@@ -95,9 +83,8 @@ export const NoteArticleContent = ({
                 }}
               />
             ) : (
-              <AppButton inline className="mt-2 block w-full p-2 pr-8 text-3xl font-extrabold leading-tight text-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('title')}>
+              <AppButton inline inlineSize="title" className="mt-2 block w-full p-2 pr-8 text-3xl font-extrabold leading-tight text-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('title')}>
                 {titleValue ?? note.title}
-                {isEditable ? <InlineEditIcon /> : null}
               </AppButton>
             )}
             <p className="mt-3 text-sm text-muted-foreground">Published {formatNoteDate(note.publishedAt)}</p>
@@ -105,7 +92,8 @@ export const NoteArticleContent = ({
               <AppInputTextArea
                 autoFocus
                 inline
-                className="mt-5 min-h-32 text-lg leading-8"
+                inlineSize="summary"
+                className="mt-5 p-2 pr-8 text-lg leading-8"
                 error={summaryError}
                 name="summary"
                 value={summaryValue ?? note.summary}
@@ -115,9 +103,8 @@ export const NoteArticleContent = ({
                 }}
               />
             ) : (
-              <AppButton inline className="mt-5 block w-full p-2 pr-8 text-lg leading-8 text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('summary')}>
+              <AppButton inline inlineSize="summary" className="mt-5 block w-full p-2 pr-8 text-lg leading-8 text-muted-foreground" type="button" disabled={!isEditable} onClick={() => onEditField?.('summary')}>
                 {summaryValue ?? note.summary}
-                {isEditable ? <InlineEditIcon /> : null}
               </AppButton>
             )}
           </header>
@@ -138,12 +125,11 @@ export const NoteArticleContent = ({
               />
             </div>
           ) : (
-            <div className={`${isEditable ? `mt-10 cursor-text p-2 pr-8 ${editableBodyClassName}` : 'mt-10'}`} role={isEditable ? 'button' : undefined} tabIndex={isEditable ? 0 : undefined} onClick={handleBodyEdit} onKeyDown={handleBodyKeyDown}>
-              {isEditable ? <InlineEditIcon /> : null}
+            <AppInlineEditSurface className="mt-10" disabled={!isEditable} iconClassName="top-2 size-4 translate-y-0" onEdit={handleBodyEdit}>
               <div className="space-y-6 pb-16">
                 <NoteMarkdown markdown={bodyMarkdownValue ?? note.bodyMarkdown} />
               </div>
-            </div>
+            </AppInlineEditSurface>
           )}
         </>
       )}
