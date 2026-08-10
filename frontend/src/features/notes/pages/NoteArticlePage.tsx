@@ -60,33 +60,30 @@ export const NoteArticlePage = () => {
     setSavedMessage('');
   };
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isOwnerArticle) return;
     setSavedMessage('');
     const entry = getValidForm();
     if (!entry) return;
 
-    if (isNewArticle) {
-      createNoteMutation.mutate(entry, {
-        onSuccess: (savedNote) => {
-          reset(entry);
-          setEditingField(undefined);
-          setSavedMessage('Saved.');
-          void navigate(`/workspace/notes/${encodeURIComponent(savedNote.noteId)}`, { replace: true });
-        }
-      });
-
-      return;
-    }
-
-    updateNoteMutation.mutate(entry, {
-      onSuccess: () => {
+    try {
+      if (isNewArticle) {
+        const savedNote = await createNoteMutation.mutateAsync(entry);
         reset(entry);
         setEditingField(undefined);
         setSavedMessage('Saved.');
+        void navigate(`/workspace/notes/${encodeURIComponent(savedNote.noteId)}`, { replace: true });
+        return;
       }
-    });
+
+      await updateNoteMutation.mutateAsync(entry);
+      reset(entry);
+      setEditingField(undefined);
+      setSavedMessage('Saved.');
+    } catch {
+      // The mutation state drives the visible error message.
+    }
   };
 
   const formController: NoteEntryFormController = {

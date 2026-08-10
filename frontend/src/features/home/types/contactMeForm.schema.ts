@@ -14,5 +14,4 @@ export const contactMeFormSchema = z.object({
 });
 
 export type ContactMeFormValues = z.infer<typeof contactMeFormSchema>;
-export type ContactMePayload = Omit<ContactMeFormValues, 'companyWebsite'>;
 export type ContactMeFormErrors = Partial<Record<keyof ContactMeFormValues, string>>;
