@@ -9,12 +9,13 @@ interface NotesMainContentProps {
   isNotesError: boolean;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
+  isOwnerView: boolean;
   onSearchTermChange: (searchTerm: string) => void;
   onSelectNote: (noteId: string) => void;
   onLoadMore: () => void;
 }
 
-export const NotesMainContent = ({ notes, searchTerm, selectedNoteId, isNotesLoading, isNotesError, hasNextPage, isFetchingNextPage, onSearchTermChange, onSelectNote, onLoadMore }: NotesMainContentProps) => (
+export const NotesMainContent = ({ notes, searchTerm, selectedNoteId, isNotesLoading, isNotesError, hasNextPage, isFetchingNextPage, isOwnerView, onSearchTermChange, onSelectNote, onLoadMore }: NotesMainContentProps) => (
   <section className="min-h-0 min-w-0 overflow-y-auto ">
     <div className="px-5 py-6 sm:px-8 lg:px-10">
       <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
@@ -32,12 +33,14 @@ export const NotesMainContent = ({ notes, searchTerm, selectedNoteId, isNotesLoa
           />
         </div>
 
-        <Link
-          className="inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-4 text-sm font-extrabold text-primary-foreground no-underline hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30"
-          to="/workspace/notes/new"
-        >
-          New note
-        </Link>
+        {isOwnerView ? (
+          <Link
+            className="inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-4 text-sm font-extrabold text-primary-foreground no-underline hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            to="/workspace/notes/new"
+          >
+            New note
+          </Link>
+        ) : null}
       </div>
 
       <div className="mt-6 grid gap-3">
@@ -51,7 +54,7 @@ export const NotesMainContent = ({ notes, searchTerm, selectedNoteId, isNotesLoa
             <Link
               key={note.id}
               className={`rounded-md border p-4 no-underline transition hover:border-primary hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 ${isSelected ? 'border-primary bg-muted/70' : 'border-border bg-background'}`}
-              to={`/workspace/notes/${encodeURIComponent(note.id)}`}
+              to={isOwnerView ? `/workspace/notes/${encodeURIComponent(note.id)}` : `/notes/${encodeURIComponent(note.slug)}/read`}
               onClick={() => onSelectNote(note.id)}
             >
               <span className="text-xs font-extrabold uppercase text-primary">{note.category.displayName}</span>

@@ -1,18 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 import { appConfig } from '@/app/appConfig';
 import { WorkspacePageWrapper } from '@/components/common/WorkspacePageWrapper';
+import { useAuth } from '@/features/auth';
 import { NotesCategoryPane } from '../components/NotesCategoryPane';
 import { NotesMainContent } from '../components/NotesMainContent';
-import { useOwnerNotesQuery } from '../queries/note.queries';
+import { useOwnerNotesQuery, usePublicNotesQuery } from '../queries/note.queries';
 import { allNotesCategory, getFilteredNotes, getNoteCategories } from '../utils/noteContent';
 
 export const NotesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(allNotesCategory);
   const [selectedNoteId, setSelectedNoteId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const { isAuthenticated, isAuthReady } = useAuth();
 
   const notesQueryParams = useMemo(() => ({ pageSize: 30 }), []);
-  const notesQuery = useOwnerNotesQuery(notesQueryParams);
+  const publicNotesQuery = usePublicNotesQuery(notesQueryParams, !isAuthReady || !isAuthenticated);
+  const ownerNotesQuery = useOwnerNotesQuery(notesQueryParams, isAuthReady && isAuthenticated);
+  const notesQuery = isAuthReady && isAuthenticated ? ownerNotesQuery : publicNotesQuery;
 
   useEffect(() => {
     document.title = `Notes | ${appConfig.appName}`;
@@ -49,6 +53,7 @@ export const NotesPage = () => {
             isNotesError={notesQuery.isError}
             hasNextPage={notesQuery.hasNextPage}
             isFetchingNextPage={notesQuery.isFetchingNextPage}
+            isOwnerView={isAuthReady && isAuthenticated}
             onSearchTermChange={setSearchTerm}
             onSelectNote={handleSelectNote}
             onLoadMore={handleLoadMore}

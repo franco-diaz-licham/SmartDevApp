@@ -18,7 +18,7 @@ export const noteKeys = {
   publicSearchIndex: () => [...noteKeys.all, 'public-search-index'] as const
 };
 
-export const usePublicNotesQuery = (query: BaseQuery = {}) => {
+export const usePublicNotesQuery = (query: BaseQuery = {}, enabled = true) => {
   const initialQuery = {
     pageSize: 20,
     ...query
@@ -38,11 +38,12 @@ export const usePublicNotesQuery = (query: BaseQuery = {}) => {
       };
     },
     initialPageParam: null as string | null,
-    getNextPageParam: (lastPage) => lastPage.continuationToken
+    getNextPageParam: (lastPage) => lastPage.continuationToken,
+    enabled
   });
 };
 
-export const useOwnerNotesQuery = (query: BaseQuery = {}) => {
+export const useOwnerNotesQuery = (query: BaseQuery = {}, enabled = true) => {
   const initialQuery = {
     pageSize: 20,
     ...query
@@ -62,7 +63,8 @@ export const useOwnerNotesQuery = (query: BaseQuery = {}) => {
       };
     },
     initialPageParam: null as string | null,
-    getNextPageParam: (lastPage) => lastPage.continuationToken
+    getNextPageParam: (lastPage) => lastPage.continuationToken,
+    enabled
   });
 };
 

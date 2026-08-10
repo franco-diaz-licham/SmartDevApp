@@ -5,7 +5,7 @@ import { WorkspacePageWrapper } from '@/components/common/WorkspacePageWrapper';
 import { NoteArticleContent, type EditableNoteArticleField } from '../components/NoteArticleContent';
 import { NoteArticleMetadataPane } from '../components/NoteArticleMetadataPane';
 import { NotesSectionsPane } from '../components/NotesSectionsPane';
-import { useNoteEntryForm } from '../hooks/useNoteEntryForm';
+import { useNoteEntryForm, type NoteEntryFormController } from '../hooks/useNoteEntryForm';
 import { useCreateNoteMutation, useUpdateNoteMutation } from '../queries/note.mutations';
 import { useOwnerNoteQuery, usePublicNoteQuery } from '../queries/note.queries';
 import { getNoteSections } from '../utils/noteContent';
@@ -20,7 +20,7 @@ export const NoteArticlePage = () => {
   const isExistingOwnerArticle = noteId.trim().length > 0 && !isNewArticle;
   const isOwnerArticle = isNewArticle || isExistingOwnerArticle;
   const form = useNoteEntryForm();
-  const { draft, draftNote, errors } = form;
+  const { draft, draftNote } = form;
   const { getValidForm, reset, resetFromNote, updateField } = form;
   const publicNoteQuery = usePublicNoteQuery(isOwnerArticle ? '' : slug);
   const ownerNoteQuery = useOwnerNoteQuery(isExistingOwnerArticle ? noteId : '');
@@ -93,50 +93,25 @@ export const NoteArticlePage = () => {
     });
   };
 
+  const formController: NoteEntryFormController = {
+    values: draft,
+    errors: form.errors,
+    editingField,
+    isDirty: form.isDirty,
+    isSaving: activeMutation.isPending || (!isNewArticle && noteQuery.isLoading),
+    savedMessage,
+    errorMessage: activeMutation.error instanceof Error ? activeMutation.error.message : noteQuery.error instanceof Error ? noteQuery.error.message : undefined,
+    cancel: handleCancel,
+    blurField: handleFieldBlur,
+    editField: handleEditField,
+    updateField
+  };
+
   const content = (
     <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 lg:grid-cols-[17rem_minmax(0,1fr)] xl:grid-cols-[17rem_minmax(0,1fr)_18rem]">
       <NotesSectionsPane sections={sections} />
-      <NoteArticleContent
-        bodyMarkdownError={errors.bodyMarkdown}
-        bodyMarkdownValue={isOwnerArticle ? draft.bodyMarkdown : undefined}
-        editingField={editingField}
-        isEditable={isOwnerArticle}
-        isLoading={!isNewArticle && noteQuery.isLoading}
-        isError={!isNewArticle && noteQuery.isError}
-        note={note}
-        summaryError={errors.summary}
-        summaryValue={isOwnerArticle ? draft.summary : undefined}
-        titleError={errors.title}
-        titleValue={isOwnerArticle ? draft.title : undefined}
-        onBodyMarkdownChange={(value) => updateField('bodyMarkdown', value)}
-        onFieldBlur={handleFieldBlur}
-        onEditField={handleEditField}
-        onSummaryChange={(value) => updateField('summary', value)}
-        onTitleChange={(value) => updateField('title', value)}
-      />
-      <NoteArticleMetadataPane
-        categoryError={errors.category}
-        categoryValue={isOwnerArticle ? draft.category : undefined}
-        editingField={editingField}
-        errorMessage={activeMutation.error instanceof Error ? activeMutation.error.message : noteQuery.error instanceof Error ? noteQuery.error.message : undefined}
-        isDirty={form.isDirty}
-        isEditable={isOwnerArticle}
-        isSaving={activeMutation.isPending || (!isNewArticle && noteQuery.isLoading)}
-        note={note}
-        savedMessage={savedMessage}
-        slugError={errors.slug}
-        slugValue={isOwnerArticle ? draft.slug : undefined}
-        statusError={errors.status}
-        statusValue={isOwnerArticle ? draft.status : undefined}
-        tagsError={errors.tags}
-        tagsValue={isOwnerArticle ? draft.tags : undefined}
-        visibilityError={errors.visibility}
-        visibilityValue={isOwnerArticle ? draft.visibility : undefined}
-        onCancel={handleCancel}
-        onFieldBlur={handleFieldBlur}
-        onEditField={handleEditField}
-        onFieldChange={updateField}
-      />
+      <NoteArticleContent form={isOwnerArticle ? formController : undefined} isEditable={isOwnerArticle} isLoading={!isNewArticle && noteQuery.isLoading} isError={!isNewArticle && noteQuery.isError} note={note} />
+      <NoteArticleMetadataPane form={isOwnerArticle ? formController : undefined} isEditable={isOwnerArticle} note={note} />
     </div>
   );
 

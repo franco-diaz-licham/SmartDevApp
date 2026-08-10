@@ -5,14 +5,14 @@ import logoImage from '@/assets/images/logo.png';
 import { useAuth } from '@/features/auth';
 
 const workspaceNavigationItems = [
-  { label: 'HOME', href: '/home' },
-  { label: 'WORKSPACE', href: '/workspace' },
-  { label: 'ADMIN', href: '/admin' }
+  { label: 'HOME', href: '/home', visibility: 'public' },
+  { label: 'WORKSPACE', href: '/workspace', visibility: 'public' },
+  { label: 'ADMIN', href: '/admin', visibility: 'authenticated' }
 ] as const;
 
 export const WorkspaceTopBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { interactionInProgress, logout } = useAuth();
+  const { interactionInProgress, isAuthenticated, isAuthReady, logout } = useAuth();
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -35,19 +35,29 @@ export const WorkspaceTopBar = () => {
         </button>
 
         <ul id="workspace-navigation" className={`ml-4 basis-full flex-col gap-y-2 pt-3 font-bold lg:flex lg:basis-auto lg:flex-row lg:justify-end lg:gap-x-6 lg:pt-0 ${isMenuOpen ? 'flex' : 'hidden'}`}>
-          {workspaceNavigationItems.map((item) => (
-            <li key={item.href}>
-              <a className="block py-2 no-underline hover:underline lg:py-0" href={item.href} onClick={closeMenu}>
-                {item.label}
+          {workspaceNavigationItems
+            .filter((item) => item.visibility === 'public' || (isAuthReady && isAuthenticated))
+            .map((item) => (
+              <li key={item.href}>
+                <a className="block py-2 no-underline hover:underline lg:py-0" href={item.href} onClick={closeMenu}>
+                  {item.label}
+                </a>
+              </li>
+            ))}
+
+          {isAuthReady && isAuthenticated ? (
+            <li>
+              <button className="block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline disabled:cursor-not-allowed disabled:opacity-60 lg:py-0" type="button" disabled={interactionInProgress} onClick={handleLogout}>
+                LOG OUT
+              </button>
+            </li>
+          ) : (
+            <li>
+              <a className="block py-2 no-underline hover:underline lg:py-0" href="/login?returnTo=%2Fworkspace" onClick={closeMenu}>
+                LOGIN
               </a>
             </li>
-          ))}
-
-          <li>
-            <button className="block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline disabled:cursor-not-allowed disabled:opacity-60 lg:py-0" type="button" disabled={interactionInProgress} onClick={handleLogout}>
-              LOG OUT
-            </button>
-          </li>
+          )}
         </ul>
       </nav>
     </header>

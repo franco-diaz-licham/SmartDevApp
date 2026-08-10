@@ -4,59 +4,36 @@ import { AppInlineEditSurface } from '@/components/ui/AppButton';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
 import { NoteMarkdown } from './NoteMarkdown';
+import type { EditableNoteEntryField, NoteEntryFormController } from '../hooks/useNoteEntryForm';
 import type { PublicNoteDetailModel } from '../types/note.types';
 import { formatNoteDate } from '../utils/noteContent';
 
-export type EditableNoteArticleField = 'title' | 'summary' | 'bodyMarkdown' | 'slug' | 'category' | 'tags';
+export type EditableNoteArticleField = EditableNoteEntryField;
 
 interface NoteArticleContentProps {
-  bodyMarkdownError?: string;
-  bodyMarkdownValue?: string;
-  editingField?: EditableNoteArticleField;
+  form?: NoteEntryFormController;
   isEditable?: boolean;
   note: PublicNoteDetailModel | undefined;
   isLoading: boolean;
   isError: boolean;
-  summaryError?: string;
-  summaryValue?: string;
-  titleError?: string;
-  titleValue?: string;
-  onBodyMarkdownChange?: (value: string) => void;
-  onFieldBlur?: () => void;
-  onEditField?: (field: EditableNoteArticleField) => void;
-  onSummaryChange?: (value: string) => void;
-  onTitleChange?: (value: string) => void;
 }
 
 const getInputValue = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => event.target.value;
 
-export const NoteArticleContent = ({
-  bodyMarkdownError,
-  bodyMarkdownValue,
-  editingField,
-  isEditable = false,
-  note,
-  isLoading,
-  isError,
-  summaryError,
-  summaryValue,
-  titleError,
-  titleValue,
-  onBodyMarkdownChange,
-  onFieldBlur,
-  onEditField,
-  onSummaryChange,
-  onTitleChange
-}: NoteArticleContentProps) => {
+export const NoteArticleContent = ({ form, isEditable = false, note, isLoading, isError }: NoteArticleContentProps) => {
   const bodyEditorRef = useRef<HTMLDivElement>(null);
+  const editingField = form?.editingField;
+  const titleValue = form?.values.title;
+  const summaryValue = form?.values.summary;
+  const bodyMarkdownValue = form?.values.bodyMarkdown;
 
   const handleBodyEdit = () => {
-    onEditField?.('bodyMarkdown');
+    form?.editField('bodyMarkdown');
   };
 
   const handleBodyEditorBlur = (event: FocusEvent<HTMLDivElement>) => {
     if (bodyEditorRef.current?.contains(event.relatedTarget)) return;
-    onFieldBlur?.();
+    form?.blurField();
   };
 
   return (
@@ -74,15 +51,15 @@ export const NoteArticleContent = ({
               inlineSize="title"
               inlineStatus={isEditable && editingField === 'title' ? 'edit' : 'read'}
               className="mt-2 p-2 pr-8 text-3xl font-extrabold leading-tight text-foreground"
-              error={titleError}
+              error={form?.errors.title}
               name="title"
               readValue={titleValue ?? note.title}
               value={titleValue ?? note.title}
-              onBlur={onFieldBlur}
+              onBlur={form?.blurField}
               onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                onTitleChange?.(getInputValue(event));
+                form?.updateField('title', getInputValue(event));
               }}
-              onInlineEdit={isEditable ? () => onEditField?.('title') : undefined}
+              onInlineEdit={isEditable ? () => form?.editField('title') : undefined}
             />
             <p className="mt-3 text-sm text-muted-foreground">Published {formatNoteDate(note.publishedAt)}</p>
             <AppInputTextArea
@@ -91,15 +68,15 @@ export const NoteArticleContent = ({
               inlineSize="summary"
               inlineStatus={isEditable && editingField === 'summary' ? 'edit' : 'read'}
               className="mt-5 p-2 pr-8 text-lg leading-8"
-              error={summaryError}
+              error={form?.errors.summary}
               name="summary"
               readValue={summaryValue ?? note.summary}
               value={summaryValue ?? note.summary}
-              onBlur={onFieldBlur}
+              onBlur={form?.blurField}
               onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
-                onSummaryChange?.(getInputValue(event));
+                form?.updateField('summary', getInputValue(event));
               }}
-              onInlineEdit={isEditable ? () => onEditField?.('summary') : undefined}
+              onInlineEdit={isEditable ? () => form?.editField('summary') : undefined}
             />
           </header>
 
@@ -110,11 +87,11 @@ export const NoteArticleContent = ({
                 aria-label="Note body"
                 inline
                 className="min-h-[36rem] resize-none overflow-hidden border-0 font-mono text-sm leading-7 shadow-none [field-sizing:content] focus:ring-0"
-                error={bodyMarkdownError}
+                error={form?.errors.bodyMarkdown}
                 name="bodyMarkdown"
                 value={bodyMarkdownValue ?? note.bodyMarkdown}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
-                  onBodyMarkdownChange?.(getInputValue(event));
+                  form?.updateField('bodyMarkdown', getInputValue(event));
                 }}
               />
             </div>

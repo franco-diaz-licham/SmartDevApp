@@ -2,6 +2,22 @@ import { useCallback, useMemo, useState } from 'react';
 import type { NoteEntryModel, PublicNoteDetailModel } from '../types/note.types';
 import { defaultNoteEntryFormValues, noteEntryFormSchema, type NoteEntryFormErrors } from '../types/noteEntryForm.schema';
 
+export type EditableNoteEntryField = 'title' | 'summary' | 'bodyMarkdown' | 'slug' | 'category' | 'tags';
+
+export interface NoteEntryFormController {
+  values: NoteEntryModel;
+  errors: NoteEntryFormErrors;
+  editingField?: EditableNoteEntryField;
+  isDirty: boolean;
+  isSaving: boolean;
+  savedMessage?: string;
+  errorMessage?: string;
+  cancel: () => void;
+  blurField: () => void;
+  editField: (field: EditableNoteEntryField) => void;
+  updateField: <TField extends keyof NoteEntryModel>(field: TField, value: NoteEntryModel[TField]) => void;
+}
+
 type NoteEntryTouchedFields = Partial<Record<keyof NoteEntryModel, boolean>>;
 
 const getNoteEntryFormErrors = (draft: NoteEntryModel): NoteEntryFormErrors => {

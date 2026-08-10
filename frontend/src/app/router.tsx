@@ -27,18 +27,18 @@ export const router = createBrowserRouter([
     ]
   },
   {
-    element: <RequireAuth />,
+    element: <WorkspaceLayout />,
     children: [
+      { path: '/workspace', element: <NotesPage /> },
+      { path: '/notes', element: <Navigate to="/workspace" replace /> },
       {
-        element: <WorkspaceLayout />,
+        element: <RequireAuth />,
         children: [
           { path: '/admin', element: <AdminHomePage /> },
-          { path: '/workspace', element: <NotesPage /> },
           { path: '/workspace/notes/new', element: <NoteArticlePage /> },
           { path: '/workspace/notes/:noteId', element: <NoteArticlePage /> },
           { path: '/workspace/notes/:noteId/read', element: <NoteArticlePage /> },
-          { path: '/workspace/notes/:noteId/edit', element: <NoteArticlePage /> },
-          { path: '/notes', element: <Navigate to="/workspace" replace /> }
+          { path: '/workspace/notes/:noteId/edit', element: <NoteArticlePage /> }
         ]
       }
     ]

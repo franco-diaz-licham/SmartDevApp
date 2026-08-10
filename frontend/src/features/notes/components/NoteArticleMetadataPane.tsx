@@ -2,33 +2,15 @@ import type { ChangeEvent } from 'react';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppSelect } from '@/components/ui/AppSelect';
-import type { NoteEntryModel, NoteStatusModel, NoteVisibilityModel, PublicNoteDetailModel } from '../types/note.types';
+import type { NoteEntryFormController } from '../hooks/useNoteEntryForm';
+import type { NoteStatusModel, NoteVisibilityModel, PublicNoteDetailModel } from '../types/note.types';
 import { noteStatusOptions, noteVisibilityOptions } from '../types/noteEntryForm.schema';
 import { formatNoteDate } from '../utils/noteContent';
-import type { EditableNoteArticleField } from './NoteArticleContent';
 
 interface NoteArticleMetadataPaneProps {
-  categoryError?: string;
-  categoryValue?: string;
-  editingField?: EditableNoteArticleField;
+  form?: NoteEntryFormController;
   isEditable?: boolean;
-  isSaving?: boolean;
   note: PublicNoteDetailModel | undefined;
-  savedMessage?: string;
-  errorMessage?: string;
-  isDirty?: boolean;
-  slugError?: string;
-  slugValue?: string;
-  statusError?: string;
-  statusValue?: NoteStatusModel;
-  tagsError?: string;
-  tagsValue?: string;
-  visibilityError?: string;
-  visibilityValue?: NoteVisibilityModel;
-  onCancel?: () => void;
-  onFieldBlur?: () => void;
-  onFieldChange?: <TField extends keyof Pick<NoteEntryModel, 'category' | 'slug' | 'status' | 'tags' | 'visibility'>>(field: TField, value: NoteEntryModel[TField]) => void;
-  onEditField?: (field: EditableNoteArticleField) => void;
 }
 
 const getInputValue = (event: ChangeEvent<HTMLInputElement>) => event.target.value;
@@ -36,28 +18,18 @@ const statusSelectOptions = noteStatusOptions.map((status) => ({ label: status, 
 const visibilitySelectOptions = noteVisibilityOptions.map((visibility) => ({ label: visibility, value: visibility }));
 
 export const NoteArticleMetadataPane = ({
-  categoryError,
-  categoryValue,
-  editingField,
-  isDirty: isPageDirty = false,
+  form,
   isEditable = false,
-  isSaving = false,
-  note,
-  savedMessage,
-  errorMessage,
-  slugError,
-  slugValue,
-  statusError,
-  statusValue,
-  tagsError,
-  tagsValue,
-  visibilityError,
-  visibilityValue,
-  onCancel,
-  onFieldBlur,
-  onFieldChange,
-  onEditField
-}: NoteArticleMetadataPaneProps) => (
+  note
+}: NoteArticleMetadataPaneProps) => {
+  const categoryValue = form?.values.category;
+  const editingField = form?.editingField;
+  const slugValue = form?.values.slug;
+  const statusValue = form?.values.status;
+  const tagsValue = form?.values.tags;
+  const visibilityValue = form?.values.visibility;
+
+  return (
   <aside className="min-h-0 overflow-y-auto border-t border-border px-5 py-6 lg:border-l lg:border-t-0 xl:px-6">
     <div className="border-b border-border pb-4">
       <p className="text-xs font-extrabold uppercase text-primary">Metadata</p>
@@ -65,25 +37,25 @@ export const NoteArticleMetadataPane = ({
 
       {isEditable ? (
         <div className="mt-4 flex gap-2">
-          <AppButton className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold w-1/2" type="submit" disabled={!isPageDirty || isSaving}>
-            {isSaving ? 'Saving...' : 'Save'}
+          <AppButton className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold w-1/2" type="submit" disabled={!form?.isDirty || form.isSaving}>
+            {form?.isSaving ? 'Saving...' : 'Save'}
           </AppButton>
-          <AppButton appearance="secondary" className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold w-1/2" type="button" disabled={!isPageDirty || isSaving} onClick={onCancel}>
+          <AppButton appearance="secondary" className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold w-1/2" type="button" disabled={!form?.isDirty || form.isSaving} onClick={form?.cancel}>
             Cancel
           </AppButton>
         </div>
       ) : null}
     </div>
 
-    {savedMessage ? <p className="mt-4 rounded-md border border-success-border bg-success p-3 text-sm font-bold text-success-heading">{savedMessage}</p> : null}
-    {errorMessage ? <p className="mt-4 rounded-md border border-error-border bg-error p-3 text-sm font-bold text-error-heading">{errorMessage}</p> : null}
+    {form?.savedMessage ? <p className="mt-4 rounded-md border border-success-border bg-success p-3 text-sm font-bold text-success-heading">{form.savedMessage}</p> : null}
+    {form?.errorMessage ? <p className="mt-4 rounded-md border border-error-border bg-error p-3 text-sm font-bold text-error-heading">{form.errorMessage}</p> : null}
 
     {!note ? (
       <p className="mt-6 rounded-md border border-border p-4 text-sm text-muted-foreground">Loading note details...</p>
     ) : (
       <div className="mt-6 space-y-5 text-sm">
         <AppSelect
-          error={statusError}
+          error={form?.errors.status}
           inline
           inlineStatus={isEditable ? 'edit' : 'read'}
           label="Status"
@@ -91,11 +63,11 @@ export const NoteArticleMetadataPane = ({
           options={statusSelectOptions}
           value={statusValue ?? note.status}
           onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-            onFieldChange?.('status', event.target.value as NoteStatusModel);
+            form?.updateField('status', event.target.value as NoteStatusModel);
           }}
         />
         <AppSelect
-          error={visibilityError}
+          error={form?.errors.visibility}
           inline
           inlineStatus={isEditable ? 'edit' : 'read'}
           label="Visibility"
@@ -103,7 +75,7 @@ export const NoteArticleMetadataPane = ({
           options={visibilitySelectOptions}
           value={visibilityValue ?? note.visibility}
           onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-            onFieldChange?.('visibility', event.target.value as NoteVisibilityModel);
+            form?.updateField('visibility', event.target.value as NoteVisibilityModel);
           }}
         />
         <AppInputText
@@ -111,39 +83,39 @@ export const NoteArticleMetadataPane = ({
           inline
           inlineStatus={isEditable && editingField === 'category' ? 'edit' : 'read'}
           className="px-2 py-1 pr-8 leading-tight"
-          error={categoryError}
+          error={form?.errors.category}
           label="Category"
           name="category"
           readValue={categoryValue ?? note.category.displayName}
           value={categoryValue ?? note.category.displayName}
-          onBlur={onFieldBlur}
+          onBlur={form?.blurField}
           onChange={(event: ChangeEvent<HTMLInputElement>) => {
-            onFieldChange?.('category', getInputValue(event));
+            form?.updateField('category', getInputValue(event));
           }}
-          onInlineEdit={isEditable ? () => onEditField?.('category') : undefined}
+          onInlineEdit={isEditable ? () => form?.editField('category') : undefined}
         />
         <AppInputText
           autoFocus={isEditable && editingField === 'slug'}
           inline
           inlineStatus={isEditable && editingField === 'slug' ? 'edit' : 'read'}
           className="break-all px-2 py-1 pr-8"
-          error={slugError}
+          error={form?.errors.slug}
           label="Slug"
           name="slug"
           readValue={slugValue ?? note.slug}
           value={slugValue ?? note.slug}
-          onBlur={onFieldBlur}
+          onBlur={form?.blurField}
           onChange={(event: ChangeEvent<HTMLInputElement>) => {
-            onFieldChange?.('slug', getInputValue(event));
+            form?.updateField('slug', getInputValue(event));
           }}
-          onInlineEdit={isEditable ? () => onEditField?.('slug') : undefined}
+          onInlineEdit={isEditable ? () => form?.editField('slug') : undefined}
         />
         <AppInputText
           autoFocus={isEditable && editingField === 'tags'}
           inline
           inlineStatus={isEditable && editingField === 'tags' ? 'edit' : 'read'}
           className="flex flex-wrap gap-2 px-2 py-1 pr-8"
-          error={tagsError}
+          error={form?.errors.tags}
           label="Tags"
           name="tags"
           readValue={(tagsValue ?? note.tags.map((tag) => tag.displayName).join(', '))
@@ -156,11 +128,11 @@ export const NoteArticleMetadataPane = ({
               </span>
             ))}
           value={tagsValue ?? note.tags.map((tag) => tag.displayName).join(', ')}
-          onBlur={onFieldBlur}
+          onBlur={form?.blurField}
           onChange={(event: ChangeEvent<HTMLInputElement>) => {
-            onFieldChange?.('tags', getInputValue(event));
+            form?.updateField('tags', getInputValue(event));
           }}
-          onInlineEdit={isEditable ? () => onEditField?.('tags') : undefined}
+          onInlineEdit={isEditable ? () => form?.editField('tags') : undefined}
         />
 
         <div>
@@ -188,4 +160,5 @@ export const NoteArticleMetadataPane = ({
       </div>
     )}
   </aside>
-);
+  );
+};
