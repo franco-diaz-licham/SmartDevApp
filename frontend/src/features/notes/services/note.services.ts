@@ -26,8 +26,8 @@ export const noteService = {
     return apiClient.getSingle<PublicNoteDetailResponse>(`${OWNER_NOTES_URL}/${encodeURIComponent(noteId)}`);
   },
 
-  getPublicNoteBySlug(slug: string): Promise<PublicNoteDetailResponse> {
-    return apiClient.getSingle<PublicNoteDetailResponse>(`${NOTES_URL}/${encodeURIComponent(slug)}`);
+  getPublicNoteById(noteId: string): Promise<PublicNoteDetailResponse> {
+    return apiClient.getSingle<PublicNoteDetailResponse>(`${NOTES_URL}/${encodeURIComponent(noteId)}`);
   },
 
   getPublicNoteCategories(request: BaseQuery = {}): Promise<PageResult<string>> {

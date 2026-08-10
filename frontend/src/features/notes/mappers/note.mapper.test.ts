@@ -69,7 +69,7 @@ describe('note mapper', () => {
           category: 'Backend',
           tags: ['.NET'],
           bodyText: 'Cosmos DB notes.',
-          url: '/notes/cosmos-notes/read',
+          url: '/workspace/notes/1f4d0b3f-10a9-4c59-9e91-65cb3770887f',
           updatedAt: '2026-08-06T09:30:00Z',
           publishedAt: null
         }

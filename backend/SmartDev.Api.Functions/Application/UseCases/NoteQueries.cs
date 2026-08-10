@@ -30,11 +30,11 @@ public sealed class GetOwnerNoteByIdHandler(INoteRepository noteRepository)
     }
 }
 
-public sealed class GetPublicNoteBySlugHandler(INoteRepository noteRepository)
+public sealed class GetPublicNoteByIdHandler(INoteRepository noteRepository)
 {
-    public async Task<PublicNoteDetail?> HandleAsync(string slug, CancellationToken cancellationToken)
+    public async Task<PublicNoteDetail?> HandleAsync(Guid noteId, CancellationToken cancellationToken)
     {
-        var note = await noteRepository.GetBySlugAsync(NoteSlug.Create(slug), cancellationToken);
+        var note = await noteRepository.GetByIdAsync(NoteId.From(noteId), cancellationToken);
         if (note is null || note.Status != NoteStatus.Published || note.Visibility != NoteVisibility.Public) return null;
         return PublicNoteDetail.FromDomain(note);
     }
@@ -178,7 +178,7 @@ public sealed record PublicNoteSearchDocument(
             note.Category.DisplayName,
             note.Tags.Select(tag => tag.DisplayName).ToArray(),
             note.Body.Value,
-            $"/notes/{note.Slug.Value}/read",
+            $"/workspace/notes/{note.Id.Value:D}",
             note.UpdatedAt,
             note.PublishedAt);
     }

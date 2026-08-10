@@ -10,7 +10,7 @@ public sealed class NotesFunction(
     GetPublicNotesHandler getPublicNotesHandler,
     GetOwnerNotesHandler getOwnerNotesHandler,
     GetOwnerNoteByIdHandler getOwnerNoteByIdHandler,
-    GetPublicNoteBySlugHandler getPublicNoteBySlugHandler,
+    GetPublicNoteByIdHandler getPublicNoteByIdHandler,
     GetPublicNoteCategoriesHandler getPublicNoteCategoriesHandler,
     GetPublicNoteTagsHandler getPublicNoteTagsHandler,
     SearchPublicNotesHandler searchPublicNotesHandler,
@@ -169,16 +169,14 @@ public sealed class NotesFunction(
         return await request.CreateJsonResponseAsync(HttpStatusCode.OK, searchIndex, cancellationToken);
     }
 
-    [Function(nameof(GetPublicNoteBySlug))]
-    public async Task<HttpResponseData> GetPublicNoteBySlug([HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "notes/{slug}")] HttpRequestData request, string slug, CancellationToken cancellationToken)
+    [Function(nameof(GetPublicNoteById))]
+    public async Task<HttpResponseData> GetPublicNoteById([HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "notes/{noteId:guid}")] HttpRequestData request, string noteId, CancellationToken cancellationToken)
     {
-        try {
-            var note = await getPublicNoteBySlugHandler.HandleAsync(slug, cancellationToken);
-            if (note is null) return await request.CreateJsonResponseAsync(HttpStatusCode.NotFound, new NotesErrorResponse("Note was not found."), cancellationToken);
-            return await request.CreateJsonResponseAsync(HttpStatusCode.OK, note, cancellationToken);
-        } catch (ArgumentException exception) {
-            return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse(exception.Message), cancellationToken);
-        }
+        if (!Guid.TryParse(noteId, out var parsedNoteId)) return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse("Note id must be a valid GUID."), cancellationToken);
+
+        var note = await getPublicNoteByIdHandler.HandleAsync(parsedNoteId, cancellationToken);
+        if (note is null) return await request.CreateJsonResponseAsync(HttpStatusCode.NotFound, new NotesErrorResponse("Note was not found."), cancellationToken);
+        return await request.CreateJsonResponseAsync(HttpStatusCode.OK, note, cancellationToken);
     }
 
 

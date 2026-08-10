@@ -25,17 +25,6 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
         return privateDocument?.ToDomain();
     }
 
-    public async Task<Note?> GetBySlugAsync(NoteSlug slug, CancellationToken cancellationToken)
-    {
-        var documents = await documentStore.QueryPageAsync<NoteDocument>(
-            NoteDocument.ContainerName,
-            CosmosNoteQueries.BySlug(slug),
-            pageSize: 2,
-            cancellationToken: cancellationToken);
-
-        return documents.Items.SingleOrDefault()?.ToDomain();
-    }
-
     public async Task<DocumentPage<Note>> GetPublishedPublicNotesAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var documents = await documentStore.QueryPageAsync<NoteDocument>(
@@ -111,8 +100,9 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
 
     public async Task AddAsync(Note note, CancellationToken cancellationToken)
     {
-        var existing = await GetBySlugAsync(note.Slug, cancellationToken);
-        if (existing is not null) throw new InvalidOperationException($"Note slug '{note.Slug.Value}' already exists.");
+        if (await SlugExistsAsync(note.Slug, excludedNoteId: null, cancellationToken)) {
+            throw new InvalidOperationException($"Note slug '{note.Slug.Value}' already exists.");
+        }
 
         var created = await documentStore.TryCreateAsync(
             NoteDocument.ContainerName,
@@ -125,8 +115,9 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
 
     public async Task SaveAsync(Note note, CancellationToken cancellationToken)
     {
-        var existing = await GetBySlugAsync(note.Slug, cancellationToken);
-        if (existing is not null && existing.Id != note.Id) throw new InvalidOperationException($"Note slug '{note.Slug.Value}' already exists.");
+        if (await SlugExistsAsync(note.Slug, note.Id, cancellationToken)) {
+            throw new InvalidOperationException($"Note slug '{note.Slug.Value}' already exists.");
+        }
 
         var partitionKey = note.Visibility.ToString();
         var previousPartitionKey = partitionKey == NoteDocument.PublicPartitionKey
@@ -144,6 +135,17 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
             note.Id.Value.ToString("D"),
             previousPartitionKey,
             cancellationToken);
+    }
+
+    private async Task<bool> SlugExistsAsync(NoteSlug slug, NoteId? excludedNoteId, CancellationToken cancellationToken)
+    {
+        var documents = await documentStore.QueryPageAsync<string>(
+            NoteDocument.ContainerName,
+            CosmosNoteQueries.SlugIds(slug),
+            pageSize: 2,
+            cancellationToken: cancellationToken);
+
+        return documents.Items.Any(id => excludedNoteId is null || !string.Equals(id, excludedNoteId.Value.Value.ToString("D"), StringComparison.OrdinalIgnoreCase));
     }
 
 }

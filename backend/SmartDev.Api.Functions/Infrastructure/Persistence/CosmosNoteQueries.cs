@@ -5,10 +5,11 @@ namespace SmartDev.Api.Functions.Infrastructure.Persistence;
 
 internal static class CosmosNoteQueries
 {
-    public static QueryDefinition BySlug(NoteSlug slug)
+    public static QueryDefinition SlugIds(NoteSlug slug)
     {
         return new QueryDefinition("""
-            SELECT * FROM c
+            SELECT VALUE c.id
+            FROM c
             WHERE c.type = @type
               AND c.slug = @slug
             """)

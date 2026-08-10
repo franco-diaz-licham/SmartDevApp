@@ -54,7 +54,7 @@ export const NotesMainContent = ({ notes, searchTerm, selectedNoteId, isNotesLoa
             <Link
               key={note.id}
               className={`rounded-md border p-4 no-underline transition hover:border-primary hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 ${isSelected ? 'border-primary bg-muted/70' : 'border-border bg-background'}`}
-              to={isOwnerView ? `/workspace/notes/${encodeURIComponent(note.id)}` : `/notes/${encodeURIComponent(note.slug)}/read`}
+              to={`/workspace/notes/${encodeURIComponent(note.id)}`}
               onClick={() => onSelectNote(note.id)}
             >
               <span className="text-xs font-extrabold uppercase text-primary">{note.category.displayName}</span>

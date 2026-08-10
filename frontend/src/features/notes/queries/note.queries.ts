@@ -9,7 +9,7 @@ export const noteKeys = {
   publicList: (query: BaseQuery) => [...noteKeys.lists(), 'public', query] as const,
   ownerList: (query: BaseQuery) => [...noteKeys.lists(), 'owner', query] as const,
   details: () => [...noteKeys.all, 'detail'] as const,
-  publicDetail: (slug: string) => [...noteKeys.details(), 'public', slug] as const,
+  publicDetail: (noteId: string) => [...noteKeys.details(), 'public', noteId] as const,
   ownerDetail: (noteId: string) => [...noteKeys.details(), 'owner', noteId] as const,
   ownerEntry: (noteId: string) => [...noteKeys.details(), 'owner-entry', noteId] as const,
   publicCategories: (query: BaseQuery) => [...noteKeys.all, 'public-categories', query] as const,
@@ -81,11 +81,11 @@ export const usePublicNoteSearchQuery = (query: BaseQuery) =>
     enabled: Boolean(query.searchTerm?.trim())
   });
 
-export const usePublicNoteQuery = (slug: string) =>
+export const usePublicNoteQuery = (noteId: string, enabled = true) =>
   useQuery({
-    queryKey: noteKeys.publicDetail(slug),
-    queryFn: async () => mapPublicNoteDetailResponseToModel(await noteService.getPublicNoteBySlug(slug)),
-    enabled: slug.trim().length > 0
+    queryKey: noteKeys.publicDetail(noteId),
+    queryFn: async () => mapPublicNoteDetailResponseToModel(await noteService.getPublicNoteById(noteId)),
+    enabled: enabled && noteId.trim().length > 0
   });
 
 export const useOwnerNoteEntryQuery = (noteId: string) =>
@@ -95,11 +95,11 @@ export const useOwnerNoteEntryQuery = (noteId: string) =>
     enabled: noteId.trim().length > 0
   });
 
-export const useOwnerNoteQuery = (noteId: string) =>
+export const useOwnerNoteQuery = (noteId: string, enabled = true) =>
   useQuery({
     queryKey: noteKeys.ownerDetail(noteId),
     queryFn: async () => mapPublicNoteDetailResponseToModel(await noteService.getOwnerNoteById(noteId)),
-    enabled: noteId.trim().length > 0
+    enabled: enabled && noteId.trim().length > 0
   });
 
 export const usePublicNoteCategoriesQuery = (query: BaseQuery = {}) =>

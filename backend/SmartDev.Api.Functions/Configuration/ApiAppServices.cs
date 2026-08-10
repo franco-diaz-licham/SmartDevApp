@@ -68,7 +68,7 @@ public static class ApiAppServices
         services.AddScoped<GetPublicNotesHandler>();
         services.AddScoped<GetOwnerNotesHandler>();
         services.AddScoped<GetOwnerNoteByIdHandler>();
-        services.AddScoped<GetPublicNoteBySlugHandler>();
+        services.AddScoped<GetPublicNoteByIdHandler>();
         services.AddScoped<GetPublicNoteCategoriesHandler>();
         services.AddScoped<GetPublicNoteTagsHandler>();
         services.AddScoped<SearchPublicNotesHandler>();

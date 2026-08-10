@@ -7,8 +7,6 @@ public interface INoteRepository
 {
     Task<Note?> GetByIdAsync(NoteId id, CancellationToken cancellationToken);
 
-    Task<Note?> GetBySlugAsync(NoteSlug slug, CancellationToken cancellationToken);
-
     Task<DocumentPage<Note>> GetPublishedPublicNotesAsync(BaseQuery query, CancellationToken cancellationToken);
 
     Task<IReadOnlyCollection<Note>> GetPublishedPublicNotesAsync(CancellationToken cancellationToken);
