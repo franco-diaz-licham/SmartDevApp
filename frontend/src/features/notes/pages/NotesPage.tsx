@@ -9,7 +9,6 @@ import { allNotesCategory, getFilteredNotes, getNoteCategories } from '../utils/
 
 export const NotesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(allNotesCategory);
-  const [selectedNoteId, setSelectedNoteId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const { isAuthenticated, isAuthReady } = useAuth();
 
@@ -25,40 +24,29 @@ export const NotesPage = () => {
   const notes = useMemo(() => notesQuery.data?.pages.flatMap((page) => page.items) ?? [], [notesQuery.data]);
   const categories = useMemo(() => getNoteCategories(notes), [notes]);
   const filteredNotes = useMemo(() => getFilteredNotes(notes, selectedCategory, searchTerm), [notes, searchTerm, selectedCategory]);
-  const activeNoteId = filteredNotes.some((note) => note.id === selectedNoteId) ? selectedNoteId : (filteredNotes[0]?.id ?? '');
 
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);
-    setSelectedNoteId('');
   };
 
   const handleLoadMore = () => {
     void notesQuery.fetchNextPage();
   };
 
-  const handleSelectNote = (noteId: string) => {
-    setSelectedNoteId(noteId);
-  };
-
   return (
     <WorkspacePageWrapper>
-      <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 lg:grid-cols-[17rem_minmax(0,1fr)]">
+      <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 overflow-hidden lg:grid-cols-[17rem_minmax(0,1fr)]">
         <NotesCategoryPane categories={categories} selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} />
-        <div className="min-h-0 min-w-0">
-          <NotesMainContent
-            notes={filteredNotes}
-            searchTerm={searchTerm}
-            selectedNoteId={activeNoteId}
-            isNotesLoading={notesQuery.isLoading}
-            isNotesError={notesQuery.isError}
-            hasNextPage={notesQuery.hasNextPage}
-            isFetchingNextPage={notesQuery.isFetchingNextPage}
-            isOwnerView={isAuthReady && isAuthenticated}
-            onSearchTermChange={setSearchTerm}
-            onSelectNote={handleSelectNote}
-            onLoadMore={handleLoadMore}
-          />
-        </div>
+        <NotesMainContent
+          notes={filteredNotes}
+          searchTerm={searchTerm}
+          isNotesLoading={notesQuery.isLoading}
+          isNotesError={notesQuery.isError}
+          hasNextPage={notesQuery.hasNextPage}
+          isFetchingNextPage={notesQuery.isFetchingNextPage}
+          onSearchTermChange={setSearchTerm}
+          onLoadMore={handleLoadMore}
+        />
       </div>
     </WorkspacePageWrapper>
   );

@@ -6,4 +6,4 @@ interface WorkspacePageWrapperProps {
   className?: string;
 }
 
-export const WorkspacePageWrapper = ({ children, className }: WorkspacePageWrapperProps) => <main className={cn('h-full overflow-y-scroll bg-background text-foreground', className)}>{children}</main>;
+export const WorkspacePageWrapper = ({ children, className }: WorkspacePageWrapperProps) => <main className={cn('h-full min-h-0 overflow-hidden bg-background text-foreground', className)}>{children}</main>;

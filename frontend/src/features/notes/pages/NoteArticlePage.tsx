@@ -105,7 +105,7 @@ export const NoteArticlePage = () => {
   };
 
   const content = (
-    <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 lg:grid-cols-[17rem_minmax(0,1fr)] xl:grid-cols-[17rem_minmax(0,1fr)_18rem]">
+    <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 overflow-hidden lg:grid-cols-[17rem_minmax(0,1fr)] xl:grid-cols-[17rem_minmax(0,1fr)_18rem]">
       <NotesSectionsPane sections={sections} />
       <NoteArticleContent form={canEditArticle ? formController : undefined} isEditable={canEditArticle} isLoading={!isNewArticle && noteQuery.isLoading} isError={!isNewArticle && noteQuery.isError} note={note} />
       <NoteArticleMetadataPane form={canEditArticle ? formController : undefined} isEditable={canEditArticle} note={note} />

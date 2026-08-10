@@ -55,7 +55,7 @@ public sealed record NoteSlug
 /// </summary>
 public sealed record NoteSummary
 {
-    private const int MaxLength = 320;
+    private const int MaxLength = 500;
 
     private NoteSummary(string value) => Value = value;
 

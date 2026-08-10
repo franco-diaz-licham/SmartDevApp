@@ -5,7 +5,7 @@ interface NotesCategoryPaneProps {
 }
 
 export const NotesCategoryPane = ({ categories, selectedCategory, onSelectCategory }: NotesCategoryPaneProps) => (
-  <aside className="min-h-0 overflow-y-auto border-b border-border px-5 py-6 lg:border-b-0 lg:border-r xl:px-6">
+  <aside className="h-full min-h-0 overflow-y-auto border-b border-border px-5 py-6 lg:border-b-0 lg:border-r xl:px-6">
     <p className="text-xs font-extrabold uppercase text-primary">Workspace notes</p>
     <h1 className="mt-2 text-2xl font-extrabold leading-tight">Knowledge Base</h1>
 
