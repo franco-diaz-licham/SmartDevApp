@@ -1,6 +1,6 @@
 import type { ReactNode, SelectHTMLAttributes } from 'react';
 import { useId } from 'react';
-import { AppButton } from './AppButton';
+import { AppInlineEditSurface } from './AppInlineEditSurface';
 import { cn } from '@/lib/cn';
 
 export interface AppSelectOption<TValue extends string = string> {
@@ -31,9 +31,9 @@ export const AppSelect = <TValue extends string = string>({ className, error, id
   const isInlineReadMode = inline && inlineStatus === 'read';
 
   const select = isInlineReadMode ? (
-    <AppButton inline className={cn('w-full px-2 py-1 pr-8 text-muted-foreground', className)} type="button" disabled={!onInlineEdit} onClick={onInlineEdit}>
+    <AppInlineEditSurface className={cn('px-2 py-1 pr-8 text-muted-foreground', className)} disabled={!onInlineEdit} onEdit={onInlineEdit}>
       {readValue ?? getSelectedOptionLabel(options, selectProps.value)}
-    </AppButton>
+    </AppInlineEditSurface>
   ) : (
     <select
       {...selectProps}

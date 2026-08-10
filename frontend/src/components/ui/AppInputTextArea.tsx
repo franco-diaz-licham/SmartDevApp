@@ -2,7 +2,7 @@ import type { TextareaProps } from '@primereact/types/primitive/textarea';
 import { Textarea } from 'primereact/textarea';
 import type { ReactNode } from 'react';
 import { useId } from 'react';
-import { AppButton } from './AppButton';
+import { AppInlineEditSurface } from './AppInlineEditSurface';
 import { cn } from '@/lib/cn';
 
 interface AppInputTextAreaProps extends TextareaProps {
@@ -27,9 +27,9 @@ export const AppInputTextArea = ({ className, error, id, inline = false, inlineS
   const isInlineReadMode = inline && inlineStatus === 'read';
 
   const textarea = isInlineReadMode ? (
-    <AppButton inline inlineField="textArea" inlineSize={inlineSize} className={cn('w-full text-muted-foreground', className)} type="button" disabled={!onInlineEdit} onClick={onInlineEdit}>
+    <AppInlineEditSurface inlineField="textArea" inlineSize={inlineSize} className={cn('text-muted-foreground', className)} disabled={!onInlineEdit} onEdit={onInlineEdit}>
       {readValue ?? textareaProps.value}
-    </AppButton>
+    </AppInlineEditSurface>
   ) : (
     <Textarea
       {...textareaProps}

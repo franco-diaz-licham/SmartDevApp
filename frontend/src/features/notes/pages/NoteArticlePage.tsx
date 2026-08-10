@@ -54,12 +54,8 @@ export const NoteArticlePage = () => {
   };
 
   const handleCancel = () => {
-    if (persistedNote) {
-      resetFromNote(persistedNote);
-    } else {
-      reset();
-    }
-
+    if (persistedNote) resetFromNote(persistedNote);
+    else reset();
     setEditingField(undefined);
     setSavedMessage('');
   };

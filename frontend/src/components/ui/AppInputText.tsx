@@ -2,7 +2,7 @@ import type { InputTextProps } from '@primereact/types/primitive/inputtext';
 import { InputText } from 'primereact/inputtext';
 import type { ReactNode } from 'react';
 import { useId } from 'react';
-import { AppButton } from './AppButton';
+import { AppInlineEditSurface } from './AppInlineEditSurface';
 import { cn } from '@/lib/cn';
 
 interface AppInputTextProps extends InputTextProps {
@@ -27,9 +27,9 @@ export const AppInputText = ({ className, error, id, inline = false, inlineSize 
   const isInlineReadMode = inline && inlineStatus === 'read';
 
   const input = isInlineReadMode ? (
-    <AppButton inline inlineSize={inlineSize} className={cn('w-full text-muted-foreground', className)} type="button" disabled={!onInlineEdit} onClick={onInlineEdit}>
+    <AppInlineEditSurface inlineSize={inlineSize} className={cn('text-muted-foreground', className)} disabled={!onInlineEdit} onEdit={onInlineEdit}>
       {readValue ?? inputProps.value}
-    </AppButton>
+    </AppInlineEditSurface>
   ) : (
     <InputText
       {...inputProps}

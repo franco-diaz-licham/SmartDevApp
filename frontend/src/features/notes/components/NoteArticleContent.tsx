@@ -1,6 +1,6 @@
 import type { ChangeEvent, FocusEvent } from 'react';
 import { useRef } from 'react';
-import { AppInlineEditSurface } from '@/components/ui/AppButton';
+import { AppInlineEditSurface } from '@/components/ui/AppInlineEditSurface';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
 import { NoteMarkdown } from './NoteMarkdown';
