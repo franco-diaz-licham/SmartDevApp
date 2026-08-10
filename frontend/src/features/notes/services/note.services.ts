@@ -1,14 +1,6 @@
 import { apiClient } from '@/lib/api/apiClient';
 import type { BaseQuery, PageResult } from '@/lib/api/api.types';
-import type {
-  CreateNoteRequestDto,
-  CreateNoteResponseDto,
-  PublicNoteDetailResponse,
-  PublicNoteListItemResponse,
-  PublicSearchIndexResponse,
-  UpdateNoteRequestDto,
-  UpdateNoteResponseDto
-} from '../types/note.api.types';
+import type { CreateNoteRequestDto, CreateNoteResponseDto, PublicNoteDetailResponse, PublicNoteListItemResponse, PublicSearchIndexResponse, UpdateNoteRequestDto, UpdateNoteResponseDto } from '../types/note.api.types';
 
 const NOTES_URL = '/notes';
 const OWNER_NOTES_URL = '/owner/notes';

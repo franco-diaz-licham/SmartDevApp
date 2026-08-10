@@ -38,7 +38,7 @@ export const AppInputTextArea = ({ className, error, id, inline = false, inlineS
       id={textareaId}
       required={required}
       className={cn(
-        'w-full rounded-md border border-border bg-background px-4 py-3 text-foreground transition placeholder:text-muted-foreground',
+        'block w-full rounded-md border border-border bg-background px-4 py-3 text-foreground transition placeholder:text-muted-foreground',
         inline ? inlineTextAreaSizeClassNames[inlineSize] : 'min-h-32',
         'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
         inline && 'rounded-md border-transparent bg-muted/35 px-2 py-1 shadow-none hover:border-primary/35 focus:border-primary',
@@ -51,7 +51,7 @@ export const AppInputTextArea = ({ className, error, id, inline = false, inlineS
   if (!label && !error) return textarea;
 
   return (
-    <div className="block">
+    <div className="block w-full">
       {label ? (
         <label className="mb-2 block font-semibold text-foreground" htmlFor={textareaId}>
           {label}

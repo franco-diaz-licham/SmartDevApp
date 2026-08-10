@@ -24,7 +24,7 @@ export const NoteArticleMetadataPane = ({ form, isEditable = false, note }: Note
   return (
     <aside className="min-h-0 overflow-y-auto border-t border-border px-5 py-6 lg:border-l lg:border-t-0 xl:px-6">
       <div className="border-b border-border pb-4">
-        <h2 className="mt-1 text-lg font-extrabold">Note details</h2>
+        <h2 className="text-lg font-extrabold">More Details</h2>
         <AuthenticatedOnly when={isEditable && Boolean(form)}>
           <div className="mt-4 flex gap-2">
             <AppButton className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold w-1/2" type="submit" disabled={!form?.isDirty || form.isSaving}>
@@ -51,6 +51,7 @@ export const NoteArticleMetadataPane = ({ form, isEditable = false, note }: Note
               label="Status"
               name="status"
               options={statusSelectOptions}
+              required={isEditable}
               value={form?.values.status ?? note.status}
               onChange={(event: ChangeEvent<HTMLSelectElement>) => {
                 form?.updateField('status', event.target.value as NoteStatusModel);
@@ -63,6 +64,7 @@ export const NoteArticleMetadataPane = ({ form, isEditable = false, note }: Note
               label="Visibility"
               name="visibility"
               options={visibilitySelectOptions}
+              required={isEditable}
               value={form?.values.visibility ?? note.visibility}
               onChange={(event: ChangeEvent<HTMLSelectElement>) => {
                 form?.updateField('visibility', event.target.value as NoteVisibilityModel);
@@ -77,6 +79,7 @@ export const NoteArticleMetadataPane = ({ form, isEditable = false, note }: Note
             error={form?.errors.category}
             label="Category"
             name="category"
+            required={isEditable}
             readValue={form?.values.category ?? note.category.displayName}
             value={form?.values.category ?? note.category.displayName}
             onBlur={form?.blurField}
@@ -93,6 +96,7 @@ export const NoteArticleMetadataPane = ({ form, isEditable = false, note }: Note
             error={form?.errors.slug}
             label="Slug"
             name="slug"
+            required={isEditable}
             readValue={form?.values.slug ?? note.slug}
             value={form?.values.slug ?? note.slug}
             onBlur={form?.blurField}
@@ -109,6 +113,7 @@ export const NoteArticleMetadataPane = ({ form, isEditable = false, note }: Note
             error={form?.errors.tags}
             label="Tags"
             name="tags"
+            required={isEditable}
             readValue={tagNames
               .split(',')
               .map((tag) => tag.trim())

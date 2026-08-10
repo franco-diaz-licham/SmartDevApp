@@ -18,7 +18,7 @@ const getSectionClassName = (level: number) => {
 
 export const NotesSectionsPane = ({ sections }: NotesSectionsPaneProps) => (
   <aside className="hidden min-h-0 overflow-y-auto px-6 py-8 xl:block xl:border-r">
-    <p className="text-sm font-extrabold">On this page</p>
+    <h2 className="text-lg font-extrabold">Table of Content</h2>
     <nav className="mt-4 space-y-1" aria-label="Article structure">
       {sections.length > 0 ? (
         sections.map((section) => (
