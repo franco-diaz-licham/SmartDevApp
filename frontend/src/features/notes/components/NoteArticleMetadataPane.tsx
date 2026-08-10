@@ -28,9 +28,7 @@ export const NoteArticleMetadataPane = ({ form, isEditable = false, note }: Note
   return (
     <aside className="min-h-0 overflow-y-auto border-t border-border px-5 py-6 lg:border-l lg:border-t-0 xl:px-6">
       <div className="border-b border-border pb-4">
-        <p className="text-xs font-extrabold uppercase text-primary">Metadata</p>
         <h2 className="mt-1 text-lg font-extrabold">Note details</h2>
-
         {isEditable ? (
           <div className="mt-4 flex gap-2">
             <AppButton className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold w-1/2" type="submit" disabled={!form?.isDirty || form.isSaving}>

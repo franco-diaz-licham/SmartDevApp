@@ -2,16 +2,16 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useMatch, useNavigate, useParams } from 'react-router-dom';
 import { appConfig } from '@/app/appConfig';
 import { WorkspacePageWrapper } from '@/components/common/WorkspacePageWrapper';
-import { NoteArticleContent, type EditableNoteArticleField } from '../components/NoteArticleContent';
+import { NoteArticleContent } from '../components/NoteArticleContent';
 import { NoteArticleMetadataPane } from '../components/NoteArticleMetadataPane';
 import { NotesSectionsPane } from '../components/NotesSectionsPane';
-import { useNoteEntryForm, type NoteEntryFormController } from '../hooks/useNoteEntryForm';
+import { useNoteEntryForm, type EditableNoteEntryField, type NoteEntryFormController } from '../hooks/useNoteEntryForm';
 import { useCreateNoteMutation, useUpdateNoteMutation } from '../queries/note.mutations';
 import { useOwnerNoteQuery, usePublicNoteQuery } from '../queries/note.queries';
 import { getNoteSections } from '../utils/noteContent';
 
 export const NoteArticlePage = () => {
-  const [editingField, setEditingField] = useState<EditableNoteArticleField | undefined>();
+  const [editingField, setEditingField] = useState<EditableNoteEntryField | undefined>();
   const [savedMessage, setSavedMessage] = useState('');
   const navigate = useNavigate();
   const newArticleMatch = useMatch('/workspace/notes/new');
@@ -43,7 +43,7 @@ export const NoteArticlePage = () => {
     resetFromNote(persistedNote);
   }, [isExistingOwnerArticle, persistedNote, resetFromNote]);
 
-  const handleEditField = (field: EditableNoteArticleField) => {
+  const handleEditField = (field: EditableNoteEntryField) => {
     if (!isOwnerArticle) return;
     setSavedMessage('');
     setEditingField(field);

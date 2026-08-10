@@ -4,11 +4,8 @@ import { AppInlineEditSurface } from '@/components/ui/AppInlineEditSurface';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
 import { NoteMarkdown } from './NoteMarkdown';
-import type { EditableNoteEntryField, NoteEntryFormController } from '../hooks/useNoteEntryForm';
+import type { NoteEntryFormController } from '../hooks/useNoteEntryForm';
 import type { PublicNoteDetailModel } from '../types/note.types';
-import { formatNoteDate } from '../utils/noteContent';
-
-export type EditableNoteArticleField = EditableNoteEntryField;
 
 interface NoteArticleContentProps {
   form?: NoteEntryFormController;
@@ -40,11 +37,9 @@ export const NoteArticleContent = ({ form, isEditable = false, note, isLoading, 
     <article className="min-h-0 min-w-0 overflow-y-auto px-5 py-7 sm:px-8 lg:px-10">
       {isLoading && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">Loading note...</p>}
       {isError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Note could not be loaded.</p>}
-
       {note && (
         <>
           <header id="overview" className="scroll-mt-28">
-            <p className="text-sm font-extrabold uppercase text-primary">{note.category.displayName}</p>
             <AppInputText
               autoFocus={isEditable && editingField === 'title'}
               inline
@@ -61,7 +56,6 @@ export const NoteArticleContent = ({ form, isEditable = false, note, isLoading, 
               }}
               onInlineEdit={isEditable ? () => form?.editField('title') : undefined}
             />
-            <p className="mt-3 text-sm text-muted-foreground">Published {formatNoteDate(note.publishedAt)}</p>
             <AppInputTextArea
               autoFocus={isEditable && editingField === 'summary'}
               inline
@@ -79,7 +73,6 @@ export const NoteArticleContent = ({ form, isEditable = false, note, isLoading, 
               onInlineEdit={isEditable ? () => form?.editField('summary') : undefined}
             />
           </header>
-
           {isEditable && editingField === 'bodyMarkdown' ? (
             <div ref={bodyEditorRef} className="mt-10 rounded-md border border-border bg-background" onBlur={handleBodyEditorBlur}>
               <AppInputTextArea
