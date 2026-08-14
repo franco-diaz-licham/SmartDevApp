@@ -2,6 +2,9 @@ using SmartDev.Api.Functions.Domain.Common;
 
 namespace SmartDev.Api.Functions.Domain.Contact;
 
+/// <summary>
+/// Represents a submitted contact form message and its email delivery state.
+/// </summary>
 public sealed class ContactMessage : Entity<ContactMessageId>
 {
     private ContactMessage(
@@ -54,6 +57,9 @@ public sealed class ContactMessage : Entity<ContactMessageId>
     /// </summary>
     public string? FailureReason { get; private set; }
 
+    /// <summary>
+    /// Creates a contact message and raises a delivery event.
+    /// </summary>
     public static ContactMessage Create(
         string senderName,
         string senderEmail,
@@ -80,6 +86,9 @@ public sealed class ContactMessage : Entity<ContactMessageId>
         return contactMessage;
     }
 
+    /// <summary>
+    /// Marks the submitted contact email as successfully sent.
+    /// </summary>
     public void MarkEmailSent(DateTimeOffset sentAt)
     {
         Status = ContactMessageStatus.EmailSent;
@@ -87,6 +96,9 @@ public sealed class ContactMessage : Entity<ContactMessageId>
         FailureReason = null;
     }
 
+    /// <summary>
+    /// Marks the submitted contact email as failed with a delivery reason.
+    /// </summary>
     public void MarkEmailFailed(string failureReason)
     {
         Status = ContactMessageStatus.EmailFailed;
