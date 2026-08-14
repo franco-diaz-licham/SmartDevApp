@@ -17,6 +17,9 @@ public sealed record NoteTitle
     /// </summary>
     public string Value { get; }
 
+    /// <summary>
+    /// Creates a validated note title.
+    /// </summary>
     public static NoteTitle Create(string value) => new(Guard.Required(value, "title", MaxLength));
 
     public override string ToString() => Value;
@@ -40,6 +43,9 @@ public sealed record NoteSlug
     /// </summary>
     public string Value { get; }
 
+    /// <summary>
+    /// Creates a validated, lowercase note slug.
+    /// </summary>
     public static NoteSlug Create(string value)
     {
         var slug = Guard.Required(value, "slug", MaxLength).ToLowerInvariant();
@@ -64,6 +70,9 @@ public sealed record NoteSummary
     /// </summary>
     public string Value { get; }
 
+    /// <summary>
+    /// Creates a validated note summary.
+    /// </summary>
     public static NoteSummary Create(string value) => new(Guard.Required(value, "summary", MaxLength));
 
     public override string ToString() => Value;
@@ -84,6 +93,9 @@ public sealed record NoteCategorySlug
     /// </summary>
     public string Value { get; }
 
+    /// <summary>
+    /// Creates a validated, lowercase category slug.
+    /// </summary>
     public static NoteCategorySlug Create(string value)
     {
         var slug = Guard.Required(value, "categorySlug", MaxLength).ToLowerInvariant();
@@ -117,6 +129,9 @@ public sealed record NoteCategorySnapshot
     /// </summary>
     public string DisplayName { get; }
 
+    /// <summary>
+    /// Creates a category snapshot for storage on a note.
+    /// </summary>
     public static NoteCategorySnapshot Create(NoteCategorySlug slug, string displayName)
     {
         return new NoteCategorySnapshot(slug, Guard.Required(displayName, "categoryDisplayName", MaxDisplayNameLength));
@@ -140,6 +155,9 @@ public sealed record MarkdownContent
     /// </summary>
     public string Value { get; }
 
+    /// <summary>
+    /// Creates validated Markdown content.
+    /// </summary>
     public static MarkdownContent Create(string value) => new(Guard.Required(value, "bodyMarkdown", MaxLength));
 
     public override string ToString() => Value;
@@ -160,6 +178,9 @@ public sealed record NoteTagSlug
     /// </summary>
     public string Value { get; }
 
+    /// <summary>
+    /// Creates a validated, lowercase tag slug.
+    /// </summary>
     public static NoteTagSlug Create(string value)
     {
         var normalized = Guard.Required(value, "tagSlug", MaxLength).ToLowerInvariant();
@@ -193,6 +214,9 @@ public sealed record NoteTagSnapshot
     /// </summary>
     public string DisplayName { get; }
 
+    /// <summary>
+    /// Creates a tag snapshot for storage on a note.
+    /// </summary>
     public static NoteTagSnapshot Create(NoteTagSlug slug, string displayName)
     {
         return new NoteTagSnapshot(slug, Guard.Required(displayName, "tagDisplayName", MaxDisplayNameLength));
@@ -223,6 +247,9 @@ public sealed record RelatedProjectReference
     /// </summary>
     public string Label { get; }
 
+    /// <summary>
+    /// Creates a validated related project reference.
+    /// </summary>
     public static RelatedProjectReference Create(string projectId, string label)
     {
         return new RelatedProjectReference(

@@ -2,6 +2,9 @@ using SmartDev.Api.Functions.Domain.Common;
 
 namespace SmartDev.Api.Functions.Domain.Notes;
 
+/// <summary>
+/// Represents an authored note aggregate with content, catalog metadata, and publication state.
+/// </summary>
 public sealed class Note : Entity<NoteId>
 {
     private readonly List<NoteTagSnapshot> _tags = [];
@@ -133,6 +136,9 @@ public sealed class Note : Entity<NoteId>
         string.Join(" ", RelatedProjects.Select(project => project.Label)),
         Body.Value);
 
+    /// <summary>
+    /// Creates a private draft note and raises a creation event.
+    /// </summary>
     public static Note CreateDraft(
         NoteId id,
         NoteTitle title,
@@ -164,6 +170,9 @@ public sealed class Note : Entity<NoteId>
         return note;
     }
 
+    /// <summary>
+    /// Rehydrates a note aggregate from persisted state without raising domain events.
+    /// </summary>
     public static Note Hydrate(
         NoteId id,
         NoteTitle title,
@@ -183,6 +192,9 @@ public sealed class Note : Entity<NoteId>
         return new Note(id, title, slug, summary, category, body, status, visibility, tags, relatedProjects, createdAt, updatedAt, publishedAt, archivedAt);
     }
 
+    /// <summary>
+    /// Changes the note title and route slug.
+    /// </summary>
     public void Rename(NoteTitle title, NoteSlug slug, DateTimeOffset now)
     {
         Title = title;
@@ -190,24 +202,36 @@ public sealed class Note : Entity<NoteId>
         MarkUpdated(now);
     }
 
+    /// <summary>
+    /// Replaces the short summary used in note previews.
+    /// </summary>
     public void UpdateSummary(NoteSummary summary, DateTimeOffset now)
     {
         Summary = summary;
         MarkUpdated(now);
     }
 
+    /// <summary>
+    /// Replaces the Markdown body content.
+    /// </summary>
     public void UpdateBody(MarkdownContent body, DateTimeOffset now)
     {
         Body = body;
         MarkUpdated(now);
     }
 
+    /// <summary>
+    /// Changes the note category snapshot.
+    /// </summary>
     public void ChangeCategory(NoteCategorySnapshot category, DateTimeOffset now)
     {
         Category = category;
         MarkUpdated(now);
     }
 
+    /// <summary>
+    /// Replaces the note tag snapshots with a normalized non-empty set.
+    /// </summary>
     public void ReplaceTags(IEnumerable<NoteTagSnapshot> tags, DateTimeOffset now)
     {
         _tags.Clear();
@@ -215,6 +239,9 @@ public sealed class Note : Entity<NoteId>
         MarkUpdated(now);
     }
 
+    /// <summary>
+    /// Links a related portfolio project when it is not already linked.
+    /// </summary>
     public void LinkProject(RelatedProjectReference project, DateTimeOffset now)
     {
         if (_relatedProjects.Any(existing => string.Equals(existing.ProjectId, project.ProjectId, StringComparison.OrdinalIgnoreCase))) return;
@@ -222,12 +249,18 @@ public sealed class Note : Entity<NoteId>
         MarkUpdated(now);
     }
 
+    /// <summary>
+    /// Removes a related portfolio project link.
+    /// </summary>
     public void UnlinkProject(RelatedProjectReference project, DateTimeOffset now)
     {
         _relatedProjects.RemoveAll(existing => string.Equals(existing.ProjectId, project.ProjectId, StringComparison.OrdinalIgnoreCase));
         MarkUpdated(now);
     }
 
+    /// <summary>
+    /// Publishes the note and makes it publicly visible.
+    /// </summary>
     public void Publish(DateTimeOffset now)
     {
         Status = NoteStatus.Published;
@@ -238,6 +271,9 @@ public sealed class Note : Entity<NoteId>
         RaiseDomainEvent(new NotePublishedEvent(Id, now));
     }
 
+    /// <summary>
+    /// Changes the note lifecycle state and visibility together.
+    /// </summary>
     public void ChangePublication(NoteStatus status, NoteVisibility visibility, DateTimeOffset now)
     {
         if (Status == status && Visibility == visibility) return;
@@ -271,18 +307,27 @@ public sealed class Note : Entity<NoteId>
         }
     }
 
+    /// <summary>
+    /// Restricts the note from public reader experiences.
+    /// </summary>
     public void MakePrivate(DateTimeOffset now)
     {
         Visibility = NoteVisibility.Private;
         MarkUpdated(now);
     }
 
+    /// <summary>
+    /// Allows the note to appear in public reader experiences.
+    /// </summary>
     public void MakePublic(DateTimeOffset now)
     {
         Visibility = NoteVisibility.Public;
         MarkUpdated(now);
     }
 
+    /// <summary>
+    /// Archives the note and raises an archival event.
+    /// </summary>
     public void Archive(DateTimeOffset now)
     {
         Status = NoteStatus.Archived;

@@ -40,6 +40,9 @@ public sealed class NoteCategory : Entity<NoteCategorySlug>
     /// </summary>
     public NoteCategorySnapshot Snapshot => NoteCategorySnapshot.Create(Id, DisplayName);
 
+    /// <summary>
+    /// Creates an active note category.
+    /// </summary>
     public static NoteCategory Create(NoteCategorySlug slug, string displayName, string? description = null, int sortOrder = 0)
     {
         return new NoteCategory(

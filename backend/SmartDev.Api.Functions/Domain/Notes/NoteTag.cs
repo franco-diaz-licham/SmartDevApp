@@ -34,6 +34,9 @@ public sealed class NoteTag : Entity<NoteTagSlug>
     /// </summary>
     public NoteTagSnapshot Snapshot => NoteTagSnapshot.Create(Id, DisplayName);
 
+    /// <summary>
+    /// Creates an active note tag with optional aliases.
+    /// </summary>
     public static NoteTag Create(NoteTagSlug slug, string displayName, IEnumerable<string>? aliases = null)
     {
         return new NoteTag(
