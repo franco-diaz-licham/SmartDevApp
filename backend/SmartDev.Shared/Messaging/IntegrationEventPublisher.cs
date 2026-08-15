@@ -3,10 +3,15 @@ using Azure.Messaging.ServiceBus;
 
 namespace SmartDev.Shared.Messaging;
 
+/// <summary>
+/// Publishes supported integration event models to Azure Service Bus queues.
+/// </summary>
+/// <param name="serviceBusClient">The Service Bus client used to create queue senders.</param>
 public sealed class IntegrationEventPublisher(ServiceBusClient serviceBusClient) : IIntegrationEventPublisher
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
+    /// <inheritdoc />
     public async Task PublishAsync<TIntegrationEventModel>(
         TIntegrationEventModel integrationEventModel,
         CancellationToken cancellationToken = default)
