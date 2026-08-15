@@ -6,8 +6,7 @@ import { useAuth } from '@/features/auth';
 
 const workspaceNavigationItems = [
   { label: 'HOME', href: '/home', visibility: 'public' },
-  { label: 'WORKSPACE', href: '/workspace', visibility: 'public' },
-  { label: 'ADMIN', href: '/admin', visibility: 'authenticated' }
+  { label: 'WORKSPACE', href: '/workspace', visibility: 'public' }
 ] as const;
 
 export const WorkspaceTopBar = () => {

@@ -7,7 +7,6 @@ import { PersonalProjectPage } from '@/features/portfolio/pages/PersonalProjectP
 import { ProfessionalWorkPage } from '@/features/portfolio/pages/ProfessionalWorkPage';
 import { AppShell } from '@/layouts/AppShell';
 import { WorkspaceLayout } from '@/layouts/WorkspaceLayout';
-import { AdminHomePage } from '@/pages/AdminHomePage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export const router = createBrowserRouter([
@@ -34,7 +33,6 @@ export const router = createBrowserRouter([
       {
         element: <RequireAuth />,
         children: [
-          { path: '/admin', element: <AdminHomePage /> },
           { path: '/workspace/notes/new', element: <NoteArticlePage /> }
         ]
       }
