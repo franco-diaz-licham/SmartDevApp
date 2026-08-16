@@ -14,14 +14,14 @@ const getSafeReturnPath = (value: string | null) => {
 
 export const LoginPage = () => {
   const [searchParams] = useSearchParams();
-  const { isAuthenticated, isAuthReady, interactionInProgress, login } = useAuth();
+  const { isSignedIn, isAuthReady, interactionInProgress, login } = useAuth();
   const returnTo = getSafeReturnPath(searchParams.get('returnTo'));
 
   useEffect(() => {
     document.title = `Sign in | ${appConfig.appName}`;
   }, []);
 
-  if (isAuthenticated) return <Navigate to={returnTo} replace />;
+  if (isSignedIn) return <Navigate to={returnTo} replace />;
 
   const handleLogin = () => {
     void login(returnTo);

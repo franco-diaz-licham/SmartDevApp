@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth, LoginPage } from '@/features/auth';
+import { NoteArticlePageSkeleton } from '@/features/notes/components/NoteArticlePageSkeleton';
 import { HomePage } from '@/features/home/pages/HomePage';
 import { PersonalProjectPage } from '@/features/portfolio/pages/PersonalProjectPage';
 import { ProfessionalWorkPage } from '@/features/portfolio/pages/ProfessionalWorkPage';
@@ -30,7 +31,7 @@ export const router = createBrowserRouter([
       { path: '/notes', element: <Navigate to="/workspace" replace /> },
       { path: '/workspace/notes/:noteId', element: <NoteArticlePageRoute /> },
       {
-        element: <RequireAuth />,
+        element: <RequireAuth fallback={<NoteArticlePageSkeleton />} />,
         children: [{ path: '/workspace/notes/new', element: <NoteArticlePageRoute /> }]
       }
     ]

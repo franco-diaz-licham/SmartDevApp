@@ -6,8 +6,11 @@ interface AuthState {
   account: AuthAccount | null;
   hasInitialised: boolean;
   interactionInProgress: boolean;
+  isMasqueradingAsPublic: boolean;
   initialiseAuth: () => Promise<void>;
   syncAccount: () => void;
+  startPublicMasquerade: () => void;
+  stopPublicMasquerade: () => void;
   login: (redirectStartPage?: string) => Promise<void>;
   logout: () => Promise<void>;
   getAccessToken: () => Promise<string | null>;
@@ -17,9 +20,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   account: null,
   hasInitialised: false,
   interactionInProgress: false,
+  isMasqueradingAsPublic: false,
 
   syncAccount: () => {
     set({ account: authProvider.getCurrentAccount() });
+  },
+
+  startPublicMasquerade: () => {
+    if (!get().account) return;
+    set({ isMasqueradingAsPublic: true });
+  },
+
+  stopPublicMasquerade: () => {
+    set({ isMasqueradingAsPublic: false });
   },
 
   initialiseAuth: async () => {
@@ -59,7 +72,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (err) {
       if (!authProvider.isInteractionInProgressError(err)) throw err;
     } finally {
-      set({ interactionInProgress: false });
+      set({ interactionInProgress: false, isMasqueradingAsPublic: false });
     }
   },
 

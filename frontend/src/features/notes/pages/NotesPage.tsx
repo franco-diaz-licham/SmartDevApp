@@ -11,12 +11,12 @@ import { allNotesCategory, getFilteredNotes, getNoteCategories } from '../utils/
 export const NotesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(allNotesCategory);
   const [searchTerm, setSearchTerm] = useState('');
-  const { isAuthReady, isPublicView } = useAuth();
+  const { isAuthReady, isSignedIn } = useAuth();
 
   const notesQueryParams = useMemo(() => ({ pageSize: 30 }), []);
-  const publicNotesQuery = usePublicNotesQuery(notesQueryParams, !isAuthReady || isPublicView);
-  const ownerNotesQuery = useOwnerNotesQuery(notesQueryParams, isAuthReady && !isPublicView);
-  const notesQuery = isAuthReady && !isPublicView ? ownerNotesQuery : publicNotesQuery;
+  const publicNotesQuery = usePublicNotesQuery(notesQueryParams, isAuthReady && !isSignedIn);
+  const ownerNotesQuery = useOwnerNotesQuery(notesQueryParams, isAuthReady && isSignedIn);
+  const notesQuery = isSignedIn ? ownerNotesQuery : publicNotesQuery;
 
   useEffect(() => {
     document.title = `Notes | ${appConfig.appName}`;
@@ -34,7 +34,7 @@ export const NotesPage = () => {
     void notesQuery.fetchNextPage();
   };
 
-  if (notesQuery.isLoading) return <NotesPageSkeleton />;
+  if (!isAuthReady || notesQuery.isLoading) return <NotesPageSkeleton />;
 
   return (
     <WorkspacePageWrapper>

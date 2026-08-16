@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import { AppInlineEditSurface } from '@/components/ui/AppInlineEditSurface';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
-import { NoteArticleContentSkeleton } from './NoteArticlePageSkeleton';
+import { NoteArticleContentSkeleton } from './NoteArticleContentSkeleton';
 import { NoteMarkdown } from './NoteMarkdown';
 import type { NoteEntryFormController } from '../hooks/useNoteEntryForm';
 import type { PublicNoteDetailModel } from '../types/note.types';

@@ -17,7 +17,7 @@ const navigationItems = [
 
 export const AppTopBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, isAuthReady, interactionInProgress, logout } = useAuth();
+  const { isAuthReady, isMasqueradingAsPublic, isPublicView, isSignedIn, interactionInProgress, logout, startPublicMasquerade, stopPublicMasquerade } = useAuth();
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -28,7 +28,13 @@ export const AppTopBar = () => {
     void logout();
   };
 
-  const visibleNavigationItems = navigationItems.filter((item) => item.visibility === 'always' || (isAuthReady && (item.visibility === 'authenticated' ? isAuthenticated : !isAuthenticated)));
+  const handlePublicViewToggle = () => {
+    closeMenu();
+    if (isMasqueradingAsPublic) stopPublicMasquerade();
+    else startPublicMasquerade();
+  };
+
+  const visibleNavigationItems = navigationItems.filter((item) => item.visibility === 'always' || (isAuthReady && (item.visibility === 'authenticated' ? !isPublicView : isPublicView)));
 
   return (
     <header className="sticky top-0 z-50 bg-muted">
@@ -55,6 +61,13 @@ export const AppTopBar = () => {
               )}
             </li>
           ))}
+          {isAuthReady && isSignedIn && (
+            <li>
+              <button className="block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline lg:py-0" type="button" onClick={handlePublicViewToggle}>
+                {isMasqueradingAsPublic ? 'EXIT PUBLIC VIEW' : 'PREVIEW PUBLIC VIEW'}
+              </button>
+            </li>
+          )}
         </ul>
       </nav>
     </header>

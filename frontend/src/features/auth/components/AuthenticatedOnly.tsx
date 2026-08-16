@@ -7,7 +7,7 @@ interface AuthenticatedOnlyProps {
 }
 
 export const AuthenticatedOnly = ({ children, when = true }: AuthenticatedOnlyProps) => {
-  const { isAuthenticated, isAuthReady } = useAuth();
-  if (!isAuthReady || !isAuthenticated || !when) return null;
+  const { isAuthReady, isPublicView } = useAuth();
+  if (!isAuthReady || isPublicView || !when) return null;
   return children;
 };

@@ -1,19 +1,17 @@
+import type { ReactNode } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-export const RequireAuth = () => {
+interface RequireAuthProps {
+  fallback?: ReactNode;
+}
+
+export const RequireAuth = ({ fallback = null }: RequireAuthProps) => {
   const location = useLocation();
-  const { isAuthenticated, isAuthReady } = useAuth();
+  const { isAuthReady, isSignedIn } = useAuth();
 
-  if (!isAuthReady) {
-    return (
-      <main className="min-h-screen bg-background px-4 py-16">
-        <div className="mx-auto h-20 max-w-5xl animate-pulse rounded-md border border-border bg-muted" />
-      </main>
-    );
-  }
-
-  if (!isAuthenticated) {
+  if (!isAuthReady) return fallback;
+  if (!isSignedIn) {
     const returnTo = `${location.pathname}${location.search}${location.hash}`;
     return <Navigate to={`/login?returnTo=${encodeURIComponent(returnTo)}`} replace />;
   }

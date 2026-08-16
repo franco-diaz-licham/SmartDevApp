@@ -5,6 +5,7 @@ import { WorkspacePageWrapper } from '@/components/common/WorkspacePageWrapper';
 import { useAuth } from '@/features/auth';
 import { NoteArticleContent } from '../components/NoteArticleContent';
 import { NoteArticleMetadataPane } from '../components/NoteArticleMetadataPane';
+import { NoteArticlePageSkeleton } from '../components/NoteArticlePageSkeleton';
 import { NotesSectionsPane } from '../components/NotesSectionsPane';
 import { useNoteEntryForm, type EditableNoteEntryField, type NoteEntryFormController } from '../hooks/useNoteEntryForm';
 import { useCreateNoteMutation, useUpdateNoteMutation } from '../queries/note.mutations';
@@ -17,24 +18,21 @@ export const NoteArticlePage = () => {
   const navigate = useNavigate();
   const newArticleMatch = useMatch('/workspace/notes/new');
   const { noteId = '' } = useParams();
-  const { isAuthenticated, isAuthReady } = useAuth();
+  const { isAuthReady, isSignedIn } = useAuth();
   const isNewArticle = Boolean(newArticleMatch);
   const hasNoteId = noteId.trim().length > 0;
-  const canUseOwnerNote = isAuthReady && isAuthenticated && hasNoteId;
-  const canReadPublicNote = isAuthReady && !isAuthenticated && hasNoteId;
-  const canEditArticle = isAuthReady && isAuthenticated && (isNewArticle || hasNoteId);
   const form = useNoteEntryForm();
   const { draft, draftNote } = form;
   const { getValidForm, reset, resetFromNote, updateField } = form;
-  const publicNoteQuery = usePublicNoteQuery(noteId, canReadPublicNote);
-  const ownerNoteQuery = useOwnerNoteQuery(noteId, canUseOwnerNote);
+  const publicNoteQuery = usePublicNoteQuery(noteId, isAuthReady && hasNoteId && !isSignedIn);
+  const ownerNoteQuery = useOwnerNoteQuery(noteId, isAuthReady && hasNoteId && isSignedIn);
   const createNoteMutation = useCreateNoteMutation();
   const updateNoteMutation = useUpdateNoteMutation(noteId);
   const activeMutation = isNewArticle ? createNoteMutation : updateNoteMutation;
-  const noteQuery = canUseOwnerNote ? ownerNoteQuery : publicNoteQuery;
+  const noteQuery = isSignedIn ? ownerNoteQuery : publicNoteQuery;
   const persistedNote = isNewArticle ? undefined : noteQuery.data;
   const note = isNewArticle ? draftNote : persistedNote;
-  const articleMarkdown = canEditArticle ? draft.bodyMarkdown : (note?.bodyMarkdown ?? '');
+  const articleMarkdown = isSignedIn ? draft.bodyMarkdown : (note?.bodyMarkdown ?? '');
   const sections = useMemo(() => getNoteSections(articleMarkdown), [articleMarkdown]);
 
   useEffect(() => {
@@ -42,13 +40,13 @@ export const NoteArticlePage = () => {
   }, [isNewArticle, note?.title]);
 
   useEffect(() => {
-    if (!persistedNote || !hasNoteId || !canEditArticle) return;
+    if (!persistedNote || !hasNoteId || !isSignedIn) return;
 
     resetFromNote(persistedNote);
-  }, [canEditArticle, hasNoteId, persistedNote, resetFromNote]);
+  }, [hasNoteId, isSignedIn, persistedNote, resetFromNote]);
 
   const handleEditField = (field: EditableNoteEntryField) => {
-    if (!canEditArticle) return;
+    if (!isSignedIn) return;
     setSavedMessage('');
     setEditingField(field);
   };
@@ -66,7 +64,7 @@ export const NoteArticlePage = () => {
 
   const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!canEditArticle) return;
+    if (!isSignedIn) return;
     setSavedMessage('');
     const entry = getValidForm();
     if (!entry) return;
@@ -104,17 +102,19 @@ export const NoteArticlePage = () => {
     updateField
   };
 
+  if (!isAuthReady || (!isNewArticle && noteQuery.isLoading)) return <NoteArticlePageSkeleton />;
+
   const content = (
     <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 overflow-hidden lg:grid-cols-[17rem_minmax(0,1fr)] xl:grid-cols-[17rem_minmax(0,1fr)_18rem]">
       <NotesSectionsPane sections={sections} />
-      <NoteArticleContent form={canEditArticle ? formController : undefined} isEditable={canEditArticle} isLoading={!isNewArticle && noteQuery.isLoading} isError={!isNewArticle && noteQuery.isError} note={note} />
-      <NoteArticleMetadataPane form={canEditArticle ? formController : undefined} isEditable={canEditArticle} note={note} />
+      <NoteArticleContent form={isSignedIn ? formController : undefined} isEditable={isSignedIn} isLoading={!isNewArticle && noteQuery.isLoading} isError={!isNewArticle && noteQuery.isError} note={note} />
+      <NoteArticleMetadataPane form={isSignedIn ? formController : undefined} isEditable={isSignedIn} note={note} />
     </div>
   );
 
   return (
     <WorkspacePageWrapper>
-      {canEditArticle ? (
+      {isSignedIn ? (
         <form className="h-full min-h-0" onSubmit={handleSave}>
           {content}
         </form>

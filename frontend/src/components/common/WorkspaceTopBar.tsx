@@ -11,7 +11,7 @@ const workspaceNavigationItems = [
 
 export const WorkspaceTopBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { interactionInProgress, isAuthenticated, isAuthReady, logout } = useAuth();
+  const { interactionInProgress, isAuthReady, isMasqueradingAsPublic, isPublicView, isSignedIn, logout, startPublicMasquerade, stopPublicMasquerade } = useAuth();
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -20,6 +20,12 @@ export const WorkspaceTopBar = () => {
   const handleLogout = () => {
     closeMenu();
     void logout();
+  };
+
+  const handlePublicViewToggle = () => {
+    closeMenu();
+    if (isMasqueradingAsPublic) stopPublicMasquerade();
+    else startPublicMasquerade();
   };
 
   return (
@@ -35,7 +41,7 @@ export const WorkspaceTopBar = () => {
 
         <ul id="workspace-navigation" className={`ml-4 basis-full flex-col gap-y-2 pt-3 font-bold lg:flex lg:basis-auto lg:flex-row lg:justify-end lg:gap-x-6 lg:pt-0 ${isMenuOpen ? 'flex' : 'hidden'}`}>
           {workspaceNavigationItems
-            .filter((item) => item.visibility === 'public' || (isAuthReady && isAuthenticated))
+            .filter((item) => item.visibility === 'public' || (isAuthReady && !isPublicView))
             .map((item) => (
               <li key={item.href}>
                 <a className="block py-2 no-underline hover:underline lg:py-0" href={item.href} onClick={closeMenu}>
@@ -44,7 +50,15 @@ export const WorkspaceTopBar = () => {
               </li>
             ))}
 
-          {isAuthReady && isAuthenticated ? (
+          {isAuthReady && isSignedIn && (
+            <li>
+              <button className="block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline lg:py-0" type="button" onClick={handlePublicViewToggle}>
+                {isMasqueradingAsPublic ? 'EXIT PUBLIC VIEW' : 'PREVIEW PUBLIC VIEW'}
+              </button>
+            </li>
+          )}
+
+          {isAuthReady && !isPublicView ? (
             <li>
               <button className="block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline disabled:cursor-not-allowed disabled:opacity-60 lg:py-0" type="button" disabled={interactionInProgress} onClick={handleLogout}>
                 LOG OUT
