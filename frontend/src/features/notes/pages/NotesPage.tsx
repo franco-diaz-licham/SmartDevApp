@@ -4,18 +4,19 @@ import { WorkspacePageWrapper } from '@/components/common/WorkspacePageWrapper';
 import { useAuth } from '@/features/auth';
 import { NotesCategoryPane } from '../components/NotesCategoryPane';
 import { NotesMainContent } from '../components/NotesMainContent';
+import { NotesPageSkeleton } from '../components/NotesPageSkeleton';
 import { useOwnerNotesQuery, usePublicNotesQuery } from '../queries/note.queries';
 import { allNotesCategory, getFilteredNotes, getNoteCategories } from '../utils/noteContent';
 
 export const NotesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(allNotesCategory);
   const [searchTerm, setSearchTerm] = useState('');
-  const { isAuthenticated, isAuthReady } = useAuth();
+  const { isAuthReady, isPublicView } = useAuth();
 
   const notesQueryParams = useMemo(() => ({ pageSize: 30 }), []);
-  const publicNotesQuery = usePublicNotesQuery(notesQueryParams, !isAuthReady || !isAuthenticated);
-  const ownerNotesQuery = useOwnerNotesQuery(notesQueryParams, isAuthReady && isAuthenticated);
-  const notesQuery = isAuthReady && isAuthenticated ? ownerNotesQuery : publicNotesQuery;
+  const publicNotesQuery = usePublicNotesQuery(notesQueryParams, !isAuthReady || isPublicView);
+  const ownerNotesQuery = useOwnerNotesQuery(notesQueryParams, isAuthReady && !isPublicView);
+  const notesQuery = isAuthReady && !isPublicView ? ownerNotesQuery : publicNotesQuery;
 
   useEffect(() => {
     document.title = `Notes | ${appConfig.appName}`;
@@ -32,6 +33,8 @@ export const NotesPage = () => {
   const handleLoadMore = () => {
     void notesQuery.fetchNextPage();
   };
+
+  if (notesQuery.isLoading) return <NotesPageSkeleton />;
 
   return (
     <WorkspacePageWrapper>

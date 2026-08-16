@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { ChangeEvent } from 'react';
+import { WorkspaceSkeletonBlock } from '@/components/common/WorkspaceSkeletonBlock';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AuthenticatedOnly } from '@/features/auth';
@@ -15,6 +16,21 @@ interface NotesMainContentProps {
   onSearchTermChange: (searchTerm: string) => void;
   onLoadMore: () => void;
 }
+
+const inlineSkeletonRows = Array.from({ length: 3 }, (_, index) => index);
+
+const NotesListInlineSkeleton = () => (
+  <>
+    {inlineSkeletonRows.map((row) => (
+      <div key={row} className="rounded-md border border-border bg-muted/30 p-4">
+        <WorkspaceSkeletonBlock width="35%" height="1rem" className="bg-primary/15" />
+        <WorkspaceSkeletonBlock width="70%" height="1.5rem" className="mt-4" />
+        <WorkspaceSkeletonBlock height="1rem" className="mt-5" />
+        <WorkspaceSkeletonBlock width="85%" height="1rem" className="mt-3" />
+      </div>
+    ))}
+  </>
+);
 
 export const NotesMainContent = ({ notes, searchTerm, isNotesLoading, isNotesError, hasNextPage, isFetchingNextPage, onSearchTermChange, onLoadMore }: NotesMainContentProps) => (
   <section className="h-full min-h-0 min-w-0 overflow-y-auto">
@@ -42,7 +58,7 @@ export const NotesMainContent = ({ notes, searchTerm, isNotesLoading, isNotesErr
       </div>
 
       <div className="mt-6 grid gap-3">
-        {isNotesLoading && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">Loading notes...</p>}
+        {isNotesLoading && <NotesListInlineSkeleton />}
         {isNotesError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Notes could not be loaded.</p>}
         {notes.map((note) => (
           <Link
@@ -66,9 +82,10 @@ export const NotesMainContent = ({ notes, searchTerm, isNotesLoading, isNotesErr
         {!isNotesLoading && notes.length === 0 && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">No notes match this view.</p>}
         {hasNextPage && (
           <AppButton appearance="secondary" className="mb-0 mt-0 w-full px-4 py-3 text-sm font-extrabold" type="button" disabled={isFetchingNextPage} onClick={onLoadMore}>
-            {isFetchingNextPage ? 'Loading...' : 'Load more notes'}
+            Load more notes
           </AppButton>
         )}
+        {isFetchingNextPage && <NotesListInlineSkeleton />}
       </div>
     </div>
   </section>
