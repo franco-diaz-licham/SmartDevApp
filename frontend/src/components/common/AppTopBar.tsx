@@ -16,8 +16,11 @@ const navigationItems = [
 ] as const;
 
 export const AppTopBar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthReady, isPublicView, interactionInProgress, logout } = useAuth();
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const visibleNavigationItems = navigationItems.filter((item) => item.visibility === 'always' || (isAuthReady && (item.visibility === 'authenticated' ? !isPublicView : isPublicView)));
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -27,8 +30,6 @@ export const AppTopBar = () => {
     closeMenu();
     void logout();
   };
-
-  const visibleNavigationItems = navigationItems.filter((item) => item.visibility === 'always' || (isAuthReady && (item.visibility === 'authenticated' ? !isPublicView : isPublicView)));
 
   return (
     <header className="sticky top-0 z-50 bg-muted">

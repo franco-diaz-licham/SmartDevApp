@@ -44,7 +44,9 @@ export const NotesMainContent = ({ notes, searchTerm, isNotesLoading, isNotesErr
 
       <div className="mt-6 grid gap-3">
         {isNotesLoading && <NotesListSkeleton />}
+
         {isNotesError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Notes could not be loaded.</p>}
+
         {notes.map((note) => (
           <Link
             key={note.id}
@@ -65,11 +67,13 @@ export const NotesMainContent = ({ notes, searchTerm, isNotesLoading, isNotesErr
         ))}
 
         {!isNotesLoading && notes.length === 0 && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">No notes match this view.</p>}
+
         {hasNextPage && (
           <AppButton appearance="secondary" className="mb-0 mt-0 w-full px-4 py-3 text-sm font-extrabold" type="button" disabled={isFetchingNextPage} onClick={onLoadMore}>
             Load more notes
           </AppButton>
         )}
+
         {isFetchingNextPage && <NotesListSkeleton />}
       </div>
     </div>

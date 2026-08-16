@@ -21,6 +21,10 @@ const getInputValue = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement
 export const NoteArticleContent = ({ form, isEditable = false, note, isLoading, isError }: NoteArticleContentProps) => {
   const bodyEditorRef = useRef<HTMLDivElement>(null);
 
+  const titleValue = form?.values.title ?? note?.title;
+  const summaryValue = form?.values.summary ?? note?.summary;
+  const bodyMarkdownValue = form?.values.bodyMarkdown ?? note?.bodyMarkdown;
+
   const handleBodyEdit = () => {
     form?.editField('bodyMarkdown');
   };
@@ -47,8 +51,8 @@ export const NoteArticleContent = ({ form, isEditable = false, note, isLoading, 
               error={form?.errors.title}
               name="title"
               required={isEditable}
-              readValue={form?.values.title ?? note.title}
-              value={form?.values.title ?? note.title}
+              readValue={titleValue}
+              value={titleValue}
               onBlur={form?.blurField}
               onChange={(event: ChangeEvent<HTMLInputElement>) => {
                 form?.updateField('title', getInputValue(event));
@@ -65,8 +69,8 @@ export const NoteArticleContent = ({ form, isEditable = false, note, isLoading, 
               error={form?.errors.summary}
               name="summary"
               required={isEditable}
-              readValue={form?.values.summary ?? note.summary}
-              value={form?.values.summary ?? note.summary}
+              readValue={summaryValue}
+              value={summaryValue}
               onBlur={form?.blurField}
               onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
                 form?.updateField('summary', getInputValue(event));
@@ -85,7 +89,7 @@ export const NoteArticleContent = ({ form, isEditable = false, note, isLoading, 
                 error={form?.errors.bodyMarkdown}
                 name="bodyMarkdown"
                 required={isEditable}
-                value={form?.values.bodyMarkdown ?? note.bodyMarkdown}
+                value={bodyMarkdownValue}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
                   form?.updateField('bodyMarkdown', getInputValue(event));
                 }}
@@ -94,7 +98,7 @@ export const NoteArticleContent = ({ form, isEditable = false, note, isLoading, 
           ) : (
             <AppInlineEditSurface className="mt-3" disabled={!isEditable} iconClassName="top-2 size-4 translate-y-0" onEdit={handleBodyEdit}>
               <div className="space-y-6 pb-16">
-                <NoteMarkdown markdown={form?.values.bodyMarkdown ?? note.bodyMarkdown} />
+                <NoteMarkdown markdown={bodyMarkdownValue ?? ''} />
               </div>
             </AppInlineEditSurface>
           )}

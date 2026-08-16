@@ -9,22 +9,23 @@ import { useOwnerNotesQuery, usePublicNotesQuery } from '../queries/note.queries
 import { allNotesCategory, getFilteredNotes, getNoteCategories } from '../utils/noteContent';
 
 export const NotesPage = () => {
+  const { isAuthReady, isPublicView } = useAuth();
+
   const [selectedCategory, setSelectedCategory] = useState(allNotesCategory);
   const [searchTerm, setSearchTerm] = useState('');
-  const { isAuthReady, isPublicView } = useAuth();
 
   const notesQueryParams = useMemo(() => ({ pageSize: 30 }), []);
   const publicNotesQuery = usePublicNotesQuery(notesQueryParams, isAuthReady && isPublicView);
   const ownerNotesQuery = useOwnerNotesQuery(notesQueryParams, isAuthReady && !isPublicView);
   const notesQuery = isPublicView ? publicNotesQuery : ownerNotesQuery;
 
-  useEffect(() => {
-    document.title = `Notes | ${appConfig.appName}`;
-  }, []);
-
   const notes = useMemo(() => notesQuery.data?.pages.flatMap((page) => page.items) ?? [], [notesQuery.data]);
   const categories = useMemo(() => getNoteCategories(notes), [notes]);
   const filteredNotes = useMemo(() => getFilteredNotes(notes, selectedCategory, searchTerm), [notes, searchTerm, selectedCategory]);
+
+  useEffect(() => {
+    document.title = `Notes | ${appConfig.appName}`;
+  }, []);
 
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);

@@ -20,6 +20,15 @@ const visibilitySelectOptions = noteVisibilityOptions.map((visibility) => ({ lab
 
 export const NoteArticleMetadataPane = ({ form, isEditable = false, note }: NoteArticleMetadataPaneProps) => {
   const tagNames = form?.values.tags ?? note?.tags.map((tag) => tag.displayName).join(', ') ?? '';
+  const tagBadges = tagNames
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length > 0)
+    .map((tag) => (
+      <span key={tag} className="rounded bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
+        {tag}
+      </span>
+    ));
 
   return (
     <aside className="min-h-0 overflow-y-auto border-t border-border px-5 py-6 lg:border-l lg:border-t-0 xl:px-6">
@@ -114,15 +123,7 @@ export const NoteArticleMetadataPane = ({ form, isEditable = false, note }: Note
             label="Tags"
             name="tags"
             required={isEditable}
-            readValue={tagNames
-              .split(',')
-              .map((tag) => tag.trim())
-              .filter((tag) => tag.length > 0)
-              .map((tag) => (
-                <span key={tag} className="rounded bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
-                  {tag}
-                </span>
-              ))}
+            readValue={tagBadges}
             value={tagNames}
             onBlur={form?.blurField}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {

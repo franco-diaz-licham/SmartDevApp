@@ -10,8 +10,11 @@ const workspaceNavigationItems = [
 ] as const;
 
 export const WorkspaceTopBar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { interactionInProgress, isAuthReady, isMasqueradingAsPublic, isPublicView, isSignedIn, logout, startPublicMasquerade, stopPublicMasquerade } = useAuth();
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const visibleNavigationItems = workspaceNavigationItems.filter((item) => item.visibility === 'public' || (isAuthReady && !isPublicView));
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -40,15 +43,13 @@ export const WorkspaceTopBar = () => {
         </button>
 
         <ul id="workspace-navigation" className={`ml-4 basis-full flex-col gap-y-2 pt-3 font-bold lg:flex lg:basis-auto lg:flex-row lg:justify-end lg:gap-x-6 lg:pt-0 ${isMenuOpen ? 'flex' : 'hidden'}`}>
-          {workspaceNavigationItems
-            .filter((item) => item.visibility === 'public' || (isAuthReady && !isPublicView))
-            .map((item) => (
-              <li key={item.href}>
-                <a className="block py-2 no-underline hover:underline lg:py-0" href={item.href} onClick={closeMenu}>
-                  {item.label}
-                </a>
-              </li>
-            ))}
+          {visibleNavigationItems.map((item) => (
+            <li key={item.href}>
+              <a className="block py-2 no-underline hover:underline lg:py-0" href={item.href} onClick={closeMenu}>
+                {item.label}
+              </a>
+            </li>
+          ))}
 
           {isAuthReady && isSignedIn && (
             <li>
