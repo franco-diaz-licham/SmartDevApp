@@ -18,6 +18,14 @@ export const noteKeys = {
   publicSearchIndex: () => [...noteKeys.all, 'public-search-index'] as const
 };
 
+/**
+ * Loads the public notes feed as an infinite query.
+ *
+ * @param query - Optional filters, search terms, sorting, and page sizing.
+ * @param enabled - Set to false when the current route or auth mode should not
+ * issue a public feed request.
+ * @returns React Query infinite-query state for mapped public note list pages.
+ */
 export const usePublicNotesQuery = (query: BaseQuery = {}, enabled = true) => {
   const initialQuery = {
     pageSize: 20,
@@ -43,6 +51,14 @@ export const usePublicNotesQuery = (query: BaseQuery = {}, enabled = true) => {
   });
 };
 
+/**
+ * Loads the signed-in owner's notes feed as an infinite query.
+ *
+ * @param query - Optional filters, search terms, sorting, and page sizing.
+ * @param enabled - Set to false when public preview mode is active or auth is
+ * not ready.
+ * @returns React Query infinite-query state for mapped owner note list pages.
+ */
 export const useOwnerNotesQuery = (query: BaseQuery = {}, enabled = true) => {
   const initialQuery = {
     pageSize: 20,
@@ -68,6 +84,12 @@ export const useOwnerNotesQuery = (query: BaseQuery = {}, enabled = true) => {
   });
 };
 
+/**
+ * Searches public notes when a non-empty search term is present.
+ *
+ * @param query - Public note query values that include the search term.
+ * @returns React Query state for mapped public note search results.
+ */
 export const usePublicNoteSearchQuery = (query: BaseQuery) =>
   useQuery({
     queryKey: noteKeys.publicSearch(query),
@@ -81,6 +103,13 @@ export const usePublicNoteSearchQuery = (query: BaseQuery) =>
     enabled: Boolean(query.searchTerm?.trim())
   });
 
+/**
+ * Loads one public note detail by id.
+ *
+ * @param noteId - Note identifier from the route.
+ * @param enabled - Set to false when owner mode is active or auth is not ready.
+ * @returns React Query state for the mapped public note detail.
+ */
 export const usePublicNoteQuery = (noteId: string, enabled = true) =>
   useQuery({
     queryKey: noteKeys.publicDetail(noteId),
@@ -88,6 +117,12 @@ export const usePublicNoteQuery = (noteId: string, enabled = true) =>
     enabled: enabled && noteId.trim().length > 0
   });
 
+/**
+ * Loads one owner note detail in editable entry form shape.
+ *
+ * @param noteId - Note identifier from the route.
+ * @returns React Query state for the mapped editable note entry.
+ */
 export const useOwnerNoteEntryQuery = (noteId: string) =>
   useQuery({
     queryKey: noteKeys.ownerEntry(noteId),
@@ -95,6 +130,14 @@ export const useOwnerNoteEntryQuery = (noteId: string) =>
     enabled: noteId.trim().length > 0
   });
 
+/**
+ * Loads one owner note detail by id.
+ *
+ * @param noteId - Note identifier from the route.
+ * @param enabled - Set to false when public preview mode is active or auth is
+ * not ready.
+ * @returns React Query state for the mapped owner note detail.
+ */
 export const useOwnerNoteQuery = (noteId: string, enabled = true) =>
   useQuery({
     queryKey: noteKeys.ownerDetail(noteId),
@@ -102,18 +145,35 @@ export const useOwnerNoteQuery = (noteId: string, enabled = true) =>
     enabled: enabled && noteId.trim().length > 0
   });
 
+/**
+ * Loads public note categories used by note navigation and filters.
+ *
+ * @param query - Optional paging or filtering values for category results.
+ * @returns React Query state for public note categories.
+ */
 export const usePublicNoteCategoriesQuery = (query: BaseQuery = {}) =>
   useQuery({
     queryKey: noteKeys.publicCategories(query),
     queryFn: () => noteService.getPublicNoteCategories(query)
   });
 
+/**
+ * Loads public note tags used by note navigation and filters.
+ *
+ * @param query - Optional paging or filtering values for tag results.
+ * @returns React Query state for public note tags.
+ */
 export const usePublicNoteTagsQuery = (query: BaseQuery = {}) =>
   useQuery({
     queryKey: noteKeys.publicTags(query),
     queryFn: () => noteService.getPublicNoteTags(query)
   });
 
+/**
+ * Loads the public search index used for fast client-side note discovery.
+ *
+ * @returns React Query state for the mapped public note search index.
+ */
 export const usePublicNoteSearchIndexQuery = () =>
   useQuery({
     queryKey: noteKeys.publicSearchIndex(),

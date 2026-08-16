@@ -20,6 +20,12 @@ export type AppToastContextValue = {
 
 export const AppToastContext = createContext<AppToastContextValue | null>(null);
 
+/**
+ * Reads the app toast API from context.
+ *
+ * @returns Toast commands for showing intent-specific app notifications.
+ * @throws When used outside of AppToastProvider.
+ */
 export const useAppToast = () => {
   const context = useContext(AppToastContext);
   if (!context) throw new Error('useAppToast must be used within AppToastProvider.');
