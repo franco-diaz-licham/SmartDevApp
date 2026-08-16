@@ -16,6 +16,8 @@ interface AuthState {
   getAccessToken: () => Promise<string | null>;
 }
 
+let initialiseAuthPromise: Promise<void> | null = null;
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   account: null,
   hasInitialised: false,
@@ -36,18 +38,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   initialiseAuth: async () => {
-    set({ interactionInProgress: true });
+    if (get().hasInitialised) return;
+    if (initialiseAuthPromise) return initialiseAuthPromise;
 
-    try {
-      await authProvider.initialize();
-      await authProvider.handleRedirect();
-    } finally {
-      set({
-        account: authProvider.getCurrentAccount(),
-        hasInitialised: true,
-        interactionInProgress: false
-      });
-    }
+    initialiseAuthPromise = (async () => {
+      set({ interactionInProgress: true });
+
+      try {
+        await authProvider.initialize();
+        await authProvider.handleRedirect();
+      } finally {
+        set({
+          account: authProvider.getCurrentAccount(),
+          hasInitialised: true,
+          interactionInProgress: false
+        });
+        initialiseAuthPromise = null;
+      }
+    })();
+
+    return initialiseAuthPromise;
   },
 
   login: async (redirectStartPage) => {
