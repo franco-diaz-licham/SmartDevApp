@@ -73,7 +73,7 @@ export const NoteArticlePage = () => {
     event.preventDefault();
     if (isPublicView) return;
     setSavedMessage('');
-    const entry = getValidForm();
+    const entry = await getValidForm();
     if (!entry) return;
 
     try {

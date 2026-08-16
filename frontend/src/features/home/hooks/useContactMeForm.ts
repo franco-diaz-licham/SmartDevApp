@@ -1,8 +1,15 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, useWatch } from 'react-hook-form';
+import type { Path, PathValue } from 'react-hook-form';
 import { contactMeFormSchema, type ContactMeFormErrors, type ContactMeFormValues } from '../types/contactMeForm.schema';
 
 type ContactMeTouchedFields = Partial<Record<keyof ContactMeFormValues, boolean>>;
 
+/**
+ * Returns the controlled contact form defaults, including the hidden honeypot
+ * field submitted to the backend for spam detection.
+ */
 const createEmptyContactMeForm = (): ContactMeFormValues => ({
   name: '',
   email: '',
@@ -10,17 +17,10 @@ const createEmptyContactMeForm = (): ContactMeFormValues => ({
   companyWebsite: ''
 });
 
-const getContactMeFormErrors = (draft: ContactMeFormValues): ContactMeFormErrors => {
-  const result = contactMeFormSchema.safeParse(draft);
-  if (result.success) return {};
-
-  return result.error.issues.reduce<ContactMeFormErrors>((errors, issue) => {
-    const field = issue.path[0] as keyof ContactMeFormValues | undefined;
-    if (field && !errors[field]) errors[field] = issue.message;
-    return errors;
-  }, {});
-};
-
+/**
+ * Keeps validation messages hidden until fields are touched, then reveals all
+ * current validation errors after a submit attempt.
+ */
 const getVisibleContactMeFormErrors = (validationErrors: ContactMeFormErrors, touchedFields: ContactMeTouchedFields, hasSubmitted: boolean): ContactMeFormErrors => {
   if (hasSubmitted) return validationErrors;
 
@@ -31,30 +31,62 @@ const getVisibleContactMeFormErrors = (validationErrors: ContactMeFormErrors, to
   }, {});
 };
 
+/**
+ * Manages the contact form with react-hook-form and Zod validation while keeping
+ * the component API simple: draft values, visible errors, reset, and submit.
+ *
+ * @returns Draft contact values, visible validation errors, validity state, and
+ * commands for submitting, resetting, and updating fields.
+ */
 export const useContactMeForm = () => {
-  const [draft, setDraft] = useState<ContactMeFormValues>(() => createEmptyContactMeForm());
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [touchedFields, setTouchedFields] = useState<ContactMeTouchedFields>({});
+  const defaultValues = useMemo(() => createEmptyContactMeForm(), []);
+  const {
+    control,
+    formState: { errors: formErrors, isSubmitted, isValid, touchedFields },
+    handleSubmit,
+    reset: resetForm,
+    setValue
+  } = useForm<ContactMeFormValues>({
+    defaultValues,
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
+    resolver: zodResolver(contactMeFormSchema)
+  });
 
-  const validationErrors = useMemo(() => getContactMeFormErrors(draft), [draft]);
-  const errors = useMemo(() => getVisibleContactMeFormErrors(validationErrors, touchedFields, hasSubmitted), [hasSubmitted, touchedFields, validationErrors]);
-  const isValid = useMemo(() => Object.keys(validationErrors).length === 0, [validationErrors]);
+  const draft = useWatch({ control, defaultValue: defaultValues }) as ContactMeFormValues;
+
+  const validationErrors = useMemo(
+    () =>
+      Object.entries(formErrors).reduce<ContactMeFormErrors>((errors, [field, error]) => {
+        const formField = field as keyof ContactMeFormValues;
+        if (error?.message) errors[formField] = error.message;
+        return errors;
+      }, {}),
+    [formErrors]
+  );
+
+  const errors = useMemo(() => getVisibleContactMeFormErrors(validationErrors, touchedFields as ContactMeTouchedFields, isSubmitted), [isSubmitted, touchedFields, validationErrors]);
 
   const reset = useCallback(() => {
-    setHasSubmitted(false);
-    setTouchedFields({});
-    setDraft(createEmptyContactMeForm());
-  }, []);
+    resetForm(createEmptyContactMeForm());
+  }, [resetForm]);
 
-  const getValidForm = useCallback((): ContactMeFormValues | null => {
-    setHasSubmitted(true);
-    const result = contactMeFormSchema.safeParse(draft);
-    return result.success ? result.data : null;
-  }, [draft]);
+  const getValidForm = useCallback(async (): Promise<ContactMeFormValues | null> => {
+    let validForm: ContactMeFormValues | null = null;
+
+    await handleSubmit((values) => {
+      validForm = values;
+    })();
+
+    return validForm;
+  }, [handleSubmit]);
 
   const updateField = <TField extends keyof ContactMeFormValues>(field: TField, value: ContactMeFormValues[TField]) => {
-    setDraft((currentDraft) => ({ ...currentDraft, [field]: value }));
-    setTouchedFields((currentFields) => ({ ...currentFields, [field]: true }));
+    setValue(field as Path<ContactMeFormValues>, value as PathValue<ContactMeFormValues, Path<ContactMeFormValues>>, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true
+    });
   };
 
   return {

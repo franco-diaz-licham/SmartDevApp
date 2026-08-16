@@ -19,7 +19,7 @@ export const ContactMeForm = ({ saving, onSave }: ContactMeFormProps) => {
   const hasErrors = Object.keys(errors).length > 0;
 
   const handleSave = async () => {
-    const validForm = form.getValidForm();
+    const validForm = await form.getValidForm();
     if (!validForm) return;
     const saved = await onSave(validForm);
     if (saved) form.reset();

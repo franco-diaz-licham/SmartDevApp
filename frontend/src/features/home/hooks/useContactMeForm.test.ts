@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 import { useContactMeForm } from './useContactMeForm';
 
@@ -18,29 +18,31 @@ describe('useContactMeForm', () => {
     expect(result.current.isValid).toBe(false);
   });
 
-  test('shows field errors after a field has been touched', () => {
+  test('shows field errors after a field has been touched', async () => {
     // Arrange
     const { result } = renderHook(() => useContactMeForm());
 
     // Act
-    act(() => {
+    await act(async () => {
       result.current.updateField('email', 'not-an-email');
     });
 
     // Assert
-    expect(result.current.errors).toEqual({
-      email: 'Enter a valid email address.'
+    await waitFor(() => {
+      expect(result.current.errors).toEqual({
+        email: 'Enter a valid email address.'
+      });
     });
   });
 
-  test('shows all validation errors after submit is attempted', () => {
+  test('shows all validation errors after submit is attempted', async () => {
     // Arrange
     const { result } = renderHook(() => useContactMeForm());
 
     // Act
     let validForm = null;
-    act(() => {
-      validForm = result.current.getValidForm();
+    await act(async () => {
+      validForm = await result.current.getValidForm();
     });
 
     // Assert
@@ -52,7 +54,7 @@ describe('useContactMeForm', () => {
     });
   });
 
-  test('returns trimmed valid form values and preserves the honeypot value', () => {
+  test('returns trimmed valid form values and preserves the honeypot value', async () => {
     // Arrange
     const { result } = renderHook(() => useContactMeForm());
 
@@ -65,8 +67,8 @@ describe('useContactMeForm', () => {
     });
 
     let validForm = null;
-    act(() => {
-      validForm = result.current.getValidForm();
+    await act(async () => {
+      validForm = await result.current.getValidForm();
     });
 
     // Assert

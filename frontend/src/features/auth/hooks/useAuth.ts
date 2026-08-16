@@ -1,5 +1,11 @@
 import { useAuthStore } from '../stores/auth.store';
 
+/**
+ * Selects the auth state and actions used by UI components.
+ *
+ * @returns The current account, derived auth flags, public preview controls,
+ * login/logout commands, and access-token retrieval helper.
+ */
 export const useAuth = () => {
   const account = useAuthStore((state) => state.account);
   const hasInitialised = useAuthStore((state) => state.hasInitialised);

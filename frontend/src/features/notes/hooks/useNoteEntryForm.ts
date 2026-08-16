@@ -1,4 +1,7 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, useWatch } from 'react-hook-form';
+import type { Path, PathValue } from 'react-hook-form';
 import type { NoteEntryModel, PublicNoteDetailModel } from '../types/note.types';
 import { defaultNoteEntryFormValues, noteEntryFormSchema, type NoteEntryFormErrors } from '../types/noteEntryForm.schema';
 
@@ -20,17 +23,10 @@ export interface NoteEntryFormController {
 
 type NoteEntryTouchedFields = Partial<Record<keyof NoteEntryModel, boolean>>;
 
-const getNoteEntryFormErrors = (draft: NoteEntryModel): NoteEntryFormErrors => {
-  const result = noteEntryFormSchema.safeParse(draft);
-  if (result.success) return {};
-
-  return result.error.issues.reduce<NoteEntryFormErrors>((errors, issue) => {
-    const field = issue.path[0] as keyof NoteEntryModel | undefined;
-    if (field && !errors[field]) errors[field] = issue.message;
-    return errors;
-  }, {});
-};
-
+/**
+ * Keeps validation quiet until a field has been touched, then shows all errors
+ * after the user attempts to save.
+ */
 const getVisibleNoteEntryFormErrors = (validationErrors: NoteEntryFormErrors, touchedFields: NoteEntryTouchedFields, hasSubmitted: boolean): NoteEntryFormErrors => {
   if (hasSubmitted) return validationErrors;
 
@@ -41,16 +37,10 @@ const getVisibleNoteEntryFormErrors = (validationErrors: NoteEntryFormErrors, to
   }, {});
 };
 
-const isSameNoteEntryForm = (left: NoteEntryModel, right: NoteEntryModel) =>
-  left.title === right.title &&
-  left.slug === right.slug &&
-  left.summary === right.summary &&
-  left.category === right.category &&
-  left.tags === right.tags &&
-  left.bodyMarkdown === right.bodyMarkdown &&
-  left.status === right.status &&
-  left.visibility === right.visibility;
-
+/**
+ * Converts a persisted note detail into the editable form shape used by the
+ * owner-facing note editor.
+ */
 const getNoteEntryFormValues = (note: PublicNoteDetailModel): NoteEntryModel => ({
   title: note.title,
   slug: note.slug,
@@ -62,6 +52,10 @@ const getNoteEntryFormValues = (note: PublicNoteDetailModel): NoteEntryModel => 
   visibility: note.visibility
 });
 
+/**
+ * Builds a previewable note detail from unsaved form values so the article page
+ * can render a new note before it exists in the API.
+ */
 const getDraftNote = (draft: NoteEntryModel): PublicNoteDetailModel => ({
   id: '',
   slug: draft.slug,
@@ -87,30 +81,61 @@ const getDraftNote = (draft: NoteEntryModel): PublicNoteDetailModel => ({
   relatedProjects: []
 });
 
+/**
+ * Manages the owner note editor state with react-hook-form while exposing a
+ * small domain-specific API for inline editable article fields.
+ *
+ * @param initialValues - Optional values used to seed the editor when creating
+ * or editing a note.
+ * @returns Draft note state, visible validation errors, validation helpers, and
+ * field update/reset commands for the note editor UI.
+ */
 export const useNoteEntryForm = (initialValues: NoteEntryModel = defaultNoteEntryFormValues) => {
-  const [draft, setDraft] = useState<NoteEntryModel>(initialValues);
-  const [baseline, setBaseline] = useState<NoteEntryModel>(initialValues);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [touchedFields, setTouchedFields] = useState<NoteEntryTouchedFields>({});
+  const {
+    control,
+    formState: { errors: formErrors, isDirty, isSubmitted, isValid, touchedFields },
+    handleSubmit,
+    reset: resetForm,
+    setValue
+  } = useForm<NoteEntryModel>({
+    defaultValues: initialValues,
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
+    resolver: zodResolver(noteEntryFormSchema)
+  });
 
-  const validationErrors = useMemo(() => getNoteEntryFormErrors(draft), [draft]);
-  const errors = useMemo(() => getVisibleNoteEntryFormErrors(validationErrors, touchedFields, hasSubmitted), [hasSubmitted, touchedFields, validationErrors]);
+  const draft = useWatch({ control, defaultValue: initialValues }) as NoteEntryModel;
+
+  const validationErrors = useMemo(
+    () =>
+      Object.entries(formErrors).reduce<NoteEntryFormErrors>((errors, [field, error]) => {
+        const formField = field as keyof NoteEntryModel;
+        if (error?.message) errors[formField] = error.message;
+        return errors;
+      }, {}),
+    [formErrors]
+  );
+
+  const errors = useMemo(() => getVisibleNoteEntryFormErrors(validationErrors, touchedFields as NoteEntryTouchedFields, isSubmitted), [isSubmitted, touchedFields, validationErrors]);
+
   const draftNote = useMemo(() => getDraftNote(draft), [draft]);
-  const isDirty = useMemo(() => !isSameNoteEntryForm(draft, baseline), [baseline, draft]);
-  const isValid = useMemo(() => Object.keys(validationErrors).length === 0, [validationErrors]);
 
-  const reset = useCallback((values: NoteEntryModel = defaultNoteEntryFormValues) => {
-    setDraft(values);
-    setBaseline(values);
-    setHasSubmitted(false);
-    setTouchedFields({});
-  }, []);
+  const reset = useCallback(
+    (values: NoteEntryModel = defaultNoteEntryFormValues) => {
+      resetForm(values);
+    },
+    [resetForm]
+  );
 
-  const getValidForm = useCallback((): NoteEntryModel | null => {
-    setHasSubmitted(true);
-    const result = noteEntryFormSchema.safeParse(draft);
-    return result.success ? result.data : null;
-  }, [draft]);
+  const getValidForm = useCallback(async (): Promise<NoteEntryModel | null> => {
+    let validForm: NoteEntryModel | null = null;
+
+    await handleSubmit((values) => {
+      validForm = values;
+    })();
+
+    return validForm;
+  }, [handleSubmit]);
 
   const resetFromNote = useCallback(
     (note: PublicNoteDetailModel) => {
@@ -120,12 +145,11 @@ export const useNoteEntryForm = (initialValues: NoteEntryModel = defaultNoteEntr
   );
 
   const updateField = <TField extends keyof NoteEntryModel>(field: TField, value: NoteEntryModel[TField]) => {
-    setDraft((currentDraft) => ({ ...currentDraft, [field]: value }));
-    setTouchedFields((currentFields) => ({ ...currentFields, [field]: true }));
-  };
-
-  const touchField = <TField extends keyof NoteEntryModel>(field: TField) => {
-    setTouchedFields((currentFields) => ({ ...currentFields, [field]: true }));
+    setValue(field as Path<NoteEntryModel>, value as PathValue<NoteEntryModel, Path<NoteEntryModel>>, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true
+    });
   };
 
   return {
@@ -137,7 +161,6 @@ export const useNoteEntryForm = (initialValues: NoteEntryModel = defaultNoteEntr
     getValidForm,
     reset,
     resetFromNote,
-    touchField,
     updateField
   };
 };
