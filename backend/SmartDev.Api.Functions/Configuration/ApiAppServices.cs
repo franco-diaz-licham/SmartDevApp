@@ -70,6 +70,7 @@ public static class ApiAppServices
         services.AddScoped<GetOwnerNoteByIdHandler>();
         services.AddScoped<GetPublicNoteByIdHandler>();
         services.AddScoped<GetPublicNoteCategoriesHandler>();
+        services.AddScoped<GetOwnerNoteCategoriesHandler>();
         services.AddScoped<GetPublicNoteTagsHandler>();
         services.AddScoped<SearchPublicNotesHandler>();
         services.AddScoped<GetPublicNoteSearchIndexHandler>();

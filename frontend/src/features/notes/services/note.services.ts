@@ -26,6 +26,10 @@ export const noteService = {
     return apiClient.getPage<string, BaseQuery>(`${NOTES_URL}/categories`, request);
   },
 
+  getOwnerNoteCategories(request: BaseQuery = {}): Promise<PageResult<string>> {
+    return apiClient.getPage<string, BaseQuery>(`${OWNER_NOTES_URL}/categories`, request);
+  },
+
   getPublicNoteTags(request: BaseQuery = {}): Promise<PageResult<string>> {
     return apiClient.getPage<string, BaseQuery>(`${NOTES_URL}/tags`, request);
   },

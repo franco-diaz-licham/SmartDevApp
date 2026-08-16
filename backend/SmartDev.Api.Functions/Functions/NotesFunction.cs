@@ -12,6 +12,7 @@ public sealed class NotesFunction(
     GetOwnerNoteByIdHandler getOwnerNoteByIdHandler,
     GetPublicNoteByIdHandler getPublicNoteByIdHandler,
     GetPublicNoteCategoriesHandler getPublicNoteCategoriesHandler,
+    GetOwnerNoteCategoriesHandler getOwnerNoteCategoriesHandler,
     GetPublicNoteTagsHandler getPublicNoteTagsHandler,
     SearchPublicNotesHandler searchPublicNotesHandler,
     GetPublicNoteSearchIndexHandler getPublicNoteSearchIndexHandler,
@@ -82,7 +83,7 @@ public sealed class NotesFunction(
     }
 
     [Function(nameof(OwnerNote))]
-    public async Task<HttpResponseData> OwnerNote([HttpTrigger(AuthorizationLevel.Anonymous, "get", "put", "options", Route = "owner/notes/{noteId}")] HttpRequestData request, string noteId, CancellationToken cancellationToken)
+    public async Task<HttpResponseData> OwnerNote([HttpTrigger(AuthorizationLevel.Anonymous, "get", "put", "options", Route = "owner/notes/{noteId:guid}")] HttpRequestData request, string noteId, CancellationToken cancellationToken)
     {
         if (!Guid.TryParse(noteId, out var parsedNoteId)) return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse("Note id must be a valid GUID."), cancellationToken);
         if (string.Equals(request.Method, "GET", StringComparison.OrdinalIgnoreCase)) return await GetOwnerNoteByIdAsync(request, parsedNoteId, cancellationToken);
@@ -132,6 +133,18 @@ public sealed class NotesFunction(
         try {
             var query = request.BindBaseQuery();
             var categories = await getPublicNoteCategoriesHandler.HandleAsync(query, cancellationToken);
+            return await request.CreateJsonResponseAsync(HttpStatusCode.OK, categories, cancellationToken);
+        } catch (ArgumentException exception) {
+            return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse(exception.Message), cancellationToken);
+        }
+    }
+
+    [Function(nameof(GetOwnerNoteCategories))]
+    public async Task<HttpResponseData> GetOwnerNoteCategories([HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "owner/notes/categories")] HttpRequestData request, CancellationToken cancellationToken)
+    {
+        try {
+            var query = request.BindBaseQuery();
+            var categories = await getOwnerNoteCategoriesHandler.HandleAsync(query, cancellationToken);
             return await request.CreateJsonResponseAsync(HttpStatusCode.OK, categories, cancellationToken);
         } catch (ArgumentException exception) {
             return await request.CreateJsonResponseAsync(HttpStatusCode.BadRequest, new NotesErrorResponse(exception.Message), cancellationToken);

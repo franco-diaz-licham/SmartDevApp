@@ -42,9 +42,3 @@ export const formatNoteDate = (date: Date | null) =>
     month: 'short',
     year: 'numeric'
   }) ?? 'Draft';
-
-export const getNoteCategories = (notes: { category: { displayName: string } }[]) => {
-  const categoryNames = notes.map((note) => note.category.displayName);
-  const sortedCategories = Array.from(new Set(categoryNames)).sort((left, right) => left.localeCompare(right));
-  return [allNotesCategory, ...sortedCategories];
-};

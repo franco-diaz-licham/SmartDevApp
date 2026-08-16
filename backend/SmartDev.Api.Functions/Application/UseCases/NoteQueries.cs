@@ -49,6 +49,15 @@ public sealed class GetPublicNoteCategoriesHandler(INoteRepository noteRepositor
     }
 }
 
+public sealed class GetOwnerNoteCategoriesHandler(INoteRepository noteRepository)
+{
+    public async Task<Page<string>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    {
+        var categories = await noteRepository.GetOwnerCategoryNamesAsync(query, cancellationToken);
+        return new Page<string>(categories.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), categories.ContinuationToken);
+    }
+}
+
 public sealed class GetPublicNoteTagsHandler(INoteRepository noteRepository)
 {
     public async Task<Page<string>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)

@@ -13,6 +13,7 @@ export const noteKeys = {
   ownerDetail: (noteId: string) => [...noteKeys.details(), 'owner', noteId] as const,
   ownerEntry: (noteId: string) => [...noteKeys.details(), 'owner-entry', noteId] as const,
   publicCategories: (query: BaseQuery) => [...noteKeys.all, 'public-categories', query] as const,
+  ownerCategories: (query: BaseQuery) => [...noteKeys.all, 'owner-categories', query] as const,
   publicTags: (query: BaseQuery) => [...noteKeys.all, 'public-tags', query] as const,
   publicSearch: (query: BaseQuery) => [...noteKeys.all, 'public-search', query] as const,
   publicSearchIndex: () => [...noteKeys.all, 'public-search-index'] as const
@@ -151,10 +152,26 @@ export const useOwnerNoteQuery = (noteId: string, enabled = true) =>
  * @param query - Optional paging or filtering values for category results.
  * @returns React Query state for public note categories.
  */
-export const usePublicNoteCategoriesQuery = (query: BaseQuery = {}) =>
+export const usePublicNoteCategoriesQuery = (query: BaseQuery = {}, enabled = true) =>
   useQuery({
     queryKey: noteKeys.publicCategories(query),
-    queryFn: () => noteService.getPublicNoteCategories(query)
+    queryFn: () => noteService.getPublicNoteCategories(query),
+    enabled
+  });
+
+/**
+ * Loads owner note categories used by note navigation and filters.
+ *
+ * @param query - Optional paging or filtering values for category results.
+ * @param enabled - Set to false when public preview mode is active or auth is
+ * not ready.
+ * @returns React Query state for owner note categories.
+ */
+export const useOwnerNoteCategoriesQuery = (query: BaseQuery = {}, enabled = true) =>
+  useQuery({
+    queryKey: noteKeys.ownerCategories(query),
+    queryFn: () => noteService.getOwnerNoteCategories(query),
+    enabled
   });
 
 /**

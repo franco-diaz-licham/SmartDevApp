@@ -75,6 +75,16 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
             cancellationToken);
     }
 
+    public Task<DocumentPage<string>> GetOwnerCategoryNamesAsync(BaseQuery query, CancellationToken cancellationToken)
+    {
+        return documentStore.QueryPageAsync<string>(
+            NoteDocument.ContainerName,
+            CosmosNoteQueries.OwnerCategoryNames(),
+            query.PageSize,
+            query.ContinuationToken,
+            cancellationToken: cancellationToken);
+    }
+
     public Task<DocumentPage<string>> GetPublishedPublicTagNamesAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         return documentStore.QueryPageAsync<string>(

@@ -1,48 +1,53 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { appConfig } from '@/app/appConfig';
 import { WorkspacePageWrapper } from '@/components/common/WorkspacePageWrapper';
 import { useAuth } from '@/features/auth';
 import { NotesCategoryPane } from '../components/NotesCategoryPane';
 import { NotesMainContent } from '../components/NotesMainContent';
 import { NotesPageSkeleton } from '../components/NotesPageSkeleton';
-import { useOwnerNotesQuery, usePublicNotesQuery } from '../queries/note.queries';
-import { allNotesCategory, getFilteredNotes, getNoteCategories } from '../utils/noteContent';
+import { useNotesQueryParams } from '../hooks/useNotesQueryParams';
+import { useOwnerNoteCategoriesQuery, useOwnerNotesQuery, usePublicNoteCategoriesQuery, usePublicNotesQuery } from '../queries/note.queries';
+import { useNotesUiStore } from '../stores/notesUi.store';
+import { allNotesCategory } from '../utils/noteContent';
 
 export const NotesPage = () => {
   const { isAuthReady, isPublicView } = useAuth();
 
-  const [selectedCategory, setSelectedCategory] = useState(allNotesCategory);
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const notesQueryParams = useMemo(() => ({ pageSize: 30 }), []);
+  const searchTerm = useNotesUiStore((state) => state.searchTerm);
+  const selectedCategory = useNotesUiStore((state) => state.selectedCategory);
+  const setSearchTerm = useNotesUiStore((state) => state.setSearchTerm);
+  const selectCategory = useNotesUiStore((state) => state.selectCategory);
+  const notesQueryParams = useNotesQueryParams();
   const publicNotesQuery = usePublicNotesQuery(notesQueryParams, isAuthReady && isPublicView);
   const ownerNotesQuery = useOwnerNotesQuery(notesQueryParams, isAuthReady && !isPublicView);
+  const publicCategoriesQuery = usePublicNoteCategoriesQuery({ pageSize: 100 }, isAuthReady && isPublicView);
+  const ownerCategoriesQuery = useOwnerNoteCategoriesQuery({ pageSize: 100 }, isAuthReady && !isPublicView);
   const notesQuery = isPublicView ? publicNotesQuery : ownerNotesQuery;
+  const categoriesQuery = isPublicView ? publicCategoriesQuery : ownerCategoriesQuery;
 
   const notes = useMemo(() => notesQuery.data?.pages.flatMap((page) => page.items) ?? [], [notesQuery.data]);
-  const categories = useMemo(() => getNoteCategories(notes), [notes]);
-  const filteredNotes = useMemo(() => getFilteredNotes(notes, selectedCategory, searchTerm), [notes, searchTerm, selectedCategory]);
+  const categories = useMemo(() => {
+    const loadedCategories = [allNotesCategory, ...(categoriesQuery.data?.items ?? [])];
+    if (selectedCategory === allNotesCategory || loadedCategories.includes(selectedCategory)) return loadedCategories;
+    return [allNotesCategory, selectedCategory, ...loadedCategories.filter((category) => category !== allNotesCategory)];
+  }, [categoriesQuery.data, selectedCategory]);
 
   useEffect(() => {
     document.title = `Notes | ${appConfig.appName}`;
   }, []);
 
-  const handleSelectCategory = (category: string) => {
-    setSelectedCategory(category);
-  };
-
   const handleLoadMore = () => {
     void notesQuery.fetchNextPage();
   };
 
-  if (!isAuthReady || notesQuery.isLoading) return <NotesPageSkeleton />;
+  if (!isAuthReady) return <NotesPageSkeleton />;
 
   return (
     <WorkspacePageWrapper>
       <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 overflow-hidden lg:grid-cols-[17rem_minmax(0,1fr)]">
-        <NotesCategoryPane categories={categories} selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} />
+        <NotesCategoryPane categories={categories} selectedCategory={selectedCategory} onSelectCategory={selectCategory} />
         <NotesMainContent
-          notes={filteredNotes}
+          notes={notes}
           searchTerm={searchTerm}
           isNotesLoading={notesQuery.isLoading}
           isNotesError={notesQuery.isError}

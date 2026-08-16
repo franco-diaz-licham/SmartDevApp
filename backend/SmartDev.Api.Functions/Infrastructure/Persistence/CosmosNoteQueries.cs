@@ -68,10 +68,22 @@ internal static class CosmosNoteQueries
             WHERE c.type = @type
               AND c.status = @status
               AND c.visibility = @visibility
+            ORDER BY c.category.displayName
             """)
             .WithParameter("@type", NoteDocument.DocumentType)
             .WithParameter("@status", NoteStatus.Published.ToString())
             .WithParameter("@visibility", NoteVisibility.Public.ToString());
+    }
+
+    public static QueryDefinition OwnerCategoryNames()
+    {
+        return new QueryDefinition("""
+            SELECT DISTINCT VALUE c.category.displayName
+            FROM c
+            WHERE c.type = @type
+            ORDER BY c.category.displayName
+            """)
+            .WithParameter("@type", NoteDocument.DocumentType);
     }
 
     public static QueryDefinition PublishedPublicTagNames()
@@ -83,6 +95,7 @@ internal static class CosmosNoteQueries
             WHERE c.type = @type
               AND c.status = @status
               AND c.visibility = @visibility
+            ORDER BY tag.displayName
             """)
             .WithParameter("@type", NoteDocument.DocumentType)
             .WithParameter("@status", NoteStatus.Published.ToString())

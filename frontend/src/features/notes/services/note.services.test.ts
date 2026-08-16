@@ -154,6 +154,26 @@ describe('noteService', () => {
     expect(apiClientMock.getPage).toHaveBeenCalledWith('/notes/categories', { pageSize: 10 });
   });
 
+  test('gets owner note categories', async () => {
+    // Arrange
+    apiClientMock.getPage.mockResolvedValue({
+      items: ['Backend'],
+      continuationToken: null,
+      hasMore: false
+    });
+
+    // Act
+    const result = await noteService.getOwnerNoteCategories({ pageSize: 10 });
+
+    // Assert
+    expect(result).toEqual({
+      items: ['Backend'],
+      continuationToken: null,
+      hasMore: false
+    });
+    expect(apiClientMock.getPage).toHaveBeenCalledWith('/owner/notes/categories', { pageSize: 10 });
+  });
+
   test('gets public note tags', async () => {
     // Arrange
     apiClientMock.getPage.mockResolvedValue({
