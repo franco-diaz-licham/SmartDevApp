@@ -1,5 +1,3 @@
-import type { PublicNoteListItemModel } from '../types/note.types';
-
 export interface NoteSectionModel {
   id: string;
   title: string;
@@ -45,19 +43,8 @@ export const formatNoteDate = (date: Date | null) =>
     year: 'numeric'
   }) ?? 'Draft';
 
-export const getNoteCategories = (notes: PublicNoteListItemModel[]) => {
+export const getNoteCategories = (notes: { category: { displayName: string } }[]) => {
   const categoryNames = notes.map((note) => note.category.displayName);
   const sortedCategories = Array.from(new Set(categoryNames)).sort((left, right) => left.localeCompare(right));
   return [allNotesCategory, ...sortedCategories];
-};
-
-export const getFilteredNotes = (notes: PublicNoteListItemModel[], selectedCategory: string, searchTerm: string) => {
-  const normalizedSearch = searchTerm.trim().toLowerCase();
-
-  return notes.filter((note) => {
-    const searchableText = `${note.title} ${note.summary} ${note.category.displayName} ${note.tags.map((tag) => tag.displayName).join(' ')}`;
-    const matchesCategory = selectedCategory === allNotesCategory || note.category.displayName === selectedCategory;
-    const matchesSearch = normalizedSearch.length === 0 || searchableText.toLowerCase().includes(normalizedSearch);
-    return matchesCategory && matchesSearch;
-  });
 };

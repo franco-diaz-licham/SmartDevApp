@@ -29,7 +29,7 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
     {
         var documents = await documentStore.QueryPageAsync<NoteDocument>(
             NoteDocument.ContainerName,
-            CosmosNoteQueries.PublishedPublic(),
+            CosmosNoteQueries.PublishedPublic(query),
             query.PageSize,
             query.ContinuationToken,
             NoteDocument.PublicPartitionKey,
@@ -90,7 +90,7 @@ public sealed class CosmosNoteRepository(IDocumentStore documentStore) : INoteRe
     {
         var documents = await documentStore.QueryPageAsync<NoteDocument>(
             NoteDocument.ContainerName,
-            CosmosNoteQueries.AllForOwner(),
+            CosmosNoteQueries.AllForOwner(query),
             query.PageSize,
             query.ContinuationToken,
             cancellationToken: cancellationToken);

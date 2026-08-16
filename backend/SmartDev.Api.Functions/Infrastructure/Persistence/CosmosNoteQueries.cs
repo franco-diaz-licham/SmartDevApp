@@ -1,4 +1,5 @@
 using Microsoft.Azure.Cosmos;
+using SmartDev.Api.Functions.Application.UsesCases;
 using SmartDev.Api.Functions.Domain.Notes;
 
 namespace SmartDev.Api.Functions.Infrastructure.Persistence;
@@ -17,15 +18,16 @@ internal static class CosmosNoteQueries
             .WithParameter("@slug", slug.Value);
     }
 
-    public static QueryDefinition PublishedPublic()
+    public static QueryDefinition PublishedPublic(BaseQuery? query = null)
     {
-        return new QueryDefinition("""
-            SELECT * FROM c
-            WHERE c.type = @type
-              AND c.status = @status
-              AND c.visibility = @visibility
-            ORDER BY c.publishedAt DESC
-            """)
+        return BuildNotesQuery(
+            query,
+            [
+                "c.type = @type",
+                "c.status = @status",
+                "c.visibility = @visibility"
+            ],
+            "c.publishedAt DESC")
             .WithParameter("@type", NoteDocument.DocumentType)
             .WithParameter("@status", NoteStatus.Published.ToString())
             .WithParameter("@visibility", NoteVisibility.Public.ToString());
@@ -87,13 +89,47 @@ internal static class CosmosNoteQueries
             .WithParameter("@visibility", NoteVisibility.Public.ToString());
     }
 
-    public static QueryDefinition AllForOwner()
+    public static QueryDefinition AllForOwner(BaseQuery? query = null)
     {
-        return new QueryDefinition("""
-            SELECT * FROM c
-            WHERE c.type = @type
-            ORDER BY c.updatedAt DESC
-            """)
+        return BuildNotesQuery(query, ["c.type = @type"], "c.updatedAt DESC")
             .WithParameter("@type", NoteDocument.DocumentType);
+    }
+
+    private static QueryDefinition BuildNotesQuery(BaseQuery? query, IReadOnlyCollection<string> baseConditions, string orderBy)
+    {
+        var conditions = baseConditions.ToList();
+        if (!string.IsNullOrWhiteSpace(query?.SearchTerm)) {
+            conditions.Add("""
+                (
+                  CONTAINS(LOWER(c.title), @searchTerm)
+                  OR CONTAINS(LOWER(c.summary), @searchTerm)
+                  OR CONTAINS(LOWER(c.bodyMarkdown), @searchTerm)
+                  OR CONTAINS(LOWER(c.category.displayName), @searchTerm)
+                  OR EXISTS(
+                    SELECT VALUE tag
+                    FROM tag IN c.tags
+                    WHERE CONTAINS(LOWER(tag.displayName), @searchTerm)
+                       OR CONTAINS(LOWER(tag.slug), @searchTerm)
+                  )
+                )
+                """);
+        }
+
+        var categoryFilter = query?.Filters.FirstOrDefault(filter =>
+            string.Equals(filter.Field, "category", StringComparison.OrdinalIgnoreCase)
+            && filter.Operator == FilterOperator.Equals
+            && !string.IsNullOrWhiteSpace(filter.Value));
+
+        if (categoryFilter is not null) conditions.Add("LOWER(c.category.displayName) = @category");
+
+        var queryDefinition = new QueryDefinition($"""
+            SELECT * FROM c
+            WHERE {string.Join($"{Environment.NewLine} AND ", conditions)}
+            ORDER BY {orderBy}
+            """);
+
+        if (!string.IsNullOrWhiteSpace(query?.SearchTerm)) queryDefinition = queryDefinition.WithParameter("@searchTerm", query.SearchTerm.Trim().ToLowerInvariant());
+        if (categoryFilter is not null) queryDefinition = queryDefinition.WithParameter("@category", categoryFilter.Value.Trim().ToLowerInvariant());
+        return queryDefinition;
     }
 }
