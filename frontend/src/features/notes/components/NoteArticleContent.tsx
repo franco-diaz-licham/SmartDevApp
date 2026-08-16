@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { AppInlineEditSurface } from '@/components/ui/AppInlineEditSurface';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
+import { NoteArticleContentSkeleton } from './NoteArticlePageSkeleton';
 import { NoteMarkdown } from './NoteMarkdown';
 import type { NoteEntryFormController } from '../hooks/useNoteEntryForm';
 import type { PublicNoteDetailModel } from '../types/note.types';
@@ -31,7 +32,7 @@ export const NoteArticleContent = ({ form, isEditable = false, note, isLoading, 
 
   return (
     <article className="min-h-0 min-w-0 overflow-y-auto px-5 py-7 sm:px-8 lg:px-10">
-      {isLoading && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">Loading note...</p>}
+      {isLoading && <NoteArticleContentSkeleton />}
       {isError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Note could not be loaded.</p>}
       {note && (
         <>
