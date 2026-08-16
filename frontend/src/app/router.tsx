@@ -32,9 +32,7 @@ export const router = createBrowserRouter([
       { path: '/workspace/notes/:noteId', element: <NoteArticlePage /> },
       {
         element: <RequireAuth />,
-        children: [
-          { path: '/workspace/notes/new', element: <NoteArticlePage /> }
-        ]
+        children: [{ path: '/workspace/notes/new', element: <NoteArticlePage /> }]
       }
     ]
   },

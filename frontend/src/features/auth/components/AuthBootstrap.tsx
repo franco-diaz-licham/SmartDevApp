@@ -19,4 +19,3 @@ export const AuthBootstrap = ({ children }: PropsWithChildren) => {
 
   return <>{children}</>;
 };
-
