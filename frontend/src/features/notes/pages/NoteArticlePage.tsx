@@ -18,21 +18,21 @@ export const NoteArticlePage = () => {
   const navigate = useNavigate();
   const newArticleMatch = useMatch('/workspace/notes/new');
   const { noteId = '' } = useParams();
-  const { isAuthReady, isSignedIn } = useAuth();
+  const { isAuthReady, isPublicView } = useAuth();
   const isNewArticle = Boolean(newArticleMatch);
   const hasNoteId = noteId.trim().length > 0;
   const form = useNoteEntryForm();
   const { draft, draftNote } = form;
   const { getValidForm, reset, resetFromNote, updateField } = form;
-  const publicNoteQuery = usePublicNoteQuery(noteId, isAuthReady && hasNoteId && !isSignedIn);
-  const ownerNoteQuery = useOwnerNoteQuery(noteId, isAuthReady && hasNoteId && isSignedIn);
+  const publicNoteQuery = usePublicNoteQuery(noteId, isAuthReady && hasNoteId && isPublicView);
+  const ownerNoteQuery = useOwnerNoteQuery(noteId, isAuthReady && hasNoteId && !isPublicView);
   const createNoteMutation = useCreateNoteMutation();
   const updateNoteMutation = useUpdateNoteMutation(noteId);
   const activeMutation = isNewArticle ? createNoteMutation : updateNoteMutation;
-  const noteQuery = isSignedIn ? ownerNoteQuery : publicNoteQuery;
+  const noteQuery = isPublicView ? publicNoteQuery : ownerNoteQuery;
   const persistedNote = isNewArticle ? undefined : noteQuery.data;
   const note = isNewArticle ? draftNote : persistedNote;
-  const articleMarkdown = isSignedIn ? draft.bodyMarkdown : (note?.bodyMarkdown ?? '');
+  const articleMarkdown = isPublicView ? (note?.bodyMarkdown ?? '') : draft.bodyMarkdown;
   const sections = useMemo(() => getNoteSections(articleMarkdown), [articleMarkdown]);
 
   useEffect(() => {
@@ -40,13 +40,13 @@ export const NoteArticlePage = () => {
   }, [isNewArticle, note?.title]);
 
   useEffect(() => {
-    if (!persistedNote || !hasNoteId || !isSignedIn) return;
+    if (!persistedNote || !hasNoteId || isPublicView) return;
 
     resetFromNote(persistedNote);
-  }, [hasNoteId, isSignedIn, persistedNote, resetFromNote]);
+  }, [hasNoteId, isPublicView, persistedNote, resetFromNote]);
 
   const handleEditField = (field: EditableNoteEntryField) => {
-    if (!isSignedIn) return;
+    if (isPublicView) return;
     setSavedMessage('');
     setEditingField(field);
   };
@@ -64,7 +64,7 @@ export const NoteArticlePage = () => {
 
   const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isSignedIn) return;
+    if (isPublicView) return;
     setSavedMessage('');
     const entry = getValidForm();
     if (!entry) return;
@@ -107,14 +107,14 @@ export const NoteArticlePage = () => {
   const content = (
     <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 overflow-hidden lg:grid-cols-[17rem_minmax(0,1fr)] xl:grid-cols-[17rem_minmax(0,1fr)_18rem]">
       <NotesSectionsPane sections={sections} />
-      <NoteArticleContent form={isSignedIn ? formController : undefined} isEditable={isSignedIn} isLoading={!isNewArticle && noteQuery.isLoading} isError={!isNewArticle && noteQuery.isError} note={note} />
-      <NoteArticleMetadataPane form={isSignedIn ? formController : undefined} isEditable={isSignedIn} note={note} />
+      <NoteArticleContent form={isPublicView ? undefined : formController} isEditable={!isPublicView} isLoading={!isNewArticle && noteQuery.isLoading} isError={!isNewArticle && noteQuery.isError} note={note} />
+      <NoteArticleMetadataPane form={isPublicView ? undefined : formController} isEditable={!isPublicView} note={note} />
     </div>
   );
 
   return (
     <WorkspacePageWrapper>
-      {isSignedIn ? (
+      {!isPublicView ? (
         <form className="h-full min-h-0" onSubmit={handleSave}>
           {content}
         </form>

@@ -11,12 +11,12 @@ import { allNotesCategory, getFilteredNotes, getNoteCategories } from '../utils/
 export const NotesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(allNotesCategory);
   const [searchTerm, setSearchTerm] = useState('');
-  const { isAuthReady, isSignedIn } = useAuth();
+  const { isAuthReady, isPublicView } = useAuth();
 
   const notesQueryParams = useMemo(() => ({ pageSize: 30 }), []);
-  const publicNotesQuery = usePublicNotesQuery(notesQueryParams, isAuthReady && !isSignedIn);
-  const ownerNotesQuery = useOwnerNotesQuery(notesQueryParams, isAuthReady && isSignedIn);
-  const notesQuery = isSignedIn ? ownerNotesQuery : publicNotesQuery;
+  const publicNotesQuery = usePublicNotesQuery(notesQueryParams, isAuthReady && isPublicView);
+  const ownerNotesQuery = useOwnerNotesQuery(notesQueryParams, isAuthReady && !isPublicView);
+  const notesQuery = isPublicView ? publicNotesQuery : ownerNotesQuery;
 
   useEffect(() => {
     document.title = `Notes | ${appConfig.appName}`;
