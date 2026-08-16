@@ -10,7 +10,7 @@ const navigationItems = [
   { label: 'EXPERIENCE', href: '/home#services', visibility: 'always' },
   { label: 'PORTFOLIO', href: '/home#portfolio', visibility: 'always' },
   { label: 'CONTACT ME', href: '/home#contact-me', visibility: 'always' },
-  { label: 'WORKSPACE', href: '/workspace', visibility: 'authenticated' },
+  { label: 'WORKSPACE', href: '/workspace', visibility: 'always' },
   { label: 'LOGIN', href: '/login?returnTo=%2Fworkspace', visibility: 'anonymous' },
   { label: 'LOG OUT', href: '', visibility: 'authenticated' }
 ] as const;
