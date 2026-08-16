@@ -13,25 +13,32 @@ import { useOwnerNoteQuery, usePublicNoteQuery } from '../queries/note.queries';
 import { getNoteSections } from '../utils/noteContent';
 
 export const NoteArticlePage = () => {
-  const [editingField, setEditingField] = useState<EditableNoteEntryField | undefined>();
-  const [savedMessage, setSavedMessage] = useState('');
   const navigate = useNavigate();
   const newArticleMatch = useMatch('/workspace/notes/new');
   const { noteId = '' } = useParams();
   const { isAuthReady, isPublicView } = useAuth();
+
   const isNewArticle = Boolean(newArticleMatch);
   const hasNoteId = noteId.trim().length > 0;
+
+  const [editingField, setEditingField] = useState<EditableNoteEntryField | undefined>();
+  const [savedMessage, setSavedMessage] = useState('');
+
   const form = useNoteEntryForm();
   const { draft, draftNote } = form;
   const { getValidForm, reset, resetFromNote, updateField } = form;
+
   const publicNoteQuery = usePublicNoteQuery(noteId, isAuthReady && hasNoteId && isPublicView);
   const ownerNoteQuery = useOwnerNoteQuery(noteId, isAuthReady && hasNoteId && !isPublicView);
+  const noteQuery = isPublicView ? publicNoteQuery : ownerNoteQuery;
+
   const createNoteMutation = useCreateNoteMutation();
   const updateNoteMutation = useUpdateNoteMutation(noteId);
   const activeMutation = isNewArticle ? createNoteMutation : updateNoteMutation;
-  const noteQuery = isPublicView ? publicNoteQuery : ownerNoteQuery;
+
   const persistedNote = isNewArticle ? undefined : noteQuery.data;
   const note = isNewArticle ? draftNote : persistedNote;
+
   const articleMarkdown = isPublicView ? (note?.bodyMarkdown ?? '') : draft.bodyMarkdown;
   const sections = useMemo(() => getNoteSections(articleMarkdown), [articleMarkdown]);
 
