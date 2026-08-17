@@ -1,18 +1,18 @@
 import { lazy, Suspense } from 'react';
-import { NoteArticlePageSkeleton } from '@/features/notes/components/NoteArticlePageSkeleton';
-import { NotesPageSkeleton } from '@/features/notes/components/NotesPageSkeleton';
+import { ArticlePageSkeleton } from '@/features/articles/components/ArticlePageSkeleton';
+import { ArticlesPageSkeleton } from '@/features/articles/components/ArticlesPageSkeleton';
 
-const LazyNotesPage = lazy(() => import('@/features/notes/pages/NotesPage').then((module) => ({ default: module.NotesPage })));
-const LazyNoteArticlePage = lazy(() => import('@/features/notes/pages/NoteArticlePage').then((module) => ({ default: module.NoteArticlePage })));
+const LazyArticlesPage = lazy(() => import('@/features/articles/pages/ArticlesPage').then((module) => ({ default: module.ArticlesPage })));
+const LazyArticlePage = lazy(() => import('@/features/articles/pages/ArticlePage').then((module) => ({ default: module.ArticlePage })));
 
-export const NotesPageRoute = () => (
-  <Suspense fallback={<NotesPageSkeleton />}>
-    <LazyNotesPage />
+export const ArticlesPageRoute = () => (
+  <Suspense fallback={<ArticlesPageSkeleton />}>
+    <LazyArticlesPage />
   </Suspense>
 );
 
-export const NoteArticlePageRoute = () => (
-  <Suspense fallback={<NoteArticlePageSkeleton />}>
-    <LazyNoteArticlePage />
+export const ArticlePageRoute = () => (
+  <Suspense fallback={<ArticlePageSkeleton />}>
+    <LazyArticlePage />
   </Suspense>
 );
