@@ -28,11 +28,12 @@ export const AppButtonSelect = <TValue extends string = string>({ 'aria-label': 
             'hover:bg-background focus:outline-none focus:ring-2 focus:ring-primary/30',
             isSelected ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground'
           )}
-          label={option.label}
           role="option"
           type="button"
           onClick={() => onChange(option.value)}
-        />
+        >
+          {option.label}
+        </Button>
       );
     })}
   </div>

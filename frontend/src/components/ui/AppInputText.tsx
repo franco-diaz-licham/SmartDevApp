@@ -52,7 +52,7 @@ export const AppInputText = ({ className, error, id, inline = false, inlineSize 
   if (!label && !error) return input;
 
   return (
-    <div className="block">
+    <div className="block w-full">
       {label ? (
         <label className="mb-2 block font-semibold text-foreground" htmlFor={inputId}>
           {label}
