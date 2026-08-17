@@ -41,11 +41,11 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
       {article && (
         <>
           <header id="overview" className="scroll-mt-28 border-b border-border pb-10">
-            <p className="text-xs font-extrabold uppercase tracking-wide text-muted-foreground">Title</p>
             <AppInputText
               autoFocus={isEditable && form?.editingField === 'title'}
               inline
               inlineSize="title"
+              label="TITLE"
               inlineStatus={isEditable && form?.editingField === 'title' ? 'edit' : 'read'}
               className="mt-2 p-2 pr-8 text-3xl font-extrabold leading-tight text-foreground"
               error={form?.errors.title}
@@ -59,11 +59,11 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
               }}
               onInlineEdit={isEditable ? () => form?.editField('title') : undefined}
             />
-            <p className="mt-8 text-xs font-extrabold uppercase tracking-wide text-muted-foreground">Summary</p>
             <AppInputTextArea
               autoFocus={isEditable && form?.editingField === 'summary'}
               inline
               inlineSize="summary"
+              label="SUMMARY"
               inlineStatus={isEditable && form?.editingField === 'summary' ? 'edit' : 'read'}
               className="mt-5 p-2 pr-8 text-lg leading-8 text-muted-foreground"
               error={form?.errors.summary}
@@ -85,7 +85,7 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
                 autoFocus
                 aria-label="Article body"
                 inline
-                className="min-h-[36rem] resize-none overflow-hidden border-0 font-mono text-sm leading-7 shadow-none [field-sizing:content] focus:ring-0"
+                className="min-h-144 resize-none overflow-hidden border-0 font-mono text-sm leading-7 shadow-none field-sizing-content focus:ring-0"
                 error={form?.errors.bodyMarkdown}
                 name="bodyMarkdown"
                 required={isEditable}

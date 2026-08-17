@@ -53,7 +53,7 @@ export const AppInputTextArea = ({ className, error, id, inline = false, inlineS
   return (
     <div className="block w-full">
       {label ? (
-        <label className="mb-2 block font-semibold text-foreground" htmlFor={textareaId}>
+        <label className="mb-2 block text-sm font-semibold text-foreground" htmlFor={textareaId}>
           {label}
           {required ? (
             <>

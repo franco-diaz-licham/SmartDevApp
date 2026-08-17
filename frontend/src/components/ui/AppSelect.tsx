@@ -62,7 +62,7 @@ export const AppSelect = <TValue extends string = string>({ className, error, id
   return (
     <div className="block">
       {label ? (
-        <label className="mb-2 block font-semibold text-foreground" htmlFor={selectId}>
+        <label className="mb-2 block text-sm font-semibold text-foreground" htmlFor={selectId}>
           {label}
           {required ? (
             <>
