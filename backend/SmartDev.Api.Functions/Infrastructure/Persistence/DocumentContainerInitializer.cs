@@ -16,8 +16,8 @@ public sealed class DocumentContainerInitializer(IDocumentStore documentStore, I
             cancellationToken: stoppingToken);
 
         await documentStore.EnsureContainerAsync(
-            NoteDocument.ContainerName,
-            NoteDocument.PartitionKeyPath,
+            ArticleDocument.ContainerName,
+            ArticleDocument.PartitionKeyPath,
             defaultTimeToLiveSeconds: null,
             cancellationToken: stoppingToken);
 

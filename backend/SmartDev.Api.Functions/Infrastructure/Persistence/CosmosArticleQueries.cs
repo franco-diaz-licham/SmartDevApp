@@ -1,12 +1,12 @@
 using Microsoft.Azure.Cosmos;
 using SmartDev.Api.Functions.Application.UsesCases;
-using SmartDev.Api.Functions.Domain.Notes;
+using SmartDev.Api.Functions.Domain.Articles;
 
 namespace SmartDev.Api.Functions.Infrastructure.Persistence;
 
-internal static class CosmosNoteQueries
+internal static class CosmosArticleQueries
 {
-    public static QueryDefinition SlugIds(NoteSlug slug)
+    public static QueryDefinition SlugIds(ArticleSlug slug)
     {
         return new QueryDefinition("""
             SELECT VALUE c.id
@@ -14,13 +14,13 @@ internal static class CosmosNoteQueries
             WHERE c.type = @type
               AND c.slug = @slug
             """)
-            .WithParameter("@type", NoteDocument.DocumentType)
+            .WithParameter("@type", ArticleDocument.DocumentType)
             .WithParameter("@slug", slug.Value);
     }
 
     public static QueryDefinition PublishedPublic(BaseQuery? query = null)
     {
-        return BuildNotesQuery(
+        return BuildArticlesQuery(
             query,
             [
                 "c.type = @type",
@@ -28,9 +28,9 @@ internal static class CosmosNoteQueries
                 "c.visibility = @visibility"
             ],
             "c.publishedAt DESC")
-            .WithParameter("@type", NoteDocument.DocumentType)
-            .WithParameter("@status", NoteStatus.Published.ToString())
-            .WithParameter("@visibility", NoteVisibility.Public.ToString());
+            .WithParameter("@type", ArticleDocument.DocumentType)
+            .WithParameter("@status", ArticleStatus.Published.ToString())
+            .WithParameter("@visibility", ArticleVisibility.Public.ToString());
     }
 
     public static QueryDefinition PublishedPublicSearch(string searchTerm)
@@ -54,9 +54,9 @@ internal static class CosmosNoteQueries
               )
             ORDER BY c.publishedAt DESC
             """)
-            .WithParameter("@type", NoteDocument.DocumentType)
-            .WithParameter("@status", NoteStatus.Published.ToString())
-            .WithParameter("@visibility", NoteVisibility.Public.ToString())
+            .WithParameter("@type", ArticleDocument.DocumentType)
+            .WithParameter("@status", ArticleStatus.Published.ToString())
+            .WithParameter("@visibility", ArticleVisibility.Public.ToString())
             .WithParameter("@searchTerm", searchTerm.Trim().ToLowerInvariant());
     }
 
@@ -70,9 +70,9 @@ internal static class CosmosNoteQueries
               AND c.visibility = @visibility
             ORDER BY c.category.displayName
             """)
-            .WithParameter("@type", NoteDocument.DocumentType)
-            .WithParameter("@status", NoteStatus.Published.ToString())
-            .WithParameter("@visibility", NoteVisibility.Public.ToString());
+            .WithParameter("@type", ArticleDocument.DocumentType)
+            .WithParameter("@status", ArticleStatus.Published.ToString())
+            .WithParameter("@visibility", ArticleVisibility.Public.ToString());
     }
 
     public static QueryDefinition OwnerCategoryNames()
@@ -83,7 +83,7 @@ internal static class CosmosNoteQueries
             WHERE c.type = @type
             ORDER BY c.category.displayName
             """)
-            .WithParameter("@type", NoteDocument.DocumentType);
+            .WithParameter("@type", ArticleDocument.DocumentType);
     }
 
     public static QueryDefinition PublishedPublicTagNames()
@@ -97,18 +97,18 @@ internal static class CosmosNoteQueries
               AND c.visibility = @visibility
             ORDER BY tag.displayName
             """)
-            .WithParameter("@type", NoteDocument.DocumentType)
-            .WithParameter("@status", NoteStatus.Published.ToString())
-            .WithParameter("@visibility", NoteVisibility.Public.ToString());
+            .WithParameter("@type", ArticleDocument.DocumentType)
+            .WithParameter("@status", ArticleStatus.Published.ToString())
+            .WithParameter("@visibility", ArticleVisibility.Public.ToString());
     }
 
     public static QueryDefinition AllForOwner(BaseQuery? query = null)
     {
-        return BuildNotesQuery(query, ["c.type = @type"], "c.updatedAt DESC")
-            .WithParameter("@type", NoteDocument.DocumentType);
+        return BuildArticlesQuery(query, ["c.type = @type"], "c.updatedAt DESC")
+            .WithParameter("@type", ArticleDocument.DocumentType);
     }
 
-    private static QueryDefinition BuildNotesQuery(BaseQuery? query, IReadOnlyCollection<string> baseConditions, string orderBy)
+    private static QueryDefinition BuildArticlesQuery(BaseQuery? query, IReadOnlyCollection<string> baseConditions, string orderBy)
     {
         var conditions = baseConditions.ToList();
         if (!string.IsNullOrWhiteSpace(query?.SearchTerm)) {

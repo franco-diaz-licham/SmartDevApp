@@ -1,13 +1,13 @@
 using SmartDev.Api.Functions.Domain.Common;
 
-namespace SmartDev.Api.Functions.Domain.Notes;
+namespace SmartDev.Api.Functions.Domain.Articles;
 
 /// <summary>
-/// Defines a managed tag that notes can reference through snapshots.
+/// Defines a managed tag that articles can reference through snapshots.
 /// </summary>
-public sealed class NoteTag : Entity<NoteTagSlug>
+public sealed class ArticleTag : Entity<ArticleTagSlug>
 {
-    private NoteTag(NoteTagSlug id, string displayName, IReadOnlyCollection<string> aliases, bool isActive) : base(id)
+    private ArticleTag(ArticleTagSlug id, string displayName, IReadOnlyCollection<string> aliases, bool isActive) : base(id)
     {
         DisplayName = displayName;
         Aliases = aliases;
@@ -25,21 +25,21 @@ public sealed class NoteTag : Entity<NoteTagSlug>
     public IReadOnlyCollection<string> Aliases { get; private set; }
 
     /// <summary>
-    /// Gets whether the tag can be assigned to notes.
+    /// Gets whether the tag can be assigned to articles.
     /// </summary>
     public bool IsActive { get; private set; }
 
     /// <summary>
-    /// Gets the snapshot copied onto notes that reference this tag.
+    /// Gets the snapshot copied onto articles that reference this tag.
     /// </summary>
-    public NoteTagSnapshot Snapshot => NoteTagSnapshot.Create(Id, DisplayName);
+    public ArticleTagSnapshot Snapshot => ArticleTagSnapshot.Create(Id, DisplayName);
 
     /// <summary>
-    /// Creates an active note tag with optional aliases.
+    /// Creates an active article tag with optional aliases.
     /// </summary>
-    public static NoteTag Create(NoteTagSlug slug, string displayName, IEnumerable<string>? aliases = null)
+    public static ArticleTag Create(ArticleTagSlug slug, string displayName, IEnumerable<string>? aliases = null)
     {
-        return new NoteTag(
+        return new ArticleTag(
             slug,
             Guard.Required(displayName, "tagDisplayName", 80),
             NormalizeAliases(aliases ?? []),

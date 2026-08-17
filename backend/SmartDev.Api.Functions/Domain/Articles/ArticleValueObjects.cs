@@ -1,16 +1,16 @@
 using System.Text.RegularExpressions;
 using SmartDev.Api.Functions.Domain.Common;
 
-namespace SmartDev.Api.Functions.Domain.Notes;
+namespace SmartDev.Api.Functions.Domain.Articles;
 
 /// <summary>
-/// Represents the human-readable note title displayed in lists and detail pages.
+/// Represents the human-readable article title displayed in lists and detail pages.
 /// </summary>
-public sealed record NoteTitle
+public sealed record ArticleTitle
 {
     private const int MaxLength = 160;
 
-    private NoteTitle(string value) => Value = value;
+    private ArticleTitle(string value) => Value = value;
 
     /// <summary>
     /// Gets the trimmed title text.
@@ -18,25 +18,25 @@ public sealed record NoteTitle
     public string Value { get; }
 
     /// <summary>
-    /// Creates a validated note title.
+    /// Creates a validated article title.
     /// </summary>
-    public static NoteTitle Create(string value) => new(Guard.Required(value, "title", MaxLength));
+    public static ArticleTitle Create(string value) => new(Guard.Required(value, "title", MaxLength));
 
     public override string ToString() => Value;
 }
 
 /// <summary>
-/// Represents the URL-safe public identifier used to route to a note.
+/// Represents the URL-safe public identifier used to route to an article.
 /// </summary>
 /// <remarks>
 /// Slugs are normalized to lowercase and may contain lowercase letters, numbers, and single hyphens between segments.
 /// </remarks>
-public sealed record NoteSlug
+public sealed record ArticleSlug
 {
     private const int MaxLength = 120;
     private static readonly Regex SlugExpression = new("^[a-z0-9]+(?:-[a-z0-9]+)*$", RegexOptions.Compiled);
 
-    private NoteSlug(string value) => Value = value;
+    private ArticleSlug(string value) => Value = value;
 
     /// <summary>
     /// Gets the normalized URL-safe slug.
@@ -44,26 +44,26 @@ public sealed record NoteSlug
     public string Value { get; }
 
     /// <summary>
-    /// Creates a validated, lowercase note slug.
+    /// Creates a validated, lowercase article slug.
     /// </summary>
-    public static NoteSlug Create(string value)
+    public static ArticleSlug Create(string value)
     {
         var slug = Guard.Required(value, "slug", MaxLength).ToLowerInvariant();
         if (!SlugExpression.IsMatch(slug)) throw new ArgumentException("slug must be URL-safe and use lowercase letters, numbers, and hyphens.", "slug");
-        return new NoteSlug(slug);
+        return new ArticleSlug(slug);
     }
 
     public override string ToString() => Value;
 }
 
 /// <summary>
-/// Represents the short note preview shown in lists, cards, and search results.
+/// Represents the short article preview shown in lists, cards, and search results.
 /// </summary>
-public sealed record NoteSummary
+public sealed record ArticleSummary
 {
     private const int MaxLength = 500;
 
-    private NoteSummary(string value) => Value = value;
+    private ArticleSummary(string value) => Value = value;
 
     /// <summary>
     /// Gets the trimmed summary text.
@@ -71,22 +71,22 @@ public sealed record NoteSummary
     public string Value { get; }
 
     /// <summary>
-    /// Creates a validated note summary.
+    /// Creates a validated article summary.
     /// </summary>
-    public static NoteSummary Create(string value) => new(Guard.Required(value, "summary", MaxLength));
+    public static ArticleSummary Create(string value) => new(Guard.Required(value, "summary", MaxLength));
 
     public override string ToString() => Value;
 }
 
 /// <summary>
-/// Represents the canonical slug for a managed note category.
+/// Represents the canonical slug for a managed article category.
 /// </summary>
-public sealed record NoteCategorySlug
+public sealed record ArticleCategorySlug
 {
     private const int MaxLength = 80;
     private static readonly Regex SlugExpression = new("^[a-z0-9]+(?:-[a-z0-9]+)*$", RegexOptions.Compiled);
 
-    private NoteCategorySlug(string value) => Value = value;
+    private ArticleCategorySlug(string value) => Value = value;
 
     /// <summary>
     /// Gets the normalized category slug.
@@ -96,24 +96,24 @@ public sealed record NoteCategorySlug
     /// <summary>
     /// Creates a validated, lowercase category slug.
     /// </summary>
-    public static NoteCategorySlug Create(string value)
+    public static ArticleCategorySlug Create(string value)
     {
         var slug = Guard.Required(value, "categorySlug", MaxLength).ToLowerInvariant();
         if (!SlugExpression.IsMatch(slug)) throw new ArgumentException("categorySlug must be URL-safe and use lowercase letters, numbers, and hyphens.", "categorySlug");
-        return new NoteCategorySlug(slug);
+        return new ArticleCategorySlug(slug);
     }
 
     public override string ToString() => Value;
 }
 
 /// <summary>
-/// Stores the category data a note needs to render without a catalog lookup.
+/// Stores the category data an article needs to render without a catalog lookup.
 /// </summary>
-public sealed record NoteCategorySnapshot
+public sealed record ArticleCategorySnapshot
 {
     private const int MaxDisplayNameLength = 80;
 
-    private NoteCategorySnapshot(NoteCategorySlug slug, string displayName)
+    private ArticleCategorySnapshot(ArticleCategorySlug slug, string displayName)
     {
         Slug = slug;
         DisplayName = displayName;
@@ -122,24 +122,24 @@ public sealed record NoteCategorySnapshot
     /// <summary>
     /// Gets the canonical category slug.
     /// </summary>
-    public NoteCategorySlug Slug { get; }
+    public ArticleCategorySlug Slug { get; }
 
     /// <summary>
-    /// Gets the category display name captured when the note was saved.
+    /// Gets the category display name captured when the article was saved.
     /// </summary>
     public string DisplayName { get; }
 
     /// <summary>
-    /// Creates a category snapshot for storage on a note.
+    /// Creates a category snapshot for storage on an article.
     /// </summary>
-    public static NoteCategorySnapshot Create(NoteCategorySlug slug, string displayName)
+    public static ArticleCategorySnapshot Create(ArticleCategorySlug slug, string displayName)
     {
-        return new NoteCategorySnapshot(slug, Guard.Required(displayName, "categoryDisplayName", MaxDisplayNameLength));
+        return new ArticleCategorySnapshot(slug, Guard.Required(displayName, "categoryDisplayName", MaxDisplayNameLength));
     }
 }
 
 /// <summary>
-/// Represents the editable Markdown body of a note.
+/// Represents the editable Markdown body of an article.
 /// </summary>
 public sealed record MarkdownContent
 {
@@ -164,14 +164,14 @@ public sealed record MarkdownContent
 }
 
 /// <summary>
-/// Represents the canonical slug for a managed note tag.
+/// Represents the canonical slug for a managed article tag.
 /// </summary>
-public sealed record NoteTagSlug
+public sealed record ArticleTagSlug
 {
     private const int MaxLength = 80;
     private static readonly Regex SlugExpression = new("^[a-z0-9]+(?:-[a-z0-9]+)*$", RegexOptions.Compiled);
 
-    private NoteTagSlug(string value) => Value = value;
+    private ArticleTagSlug(string value) => Value = value;
 
     /// <summary>
     /// Gets the normalized canonical tag slug.
@@ -181,24 +181,24 @@ public sealed record NoteTagSlug
     /// <summary>
     /// Creates a validated, lowercase tag slug.
     /// </summary>
-    public static NoteTagSlug Create(string value)
+    public static ArticleTagSlug Create(string value)
     {
         var normalized = Guard.Required(value, "tagSlug", MaxLength).ToLowerInvariant();
         if (!SlugExpression.IsMatch(normalized)) throw new ArgumentException("tagSlug must be URL-safe and use lowercase letters, numbers, and hyphens.", "tagSlug");
-        return new NoteTagSlug(normalized);
+        return new ArticleTagSlug(normalized);
     }
 
     public override string ToString() => Value;
 }
 
 /// <summary>
-/// Stores the tag data a note needs to render without a catalog lookup.
+/// Stores the tag data an article needs to render without a catalog lookup.
 /// </summary>
-public sealed record NoteTagSnapshot
+public sealed record ArticleTagSnapshot
 {
     private const int MaxDisplayNameLength = 80;
 
-    private NoteTagSnapshot(NoteTagSlug slug, string displayName)
+    private ArticleTagSnapshot(ArticleTagSlug slug, string displayName)
     {
         Slug = slug;
         DisplayName = displayName;
@@ -207,24 +207,24 @@ public sealed record NoteTagSnapshot
     /// <summary>
     /// Gets the canonical tag slug.
     /// </summary>
-    public NoteTagSlug Slug { get; }
+    public ArticleTagSlug Slug { get; }
 
     /// <summary>
-    /// Gets the tag display name captured when the note was saved.
+    /// Gets the tag display name captured when the article was saved.
     /// </summary>
     public string DisplayName { get; }
 
     /// <summary>
-    /// Creates a tag snapshot for storage on a note.
+    /// Creates a tag snapshot for storage on an article.
     /// </summary>
-    public static NoteTagSnapshot Create(NoteTagSlug slug, string displayName)
+    public static ArticleTagSnapshot Create(ArticleTagSlug slug, string displayName)
     {
-        return new NoteTagSnapshot(slug, Guard.Required(displayName, "tagDisplayName", MaxDisplayNameLength));
+        return new ArticleTagSnapshot(slug, Guard.Required(displayName, "tagDisplayName", MaxDisplayNameLength));
     }
 }
 
 /// <summary>
-/// References a portfolio project related to a note.
+/// References a portfolio project related to an article.
 /// </summary>
 public sealed record RelatedProjectReference
 {

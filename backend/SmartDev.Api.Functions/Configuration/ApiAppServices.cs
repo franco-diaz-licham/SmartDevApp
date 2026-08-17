@@ -65,17 +65,17 @@ public static class ApiAppServices
 
         services.AddScoped<CreateContactEmailHandler>();
         services.AddScoped<UpdateContactEmailStatusHandler>();
-        services.AddScoped<GetPublicNotesHandler>();
-        services.AddScoped<GetOwnerNotesHandler>();
-        services.AddScoped<GetOwnerNoteByIdHandler>();
-        services.AddScoped<GetPublicNoteByIdHandler>();
-        services.AddScoped<GetPublicNoteCategoriesHandler>();
-        services.AddScoped<GetOwnerNoteCategoriesHandler>();
-        services.AddScoped<GetPublicNoteTagsHandler>();
-        services.AddScoped<SearchPublicNotesHandler>();
-        services.AddScoped<GetPublicNoteSearchIndexHandler>();
-        services.AddScoped<CreateNoteHandler>();
-        services.AddScoped<UpdateNoteHandler>();
+        services.AddScoped<GetPublicArticlesHandler>();
+        services.AddScoped<GetOwnerArticlesHandler>();
+        services.AddScoped<GetOwnerArticleByIdHandler>();
+        services.AddScoped<GetPublicArticleByIdHandler>();
+        services.AddScoped<GetPublicArticleCategoriesHandler>();
+        services.AddScoped<GetOwnerArticleCategoriesHandler>();
+        services.AddScoped<GetPublicArticleTagsHandler>();
+        services.AddScoped<SearchPublicArticlesHandler>();
+        services.AddScoped<GetPublicArticleSearchIndexHandler>();
+        services.AddScoped<CreateArticleHandler>();
+        services.AddScoped<UpdateArticleHandler>();
 
         return services;
     }
@@ -113,7 +113,7 @@ public static class ApiAppServices
         services.AddSingleton<IDocumentStore, CosmosDocumentStore>();
         services.AddHostedService<DocumentContainerInitializer>();
         services.AddScoped<IContactMessageStore, CosmosContactMessageStore>();
-        services.AddScoped<INoteRepository, CosmosNoteRepository>();
+        services.AddScoped<IArticleRepository, CosmosArticleRepository>();
 
         return services;
     }

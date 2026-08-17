@@ -1,13 +1,13 @@
 using SmartDev.Api.Functions.Domain.Common;
 
-namespace SmartDev.Api.Functions.Domain.Notes;
+namespace SmartDev.Api.Functions.Domain.Articles;
 
 /// <summary>
-/// Defines a managed category that notes can reference through snapshots.
+/// Defines a managed category that articles can reference through snapshots.
 /// </summary>
-public sealed class NoteCategory : Entity<NoteCategorySlug>
+public sealed class ArticleCategory : Entity<ArticleCategorySlug>
 {
-    private NoteCategory(NoteCategorySlug id, string displayName, string? description, int sortOrder, bool isActive) : base(id)
+    private ArticleCategory(ArticleCategorySlug id, string displayName, string? description, int sortOrder, bool isActive) : base(id)
     {
         DisplayName = displayName;
         Description = description;
@@ -31,21 +31,21 @@ public sealed class NoteCategory : Entity<NoteCategorySlug>
     public int SortOrder { get; private set; }
 
     /// <summary>
-    /// Gets whether the category can be assigned to notes.
+    /// Gets whether the category can be assigned to articles.
     /// </summary>
     public bool IsActive { get; private set; }
 
     /// <summary>
-    /// Gets the snapshot copied onto notes that reference this category.
+    /// Gets the snapshot copied onto articles that reference this category.
     /// </summary>
-    public NoteCategorySnapshot Snapshot => NoteCategorySnapshot.Create(Id, DisplayName);
+    public ArticleCategorySnapshot Snapshot => ArticleCategorySnapshot.Create(Id, DisplayName);
 
     /// <summary>
-    /// Creates an active note category.
+    /// Creates an active article category.
     /// </summary>
-    public static NoteCategory Create(NoteCategorySlug slug, string displayName, string? description = null, int sortOrder = 0)
+    public static ArticleCategory Create(ArticleCategorySlug slug, string displayName, string? description = null, int sortOrder = 0)
     {
-        return new NoteCategory(
+        return new ArticleCategory(
             slug,
             Guard.Required(displayName, "categoryDisplayName", 80),
             Guard.Optional(description, "categoryDescription", 500),

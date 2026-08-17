@@ -1,16 +1,16 @@
-using SmartDev.Api.Functions.Domain.Notes;
+using SmartDev.Api.Functions.Domain.Articles;
 using static SmartDev.Tests.TestData.AggregateTestData;
 
-namespace SmartDev.Tests.Api.Notes;
+namespace SmartDev.Tests.Api.Articles;
 
 [TestFixture]
-public sealed class NoteCatalogTests
+public sealed class ArticleCatalogTests
 {
     [Test]
-    public void CreateNoteCategory_ValidDetails_CreatesCategorySnapshot()
+    public void CreateArticleCategory_ValidDetails_CreatesCategorySnapshot()
     {
         // Act
-        var category = CreateNoteCategory("backend", "Backend");
+        var category = CreateArticleCategory("backend", "Backend");
 
         // Assert
         category.Id.Value.ShouldBe("backend");
@@ -21,10 +21,10 @@ public sealed class NoteCatalogTests
     }
 
     [Test]
-    public void CreateNoteTag_ValidDetails_CreatesTagSnapshotAndNormalizesAliases()
+    public void CreateArticleTag_ValidDetails_CreatesTagSnapshotAndNormalizesAliases()
     {
         // Act
-        var tag = CreateNoteTag("csharp", "C#", [" C# ", "c-sharp", "c#"]);
+        var tag = CreateArticleTag("csharp", "C#", [" C# ", "c-sharp", "c#"]);
 
         // Assert
         tag.Id.Value.ShouldBe("csharp");
@@ -36,10 +36,10 @@ public sealed class NoteCatalogTests
 
     [TestCase("C Sharp")]
     [TestCase("c_sharp")]
-    public void CreateNoteTag_InvalidSlug_ThrowsArgumentException(string slug)
+    public void CreateArticleTag_InvalidSlug_ThrowsArgumentException(string slug)
     {
         // Act
-        var exception = Should.Throw<ArgumentException>(() => NoteTag.Create(NoteTagSlug.Create(slug), "C#"));
+        var exception = Should.Throw<ArgumentException>(() => ArticleTag.Create(ArticleTagSlug.Create(slug), "C#"));
 
         // Assert
         exception.ParamName.ShouldBe("tagSlug");

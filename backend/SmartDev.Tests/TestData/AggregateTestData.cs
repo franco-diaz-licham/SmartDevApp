@@ -1,5 +1,5 @@
 using SmartDev.Api.Functions.Domain.Contact;
-using SmartDev.Api.Functions.Domain.Notes;
+using SmartDev.Api.Functions.Domain.Articles;
 
 namespace SmartDev.Tests.TestData;
 
@@ -18,36 +18,36 @@ internal static class AggregateTestData
             submittedAt: submittedAt ?? DateTimeOffset.UtcNow);
     }
 
-    public static Note CreateNote(
-        string title = "Azure Functions Notes",
-        string slug = "azure-functions-notes",
-        string summary = "Useful notes about Azure Functions.",
+    public static Article CreateArticle(
+        string title = "Azure Functions Articles",
+        string slug = "azure-functions-articles",
+        string summary = "Useful articles about Azure Functions.",
         string category = "Backend",
-        string bodyMarkdown = "# Azure Functions\n\nNotes.",
+        string bodyMarkdown = "# Azure Functions\n\nArticles.",
         IEnumerable<string>? tags = null,
         DateTimeOffset? createdAt = null)
     {
-        return Note.CreateDraft(
-            id: NoteId.New(),
-            title: NoteTitle.Create(title),
-            slug: NoteSlug.Create(slug),
-            summary: NoteSummary.Create(summary),
-            category: NoteCategorySnapshot.Create(NoteCategorySlug.Create(ToSlug(category)), category.Trim()),
+        return Article.CreateDraft(
+            id: ArticleId.New(),
+            title: ArticleTitle.Create(title),
+            slug: ArticleSlug.Create(slug),
+            summary: ArticleSummary.Create(summary),
+            category: ArticleCategorySnapshot.Create(ArticleCategorySlug.Create(ToSlug(category)), category.Trim()),
             body: MarkdownContent.Create(bodyMarkdown),
             tags: (tags ?? ["azure-functions", "dotnet"])
-                .Select(tag => NoteTagSnapshot.Create(NoteTagSlug.Create(tag), ToDisplayName(tag))),
+                .Select(tag => ArticleTagSnapshot.Create(ArticleTagSlug.Create(tag), ToDisplayName(tag))),
             relatedProjects: [],
             now: createdAt ?? DateTimeOffset.UtcNow);
     }
 
-    public static NoteCategory CreateNoteCategory(string slug = "backend", string displayName = "Backend")
+    public static ArticleCategory CreateArticleCategory(string slug = "backend", string displayName = "Backend")
     {
-        return NoteCategory.Create(NoteCategorySlug.Create(slug), displayName);
+        return ArticleCategory.Create(ArticleCategorySlug.Create(slug), displayName);
     }
 
-    public static NoteTag CreateNoteTag(string slug = "dotnet", string displayName = ".NET", IEnumerable<string>? aliases = null)
+    public static ArticleTag CreateArticleTag(string slug = "dotnet", string displayName = ".NET", IEnumerable<string>? aliases = null)
     {
-        return NoteTag.Create(NoteTagSlug.Create(slug), displayName, aliases);
+        return ArticleTag.Create(ArticleTagSlug.Create(slug), displayName, aliases);
     }
 
     private static string ToSlug(string value)
