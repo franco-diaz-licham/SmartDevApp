@@ -31,7 +31,6 @@ export const ArticlesMainContent = ({ articles, searchTerm, isArticlesLoading, i
           className="min-h-12 text-base"
           onChange={(event: ChangeEvent<HTMLInputElement>) => onSearchTermChange(event.target.value)}
         />
-
         <AuthenticatedOnly>
           <Link
             className="inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-4 text-sm font-extrabold text-primary-foreground no-underline hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30"
