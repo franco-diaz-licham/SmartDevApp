@@ -1,5 +1,5 @@
 import UilPen from '@iconscout/react-unicons/icons/uil-pen';
-import type { HTMLAttributes, KeyboardEvent } from 'react';
+import type { HTMLAttributes, KeyboardEvent, ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
 interface AppInlineEditIconProps {
@@ -12,6 +12,8 @@ interface AppInlineEditSurfaceProps extends Omit<HTMLAttributes<HTMLDivElement>,
   inlineField?: 'textInput' | 'textArea';
   inlineSize?: 'default' | 'title' | 'summary';
   iconClassName?: string;
+  label?: ReactNode;
+  required?: boolean;
   onEdit?: () => void;
 }
 
@@ -30,7 +32,7 @@ export const AppInlineEditIcon = ({ className }: AppInlineEditIconProps) => (
   <UilPen aria-hidden="true" className={cn('pointer-events-none absolute right-2 top-2 size-3.5 opacity-0 transition group-hover:opacity-70 group-focus:opacity-70', className)} />
 );
 
-export const AppInlineEditSurface = ({ children, className, disabled = false, inlineField = 'textInput', inlineSize = 'default', iconClassName, onEdit, ...surfaceProps }: AppInlineEditSurfaceProps) => {
+export const AppInlineEditSurface = ({ children, className, disabled = false, inlineField = 'textInput', inlineSize = 'default', iconClassName, label, required = false, onEdit, ...surfaceProps }: AppInlineEditSurfaceProps) => {
   const isEditable = !disabled && Boolean(onEdit);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -42,7 +44,7 @@ export const AppInlineEditSurface = ({ children, className, disabled = false, in
     }
   };
 
-  return (
+  const surface = (
     <div
       {...surfaceProps}
       aria-disabled={isEditable ? undefined : true}
@@ -60,6 +62,25 @@ export const AppInlineEditSurface = ({ children, className, disabled = false, in
     >
       {isEditable ? <AppInlineEditIcon className={iconClassName} /> : null}
       {children}
+    </div>
+  );
+
+  if (!label) return surface;
+
+  return (
+    <div className="block w-full">
+      <p className="mb-2 block text-sm font-semibold text-foreground">
+        {label}
+        {required ? (
+          <>
+            <span aria-hidden="true" className="ml-1.5 align-middle text-xl font-bold leading-none text-destructive">
+              *
+            </span>
+            <span className="sr-only"> required</span>
+          </>
+        ) : null}
+      </p>
+      {surface}
     </div>
   );
 };

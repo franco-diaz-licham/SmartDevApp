@@ -39,8 +39,8 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
       {isLoading && <ArticleContentSkeleton />}
       {isError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Article could not be loaded.</p>}
       {article && (
-        <>
-          <header id="overview" className="scroll-mt-28 border-b border-border pb-10">
+        <div className="flex flex-col gap-3">
+          <header id="overview" className="scroll-mt-28 border-b border-border pb-10 flex flex-col gap-3">
             <AppInputText
               autoFocus={isEditable && form?.editingField === 'title'}
               inline
@@ -78,14 +78,14 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
               onInlineEdit={isEditable ? () => form?.editField('summary') : undefined}
             />
           </header>
-          <p className="mt-10 text-xs font-extrabold uppercase tracking-wide text-muted-foreground">Article body</p>
           {isEditable && form?.editingField === 'bodyMarkdown' ? (
-            <div ref={bodyEditorRef} className="mt-3 rounded-md border border-border bg-background" onBlur={handleBodyEditorBlur}>
+            <div ref={bodyEditorRef} onBlur={handleBodyEditorBlur}>
               <AppInputTextArea
                 autoFocus
                 aria-label="Article body"
                 inline
-                className="min-h-144 resize-none overflow-hidden border-0 font-mono text-sm leading-7 shadow-none field-sizing-content focus:ring-0"
+                label="ARTICLE BODY"
+                className="min-h-144 resize-none overflow-hidden rounded-md border border-border bg-background font-mono text-sm leading-7 shadow-none field-sizing-content"
                 error={form?.errors.bodyMarkdown}
                 name="bodyMarkdown"
                 required={isEditable}
@@ -96,13 +96,13 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
               />
             </div>
           ) : (
-            <AppInlineEditSurface className="mt-3" disabled={!isEditable} iconClassName="top-2 size-4 translate-y-0" onEdit={handleBodyEdit}>
+            <AppInlineEditSurface className="mt-3" disabled={!isEditable} iconClassName="top-2 size-4 translate-y-0" label="ARTICLE BODY" required={isEditable} onEdit={handleBodyEdit}>
               <div className="space-y-6 pb-16">
                 <ArticleMarkdown markdown={bodyMarkdownValue ?? ''} />
               </div>
             </AppInlineEditSurface>
           )}
-        </>
+        </div>
       )}
     </article>
   );
