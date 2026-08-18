@@ -162,6 +162,7 @@ public sealed class Article : Entity<ArticleId>
             ArticleVisibility.Private,
             tags,
             relatedProjects ?? [],
+            createdAt: occurredAt,
             updatedAt: null,
             publishedAt: null,
             archivedAt: null);
