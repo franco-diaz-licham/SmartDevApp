@@ -112,7 +112,7 @@ export const ArticlePage = () => {
   if (!isAuthReady || (!isNewArticle && articleQuery.isLoading)) return <ArticlePageSkeleton />;
 
   const content = (
-    <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 overflow-hidden lg:grid-cols-[17rem_minmax(0,1fr)] xl:grid-cols-[17rem_minmax(0,1fr)_18rem]">
+    <div className="mx-auto h-full max-w-[1560px] overflow-y-auto lg:grid lg:grid-cols-[1fr_18rem] lg:overflow-hidden xl:grid-cols-[17rem_1fr_18rem]">
       <ArticlesSectionsPane sections={sections} />
       <ArticleContent form={isPublicView ? undefined : formController} isEditable={!isPublicView} isLoading={!isNewArticle && articleQuery.isLoading} isError={!isNewArticle && articleQuery.isError} article={article} />
       <ArticleMetadataPane form={isPublicView ? undefined : formController} isEditable={!isPublicView} article={article} />

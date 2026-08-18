@@ -21,8 +21,8 @@ export const ArticlesMainContent = ({ articles, searchTerm, isArticlesLoading, i
   const navigate = useNavigate();
 
   return (
-    <section className="min-h-0 min-w-0 flex-1 overflow-y-auto">
-      <div className="px-5 py-6 sm:px-8 lg:px-10">
+    <section className="min-h-0 flex-1 overflow-y-auto">
+      <div className="p-5 sm:p-8 lg:p-10">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <AppInputText
             id="articles-search"
@@ -31,11 +31,11 @@ export const ArticlesMainContent = ({ articles, searchTerm, isArticlesLoading, i
             type="search"
             value={searchTerm}
             placeholder="Search title, summary, category, or tag"
-            className="min-h-12 w-full text-base sm:flex-1"
+            className="w-full sm:flex-1"
             onChange={(event: ChangeEvent<HTMLInputElement>) => onSearchTermChange(event.target.value)}
           />
           <AuthenticatedOnly>
-            <AppButton className="mb-0 mt-0 min-h-12 w-full px-4 text-sm font-extrabold sm:w-32" type="button" onClick={() => navigate('/workspace/articles/new')}>
+            <AppButton className="mb-0 mt-0 w-full text-sm sm:w-32" type="button" onClick={() => navigate('/workspace/articles/new')}>
               New article
             </AppButton>
           </AuthenticatedOnly>
@@ -49,11 +49,11 @@ export const ArticlesMainContent = ({ articles, searchTerm, isArticlesLoading, i
           {articles.map((article) => (
             <Link
               key={article.id}
-              className="rounded-md border border-border bg-background p-4 no-underline transition hover:border-primary hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="rounded-md border border-border p-4 no-underline transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
               to={`/workspace/articles/${encodeURIComponent(article.id)}`}
             >
               <span className="text-xs font-extrabold uppercase text-primary">{article.category.displayName}</span>
-              <span className="mt-2 block text-lg font-extrabold leading-snug text-foreground">{article.title}</span>
+              <span className="mt-2 block text-lg font-extrabold">{article.title}</span>
               <span className="mt-2 block border-t border-border pt-3 text-sm leading-6 text-muted-foreground">{article.summary}</span>
               <div className="mt-4 flex flex-wrap gap-2">
                 {article.tags.map((tag) => (
@@ -68,7 +68,7 @@ export const ArticlesMainContent = ({ articles, searchTerm, isArticlesLoading, i
           {!isArticlesLoading && articles.length === 0 && <p className="rounded-md border border-border p-4 text-sm text-muted-foreground">No articles match this view.</p>}
 
           {hasNextPage && (
-            <AppButton appearance="secondary" className="mb-0 mt-0 w-full px-4 py-3 text-sm font-extrabold" type="button" disabled={isFetchingNextPage} onClick={onLoadMore}>
+            <AppButton appearance="secondary" className="mb-0 mt-0 w-full text-sm" type="button" disabled={isFetchingNextPage} onClick={onLoadMore}>
               Load more articles
             </AppButton>
           )}

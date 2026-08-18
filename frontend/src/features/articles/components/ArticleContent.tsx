@@ -35,7 +35,7 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
   };
 
   return (
-    <article className="min-h-0 min-w-0 overflow-y-auto px-5 py-7 sm:px-8 lg:px-10">
+    <article className="min-w-0 px-5 py-7 sm:px-8 lg:min-h-0 lg:overflow-y-auto lg:px-10">
       {isLoading && <ArticleContentSkeleton />}
       {isError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Article could not be loaded.</p>}
       {article && (
@@ -47,7 +47,7 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
               inlineSize="title"
               label="TITLE"
               inlineStatus={isEditable && form?.editingField === 'title' ? 'edit' : 'read'}
-              className="mt-2 p-2 pr-8 text-3xl font-extrabold leading-tight text-foreground"
+              className="mt-2 p-2 pr-8 text-3xl font-extrabold leading-tight"
               error={form?.errors.title}
               name="title"
               required={isEditable}
@@ -85,7 +85,7 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
                 aria-label="Article body"
                 inline
                 label="ARTICLE BODY"
-                className="min-h-144 resize-none overflow-hidden rounded-md border border-border bg-background font-mono text-sm leading-7 shadow-none field-sizing-content"
+                className="min-h-144 resize-none overflow-hidden font-mono text-sm leading-7 field-sizing-content"
                 error={form?.errors.bodyMarkdown}
                 name="bodyMarkdown"
                 required={isEditable}
@@ -96,7 +96,7 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
               />
             </div>
           ) : (
-            <AppInlineEditSurface className="mt-3" disabled={!isEditable} iconClassName="top-2 size-4 translate-y-0" label="ARTICLE BODY" required={isEditable} onEdit={handleBodyEdit}>
+            <AppInlineEditSurface className="mt-3" disabled={!isEditable} label="ARTICLE BODY" required={isEditable} onEdit={handleBodyEdit}>
               <div className="space-y-6 pb-16">
                 <ArticleMarkdown markdown={bodyMarkdownValue ?? ''} />
               </div>

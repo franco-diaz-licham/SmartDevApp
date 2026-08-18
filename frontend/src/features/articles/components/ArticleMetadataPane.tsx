@@ -31,15 +31,15 @@ export const ArticleMetadataPane = ({ form, isEditable = false, article }: Artic
     ));
 
   return (
-    <aside className="min-h-0 overflow-y-auto border-t border-border px-5 py-6 lg:border-l lg:border-t-0 xl:px-6">
+    <aside className="border-t border-border p-5 lg:min-h-0 lg:overflow-y-auto lg:border-l lg:border-t-0">
       <div className="border-b border-border pb-4">
         <h2 className="text-lg font-extrabold">Details</h2>
         <AuthenticatedOnly when={isEditable && Boolean(form)}>
           <div className="mt-4 flex gap-2">
-            <AppButton className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold w-1/2" type="submit" disabled={!form?.isDirty || form.isSaving}>
+            <AppButton className="mb-0 mt-0 w-1/2 text-sm" type="submit" disabled={!form?.isDirty || form.isSaving}>
               {form?.isSaving ? 'Saving...' : 'Save'}
             </AppButton>
-            <AppButton appearance="secondary" className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold w-1/2" type="button" disabled={!form?.isDirty || form.isSaving} onClick={form?.cancel}>
+            <AppButton appearance="secondary" className="mb-0 mt-0 w-1/2 text-sm" type="button" disabled={!form?.isDirty || form.isSaving} onClick={form?.cancel}>
               Cancel
             </AppButton>
           </div>
@@ -84,7 +84,6 @@ export const ArticleMetadataPane = ({ form, isEditable = false, article }: Artic
             autoFocus={isEditable && form?.editingField === 'category'}
             inline
             inlineStatus={isEditable && form?.editingField === 'category' ? 'edit' : 'read'}
-            className="px-2 py-1 pr-8 leading-tight"
             error={form?.errors.category}
             label="Category"
             name="category"
@@ -101,7 +100,7 @@ export const ArticleMetadataPane = ({ form, isEditable = false, article }: Artic
             autoFocus={isEditable && form?.editingField === 'slug'}
             inline
             inlineStatus={isEditable && form?.editingField === 'slug' ? 'edit' : 'read'}
-            className="break-all px-2 py-1 pr-8"
+            className="break-all"
             error={form?.errors.slug}
             label="Slug"
             name="slug"
@@ -118,7 +117,7 @@ export const ArticleMetadataPane = ({ form, isEditable = false, article }: Artic
             autoFocus={isEditable && form?.editingField === 'tags'}
             inline
             inlineStatus={isEditable && form?.editingField === 'tags' ? 'edit' : 'read'}
-            className="flex flex-wrap gap-2 px-2 py-1 pr-8"
+            className="flex flex-wrap gap-2"
             error={form?.errors.tags}
             label="Tags"
             name="tags"

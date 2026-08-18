@@ -16,12 +16,23 @@ export const ArticlesCategoryPane = ({ categories, selectedCategory, onSelectCat
       <h1 className="text-2xl font-extrabold text-primary">Articles</h1>
 
       <nav className="mt-4 lg:hidden" aria-label="Article category filter">
-        <AppSelect id="articles-category" label="Category" options={categoryOptions} value={selectedCategory} onChange={(event: ChangeEvent<HTMLSelectElement>) => onSelectCategory(event.target.value)} />
+        <AppSelect
+          id="articles-category"
+          label="Category"
+          options={categoryOptions}
+          value={selectedCategory}
+          onChange={(event: ChangeEvent<HTMLSelectElement>) => onSelectCategory(event.target.value)}
+        />
       </nav>
 
       <nav className="mt-8 hidden lg:block" aria-label="Article categories">
         <p className="mb-3 text-sm font-extrabold">Categories</p>
-        <AppButtonSelect aria-label="Article categories" options={categoryOptions} value={selectedCategory} onChange={onSelectCategory} />
+        <AppButtonSelect
+          aria-label="Article categories"
+          options={categoryOptions}
+          value={selectedCategory}
+          onChange={onSelectCategory}
+        />
       </nav>
     </aside>
   );

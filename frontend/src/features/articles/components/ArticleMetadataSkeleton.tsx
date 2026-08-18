@@ -1,7 +1,7 @@
 import { WorkspaceSkeletonBlock } from '@/components/common/WorkspaceSkeletonBlock';
 
 export const ArticleMetadataSkeleton = () => (
-  <aside className="hidden min-h-0 overflow-hidden border-l border-border px-5 py-6 xl:block">
+  <aside className="border-t border-border p-5 lg:border-l lg:border-t-0">
     <WorkspaceSkeletonBlock width="8rem" height="1rem" />
     <WorkspaceSkeletonBlock height="2.5rem" className="mt-6" />
     <WorkspaceSkeletonBlock height="2.5rem" className="mt-3" />
