@@ -33,7 +33,7 @@ export const ArticleMetadataPane = ({ form, isEditable = false, article }: Artic
   return (
     <aside className="min-h-0 overflow-y-auto border-t border-border px-5 py-6 lg:border-l lg:border-t-0 xl:px-6">
       <div className="border-b border-border pb-4">
-        <h2 className="text-lg font-extrabold">More Details</h2>
+        <h2 className="text-lg font-extrabold">Details</h2>
         <AuthenticatedOnly when={isEditable && Boolean(form)}>
           <div className="mt-4 flex gap-2">
             <AppButton className="mb-0 mt-0 px-3 py-2 text-sm font-extrabold w-1/2" type="submit" disabled={!form?.isDirty || form.isSaving}>
