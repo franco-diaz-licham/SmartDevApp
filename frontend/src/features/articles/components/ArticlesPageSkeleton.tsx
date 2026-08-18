@@ -5,10 +5,10 @@ import { ArticlesToolbarSkeleton } from './ArticlesToolbarSkeleton';
 
 export const ArticlesPageSkeleton = () => (
   <WorkspacePageWrapper>
-    <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 overflow-hidden lg:grid-cols-[17rem_minmax(0,1fr)]" role="status" aria-label="Loading articles">
+    <div className="mx-auto flex h-full max-w-[1560px] flex-col overflow-hidden lg:grid lg:grid-cols-[17rem_1fr]" role="status" aria-label="Loading articles">
       <ArticlesCategoryPaneSkeleton />
 
-      <section className="h-full min-h-0 min-w-0 overflow-hidden px-5 py-6 sm:px-8 lg:px-10">
+      <section className="min-h-0 min-w-0 flex-1 overflow-hidden px-5 py-6 sm:px-8 lg:px-10">
         <ArticlesToolbarSkeleton />
 
         <div className="mt-8 space-y-4">

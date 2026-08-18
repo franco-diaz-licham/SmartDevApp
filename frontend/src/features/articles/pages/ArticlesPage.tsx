@@ -44,7 +44,7 @@ export const ArticlesPage = () => {
 
   return (
     <WorkspacePageWrapper>
-      <div className="mx-auto grid h-full min-h-0 max-w-[1560px] grid-cols-1 overflow-hidden lg:grid-cols-[17rem_minmax(0,1fr)]">
+      <div className="mx-auto flex h-full max-w-[1560px] flex-col overflow-hidden lg:grid lg:grid-cols-[17rem_1fr]">
         <ArticlesCategoryPane categories={categories} selectedCategory={selectedCategory} onSelectCategory={selectCategory} />
         <ArticlesMainContent
           articles={articles}

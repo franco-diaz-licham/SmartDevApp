@@ -21,7 +21,7 @@ export const ArticlesMainContent = ({ articles, searchTerm, isArticlesLoading, i
   const navigate = useNavigate();
 
   return (
-    <section className="h-full min-h-0 min-w-0 overflow-y-auto">
+    <section className="min-h-0 min-w-0 flex-1 overflow-y-auto">
       <div className="px-5 py-6 sm:px-8 lg:px-10">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <AppInputText
