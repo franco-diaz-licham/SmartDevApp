@@ -1,17 +1,16 @@
 using System.Net;
 using System.Security.Claims;
-using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using SmartDev.Api.Functions.Application.Ports;
+using SmartDev.Api.Functions.Functions;
 
 namespace SmartDev.Api.Functions.Configuration.Middleware;
 
 public sealed class HttpAdminAuthorizationMiddleware(IAccessTokenValidator accessTokenValidator, IAdminAccessAuthorizer adminAccessAuthorizer) : IFunctionsWorkerMiddleware
 {
     private const string BearerPrefix = "Bearer ";
-    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
@@ -68,13 +67,9 @@ public sealed class HttpAdminAuthorizationMiddleware(IAccessTokenValidator acces
         return authorization[BearerPrefix.Length..].Trim();
     }
 
-    private static async Task WriteErrorResponseAsync(FunctionContext context, HttpRequestData request, HttpStatusCode statusCode, string error)
+    private static async Task WriteErrorResponseAsync(FunctionContext context, HttpRequestData request, HttpStatusCode statusCode, string message)
     {
-        var response = request.CreateResponse(statusCode);
-        response.Headers.Add("Content-Type", "application/json");
-        await response.WriteStringAsync(JsonSerializer.Serialize(new AuthorizationErrorResponse(error), SerializerOptions));
+        var response = await request.CreateErrorResponseAsync(statusCode, message, context.CancellationToken);
         context.GetInvocationResult().Value = response;
     }
-
-    private sealed record AuthorizationErrorResponse(string Error);
 }

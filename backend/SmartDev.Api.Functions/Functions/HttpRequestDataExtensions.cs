@@ -37,6 +37,15 @@ internal static class HttpRequestDataExtensions
         };
     }
 
+    public static Result<BaseQuery> BindBaseQueryResult(this HttpRequestData request, int defaultPageSize = 20, int maxPageSize = 100)
+    {
+        try {
+            return Result<BaseQuery>.Success(request.BindBaseQuery(defaultPageSize, maxPageSize));
+        } catch (ArgumentException exception) {
+            return Result<BaseQuery>.Fail(exception.Message, ResultTypeEnum.Invalid);
+        }
+    }
+
     private static int ParsePageSize(string? value, int defaultPageSize, int maxPageSize)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(defaultPageSize);
@@ -118,4 +127,56 @@ internal static class HttpRequestDataExtensions
         await response.WriteStringAsync(JsonSerializer.Serialize(body, JsonOptions), cancellationToken);
         return response;
     }
+
+    public static Task<HttpResponseData> CreateErrorResponseAsync(this HttpRequestData request, HttpStatusCode statusCode, string message, CancellationToken cancellationToken)
+    {
+        return request.CreateJsonResponseAsync(statusCode, new ApiErrorResponse((int)statusCode, message), cancellationToken);
+    }
+
+    public static async Task<HttpResponseData> ToHttpResponseAsync<TResponse>(this Result<TResponse> result, HttpRequestData request, CancellationToken cancellationToken)
+    {
+        var statusCode = GetStatusCode(result.Type);
+
+        if (!result.IsSuccess) {
+            if (result.Error is null) throw new InvalidOperationException("A failed result must include an error message.");
+            return await request.CreateErrorResponseAsync(statusCode, result.Error.Message, cancellationToken);
+        }
+
+        if (result.Value is null) return request.CreateResponse(HttpStatusCode.NoContent);
+        return await request.CreateJsonResponseAsync(statusCode, result.Value, cancellationToken);
+    }
+
+    public static async Task<HttpResponseData> ToHttpResponseAsync(this Result result, HttpRequestData request, CancellationToken cancellationToken)
+    {
+        var statusCode = GetStatusCode(result.Type);
+
+        if (!result.IsSuccess) {
+            if (result.Error is null) throw new InvalidOperationException("A failed result must include an error message.");
+            return await request.CreateErrorResponseAsync(statusCode, result.Error.Message, cancellationToken);
+        }
+
+        return request.CreateResponse(statusCode);
+    }
+
+    private static HttpStatusCode GetStatusCode(ResultTypeEnum type)
+    {
+        return type switch {
+            ResultTypeEnum.Success => HttpStatusCode.OK,
+            ResultTypeEnum.Accepted => HttpStatusCode.Accepted,
+            ResultTypeEnum.Created => HttpStatusCode.Created,
+            ResultTypeEnum.NotFound => HttpStatusCode.NotFound,
+            ResultTypeEnum.Invalid => HttpStatusCode.BadRequest,
+            ResultTypeEnum.Unauthorized => HttpStatusCode.Unauthorized,
+            ResultTypeEnum.Forbidden => HttpStatusCode.Forbidden,
+            ResultTypeEnum.Conflict => HttpStatusCode.Conflict,
+            _ => HttpStatusCode.InternalServerError
+        };
+    }
 }
+
+/// <summary>
+/// Response body returned for expected API failures.
+/// </summary>
+/// <param name="StatusCode">The HTTP status code associated with the failed request.</param>
+/// <param name="Message">The user-facing failure message produced by the application layer.</param>
+public sealed record ApiErrorResponse(int StatusCode, string Message);

@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using SmartDev.Api.Functions.Functions;
 
 namespace SmartDev.Api.Functions.Configuration.Middleware;
 
@@ -16,7 +17,7 @@ public sealed class HttpCorsMiddleware(HttpCorsHeaders corsHeaders) : IFunctions
         }
 
         if (!corsHeaders.TryResolveAllowedOrigin(request, out var allowedOrigin)) {
-            var forbiddenResponse = request.CreateResponse(HttpStatusCode.Forbidden);
+            var forbiddenResponse = await request.CreateErrorResponseAsync(HttpStatusCode.Forbidden, "The request origin is not allowed.", context.CancellationToken);
             context.GetInvocationResult().Value = forbiddenResponse;
             return;
         }
