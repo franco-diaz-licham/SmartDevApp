@@ -12,12 +12,12 @@ public interface IDocumentStore
     /// </summary>
     /// <param name="containerName">The name of the document container.</param>
     /// <param name="partitionKeyPath">The partition key path used by the container.</param>
-    /// <param name="defaultTimeToLiveSeconds">The optional default document time-to-live in seconds.</param>
+    /// <param name="timeToLive">The container time-to-live policy.</param>
     /// <param name="cancellationToken">The token used to cancel the operation.</param>
     Task EnsureContainerAsync(
         string containerName,
         string partitionKeyPath,
-        int? defaultTimeToLiveSeconds = null,
+        DocumentContainerTimeToLive timeToLive = DocumentContainerTimeToLive.UseConfiguredDefault,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -110,6 +110,22 @@ public interface IDocumentStore
         string id,
         string partitionKey,
         CancellationToken cancellationToken = default);
+}
+
+/// <summary>
+/// Defines how a document container should apply default time-to-live.
+/// </summary>
+public enum DocumentContainerTimeToLive
+{
+    /// <summary>
+    /// Use the configured default time-to-live.
+    /// </summary>
+    UseConfiguredDefault,
+
+    /// <summary>
+    /// Disable default time-to-live for durable documents.
+    /// </summary>
+    Disabled
 }
 
 /// <summary>

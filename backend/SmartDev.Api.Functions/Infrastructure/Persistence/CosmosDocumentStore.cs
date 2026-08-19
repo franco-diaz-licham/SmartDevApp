@@ -12,11 +12,19 @@ public sealed class CosmosDocumentStore(CosmosClient client, IOptions<CosmosDbOp
     private static readonly JsonSerializerOptions SerializerOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
     private readonly CosmosDbOptions _options = options.Value;
 
-    public async Task EnsureContainerAsync(string containerName, string partitionKeyPath, int? defaultTimeToLiveSeconds = null, CancellationToken cancellationToken = default)
+    public async Task EnsureContainerAsync(
+        string containerName,
+        string partitionKeyPath,
+        DocumentContainerTimeToLive timeToLive = DocumentContainerTimeToLive.UseConfiguredDefault,
+        CancellationToken cancellationToken = default)
     {
         var databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_options.DatabaseName, throughput: _options.Throughput, cancellationToken: cancellationToken);
         var properties = new ContainerProperties(containerName, partitionKeyPath) {
-            DefaultTimeToLive = defaultTimeToLiveSeconds ?? _options.DefaultTimeToLiveSeconds
+            DefaultTimeToLive = timeToLive switch {
+                DocumentContainerTimeToLive.UseConfiguredDefault => _options.DefaultTimeToLiveSeconds,
+                DocumentContainerTimeToLive.Disabled => null,
+                _ => throw new ArgumentOutOfRangeException(nameof(timeToLive), timeToLive, "Unsupported document container time-to-live policy.")
+            }
         };
 
         await databaseResponse.Database.CreateContainerIfNotExistsAsync(properties, cancellationToken: cancellationToken);

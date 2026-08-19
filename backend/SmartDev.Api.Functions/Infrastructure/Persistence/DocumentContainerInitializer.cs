@@ -18,7 +18,7 @@ public sealed class DocumentContainerInitializer(IDocumentStore documentStore, I
         await documentStore.EnsureContainerAsync(
             ArticleDocument.ContainerName,
             ArticleDocument.PartitionKeyPath,
-            defaultTimeToLiveSeconds: null,
+            timeToLive: DocumentContainerTimeToLive.Disabled,
             cancellationToken: stoppingToken);
 
         logger.LogInformation("Cosmos DB document containers are ready");
