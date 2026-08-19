@@ -9,12 +9,12 @@ export const AppFooter = () => {
         <ul className="flex justify-end gap-4">
           <li className="text-footer-foreground">
             <a className="no-underline" aria-label="LinkedIn" href="https://au.linkedin.com/in/franco-diaz-licham">
-              <UilLinkedin className="text-footer-foreground hover:text-[#adadad]" size="1.8rem" />
+              <UilLinkedin className="text-footer-foreground hover:text-footer-foreground/70" size="1.8rem" />
             </a>
           </li>
           <li className="text-footer-foreground">
             <a className="no-underline" aria-label="GitHub" href="https://github.com/Franco-Diaz-Licham">
-              <UilGithub className="text-footer-foreground hover:text-[#adadad]" size="1.8rem" />
+              <UilGithub className="text-footer-foreground hover:text-footer-foreground/70" size="1.8rem" />
             </a>
           </li>
         </ul>

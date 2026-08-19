@@ -15,6 +15,8 @@ const navigationItems = [
   { label: 'LOG OUT', href: '', visibility: 'authenticated' }
 ] as const;
 
+const navButtonClassName = 'block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline disabled:opacity-60 lg:py-0';
+
 export const AppTopBar = () => {
   const { isAuthReady, isPublicView, interactionInProgress, logout } = useAuth();
 
@@ -42,7 +44,7 @@ export const AppTopBar = () => {
           {isMenuOpen ? <UilTimes size="1.5rem" /> : <UilBars size="1.5rem" />}
         </button>
 
-        <ul id="site-navigation" className={`ml-4 basis-full flex-col gap-y-2 pt-3 font-bold lg:flex lg:basis-auto lg:flex-row lg:justify-end lg:gap-x-6 lg:pt-0 ${isMenuOpen ? 'flex' : 'hidden'}`}>
+        <ul id="site-navigation" className={`ml-4 basis-full flex-col gap-2 pt-3 font-bold lg:flex lg:basis-auto lg:flex-row lg:justify-end lg:gap-6 lg:pt-0 ${isMenuOpen ? 'flex' : 'hidden'}`}>
           {visibleNavigationItems.map((item) => (
             <li key={item.label}>
               {item.href ? (
@@ -50,7 +52,7 @@ export const AppTopBar = () => {
                   {item.label}
                 </a>
               ) : (
-                <button className="block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline disabled:cursor-not-allowed disabled:opacity-60 lg:py-0" type="button" disabled={interactionInProgress} onClick={handleLogout}>
+                <button className={navButtonClassName} type="button" disabled={interactionInProgress} onClick={handleLogout}>
                   {item.label}
                 </button>
               )}

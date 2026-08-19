@@ -38,7 +38,7 @@ const AppToastContent = () => {
                   <Toast.Title className={cn('font-bold leading-tight', toastTitleClassNames[intent])} />
                   <Toast.Description className="mt-1 text-sm leading-5 text-foreground" />
                 </Toast.Message>
-                <Toast.Close className="inline-flex h-7 w-7 items-center justify-center rounded-md text-xl leading-none text-muted-foreground transition hover:cursor-pointer hover:bg-muted hover:text-foreground">
+                <Toast.Close className="grid size-7 place-items-center rounded-md text-xl text-muted-foreground hover:bg-muted hover:text-foreground">
                   <span aria-hidden="true">×</span>
                   <span className="sr-only">Close notification</span>
                 </Toast.Close>

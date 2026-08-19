@@ -74,7 +74,7 @@ export const ContactMeForm = ({ saving, onSave }: ContactMeFormProps) => {
           form.updateField('message', getInputValue(event));
         }}
       />
-      <div className="flex items-end justify-end">
+      <div className="flex justify-end">
         <AppButton disabled={saving || !form.isValid || hasErrors} onClick={handleSave}>
           {saving ? 'Sending...' : 'Submit'}
         </AppButton>

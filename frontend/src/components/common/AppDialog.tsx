@@ -30,7 +30,7 @@ export const AppDialog = ({ children, footer, intent = 'info', open, title, onOp
           <Dialog.Popup className="w-full max-w-md rounded-md border border-border bg-background shadow-xl">
             <Dialog.Header className="flex items-start justify-between gap-4 border-b border-border px-6 py-4">
               <Dialog.Title className={cn('text-2xl font-bold leading-tight', intentTitleClassNames[intent])}>{title}</Dialog.Title>
-              <Dialog.Close className="inline-flex h-8 w-8 items-center justify-center rounded-md text-2xl leading-none text-muted-foreground transition hover:cursor-pointer hover:bg-muted hover:text-foreground">
+              <Dialog.Close className="grid size-8 place-items-center rounded-md text-2xl text-muted-foreground hover:bg-muted hover:text-foreground">
                 <span aria-hidden="true">×</span>
                 <span className="sr-only">Close dialog</span>
               </Dialog.Close>

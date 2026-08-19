@@ -7,7 +7,7 @@ import { portfolioGroups } from '../data/homeContent';
 export const Portfolio = () => {
   return (
     <AppPageContainer id="portfolio" sectionClassName="scroll-mt-32">
-      <h1 className="text-left text-3xl font-bold uppercase leading-tight sm:text-4xl md:text-5xl">Portfolio</h1>
+      <h1 className="text-3xl font-bold uppercase leading-tight sm:text-4xl md:text-5xl">Portfolio</h1>
       <p>
         Here, you'll find a selection of my work that demonstrates my experience in designing, building, and delivering software solutions. From web applications to custom systems, each project represents my focus on clean architecture,
         problem-solving, and user-centered design. Feel free to explore, and reach out if you'd like to connect or collaborate.

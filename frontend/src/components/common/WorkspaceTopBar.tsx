@@ -9,6 +9,8 @@ const workspaceNavigationItems = [
   { label: 'WORKSPACE', href: '/workspace', visibility: 'public' }
 ] as const;
 
+const navButtonClassName = 'block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline disabled:opacity-60 lg:py-0';
+
 export const WorkspaceTopBar = () => {
   const { interactionInProgress, isAuthReady, isMasqueradingAsPublic, isPublicView, isSignedIn, logout, startPublicMasquerade, stopPublicMasquerade } = useAuth();
 
@@ -42,7 +44,7 @@ export const WorkspaceTopBar = () => {
           {isMenuOpen ? <UilTimes size="1.5rem" /> : <UilBars size="1.5rem" />}
         </button>
 
-        <ul id="workspace-navigation" className={`ml-4 basis-full flex-col gap-y-2 pt-3 font-bold lg:flex lg:basis-auto lg:flex-row lg:justify-end lg:gap-x-6 lg:pt-0 ${isMenuOpen ? 'flex' : 'hidden'}`}>
+        <ul id="workspace-navigation" className={`ml-4 basis-full flex-col gap-2 pt-3 font-bold lg:flex lg:basis-auto lg:flex-row lg:justify-end lg:gap-6 lg:pt-0 ${isMenuOpen ? 'flex' : 'hidden'}`}>
           {visibleNavigationItems.map((item) => (
             <li key={item.href}>
               <a className="block py-2 no-underline hover:underline lg:py-0" href={item.href} onClick={closeMenu}>
@@ -53,7 +55,7 @@ export const WorkspaceTopBar = () => {
 
           {isAuthReady && isSignedIn && (
             <li>
-              <button className="block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline lg:py-0" type="button" onClick={handlePublicViewToggle}>
+              <button className={navButtonClassName} type="button" onClick={handlePublicViewToggle}>
                 {isMasqueradingAsPublic ? 'EXIT PUBLIC VIEW' : 'PREVIEW PUBLIC VIEW'}
               </button>
             </li>
@@ -61,7 +63,7 @@ export const WorkspaceTopBar = () => {
 
           {isAuthReady && !isPublicView ? (
             <li>
-              <button className="block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline disabled:cursor-not-allowed disabled:opacity-60 lg:py-0" type="button" disabled={interactionInProgress} onClick={handleLogout}>
+              <button className={navButtonClassName} type="button" disabled={interactionInProgress} onClick={handleLogout}>
                 LOG OUT
               </button>
             </li>

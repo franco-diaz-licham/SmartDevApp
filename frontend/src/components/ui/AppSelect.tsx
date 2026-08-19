@@ -44,7 +44,7 @@ export const AppSelect = <TValue extends string = string>({ className, error, id
       className={cn(
         'min-h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-foreground transition',
         'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
-        inline && 'rounded-md border-transparent bg-muted/35 px-2 py-1 shadow-none hover:border-primary/35 focus:border-primary',
+        inline && 'border-transparent bg-muted/35 px-2 py-1 shadow-none hover:border-primary/35',
         'disabled:cursor-not-allowed disabled:opacity-60',
         className
       )}

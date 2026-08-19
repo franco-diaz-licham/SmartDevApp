@@ -5,12 +5,9 @@ import type { ButtonHTMLAttributes } from 'react';
 
 const buttonVariants = cva(
   [
-    'mb-8 mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4',
-    'font-semibold transition',
-    'enabled:hover:cursor-pointer',
-    'focus-visible:outline-2 focus-visible:outline-offset-2',
-    'focus-visible:outline-ring',
-    'disabled:cursor-not-allowed disabled:opacity-60'
+    'mb-8 mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4 font-semibold transition',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+    'enabled:hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-60'
   ],
   {
     variants: {

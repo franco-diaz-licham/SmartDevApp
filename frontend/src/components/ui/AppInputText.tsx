@@ -42,7 +42,7 @@ export const AppInputText = ({ className, error, id, inline = false, inlineSize 
         'block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground transition placeholder:text-muted-foreground',
         inline ? inlineInputSizeClassNames[inlineSize] : 'min-h-10',
         'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
-        inline && 'rounded-md border-transparent bg-muted/35 px-2 py-1 shadow-none hover:border-primary/35 focus:border-primary',
+        inline && 'border-transparent bg-muted/35 px-2 py-1 shadow-none hover:border-primary/35',
         'disabled:cursor-not-allowed disabled:opacity-60',
         className
       )}

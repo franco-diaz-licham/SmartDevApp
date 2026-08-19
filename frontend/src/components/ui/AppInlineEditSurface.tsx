@@ -54,7 +54,7 @@ export const AppInlineEditSurface = ({ children, className, disabled = false, in
         'relative flex w-full justify-start rounded-md p-1 text-left font-normal text-current',
         inlineEditSurfaceFieldClassNames[inlineField],
         inlineEditSurfaceSizeClassNames[inlineSize],
-        isEditable && 'group cursor-text bg-transparent transition hover:bg-muted/45 hover:ring-1 hover:ring-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/25',
+        isEditable && 'group cursor-text transition hover:bg-muted/45 hover:ring-1 hover:ring-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/25',
         className
       )}
       onClick={isEditable ? onEdit : undefined}

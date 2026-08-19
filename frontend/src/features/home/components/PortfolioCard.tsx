@@ -7,11 +7,11 @@ type PortfolioCardProps = {
 
 export const PortfolioCard = ({ description, image, imageAlt, title }: PortfolioCardProps) => {
   return (
-    <article className="grid h-[27.75rem] overflow-hidden rounded-md border border-black/20 shadow-[0_10px_15px_rgb(160_160_160_/_0.75)] transition hover:cursor-pointer">
+    <article className="grid h-[27.75rem] overflow-hidden rounded-md border border-border shadow-lg">
       <div className="h-[16.25rem] overflow-hidden bg-background">
         <img src={image} className="h-full w-full object-contain transition duration-500 ease-in hover:scale-110 hover:opacity-70" alt={imageAlt} />
       </div>
-      <div className="bg-card p-4 transition hover:bg-accent/40 h-[11.5rem]">
+      <div className="h-[11.5rem] bg-card p-4 hover:bg-accent/40">
         <h5 className="text-lg font-bold uppercase leading-tight text-secondary sm:text-xl">{title}</h5>
         <p>{description}</p>
       </div>

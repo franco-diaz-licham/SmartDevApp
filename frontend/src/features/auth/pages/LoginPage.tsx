@@ -29,7 +29,7 @@ export const LoginPage = () => {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      <section className="w-full max-w-sm rounded-lg border border-border bg-background px-8 py-10 text-center shadow-xl sm:max-w-md sm:px-12">
+      <section className="w-full max-w-sm rounded-lg border border-border bg-background px-8 py-10 text-center shadow-lg sm:max-w-md sm:px-12">
         <img src={logoImage} className="mx-auto mb-6 size-30 object-contain" alt="SmartDev" />
         <h1 className="text-3xl font-extrabold leading-tight text-foreground">Welcome back</h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">Sign in to continue to SmartDev.</p>

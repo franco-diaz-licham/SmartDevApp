@@ -10,7 +10,7 @@ type AppHoneypotProps = {
 
 export const AppHoneypot = ({ id, label, name, value, onChange }: AppHoneypotProps) => {
   return (
-    <div aria-hidden="true" className="absolute left-[-10000px] top-auto h-px w-px overflow-hidden">
+    <div aria-hidden="true" className="sr-only">
       <label htmlFor={id}>{label}</label>
       <input id={id} name={name} tabIndex={-1} value={value} autoComplete="off" onChange={onChange} />
     </div>
