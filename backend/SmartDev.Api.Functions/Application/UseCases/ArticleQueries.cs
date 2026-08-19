@@ -5,87 +5,102 @@ namespace SmartDev.Api.Functions.Application.UsesCases;
 
 public sealed class GetPublicArticlesHandler(IArticleRepository articleRepository)
 {
-    public async Task<Page<PublicArticleListItem>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<PublicArticleListItem>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var articles = await articleRepository.GetPublishedPublicArticlesAsync(query, cancellationToken);
-        return new Page<PublicArticleListItem>(articles.Items.Select(PublicArticleListItem.FromDomain).ToArray(), articles.ContinuationToken);
+        var response = new Page<PublicArticleListItem>(articles.Items.Select(PublicArticleListItem.FromDomain).ToArray(), articles.ContinuationToken);
+        return Result<Page<PublicArticleListItem>>.Success(response);
     }
 }
 
 public sealed class GetOwnerArticlesHandler(IArticleRepository articleRepository)
 {
-    public async Task<Page<PublicArticleListItem>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<PublicArticleListItem>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var articles = await articleRepository.GetAllForOwnerAsync(query, cancellationToken);
-        return new Page<PublicArticleListItem>(articles.Items.Select(PublicArticleListItem.FromDomain).ToArray(), articles.ContinuationToken);
+        var response = new Page<PublicArticleListItem>(articles.Items.Select(PublicArticleListItem.FromDomain).ToArray(), articles.ContinuationToken);
+        return Result<Page<PublicArticleListItem>>.Success(response);
     }
 }
 
 public sealed class GetOwnerArticleByIdHandler(IArticleRepository articleRepository)
 {
-    public async Task<PublicArticleDetail?> HandleAsync(Guid articleId, CancellationToken cancellationToken)
+    public async Task<Result<PublicArticleDetail>> HandleAsync(Guid articleId, CancellationToken cancellationToken)
     {
         var article = await articleRepository.GetByIdAsync(ArticleId.From(articleId), cancellationToken);
-        return article is null ? null : PublicArticleDetail.FromDomain(article);
+        return article is null
+            ? Result<PublicArticleDetail>.Fail("Article was not found.", ResultTypeEnum.NotFound)
+            : Result<PublicArticleDetail>.Success(PublicArticleDetail.FromDomain(article));
     }
 }
 
 public sealed class GetPublicArticleByIdHandler(IArticleRepository articleRepository)
 {
-    public async Task<PublicArticleDetail?> HandleAsync(Guid articleId, CancellationToken cancellationToken)
+    public async Task<Result<PublicArticleDetail>> HandleAsync(Guid articleId, CancellationToken cancellationToken)
     {
         var article = await articleRepository.GetByIdAsync(ArticleId.From(articleId), cancellationToken);
-        if (article is null || article.Status != ArticleStatus.Published || article.Visibility != ArticleVisibility.Public) return null;
-        return PublicArticleDetail.FromDomain(article);
+        if (article is null || article.Status != ArticleStatus.Published || article.Visibility != ArticleVisibility.Public) {
+            return Result<PublicArticleDetail>.Fail("Article was not found.", ResultTypeEnum.NotFound);
+        }
+
+        return Result<PublicArticleDetail>.Success(PublicArticleDetail.FromDomain(article));
     }
 }
 
 public sealed class GetPublicArticleCategoriesHandler(IArticleRepository articleRepository)
 {
-    public async Task<Page<string>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<string>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var categories = await articleRepository.GetPublishedPublicCategoryNamesAsync(query, cancellationToken);
-        return new Page<string>(categories.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), categories.ContinuationToken);
+        var response = new Page<string>(categories.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), categories.ContinuationToken);
+        return Result<Page<string>>.Success(response);
     }
 }
 
 public sealed class GetOwnerArticleCategoriesHandler(IArticleRepository articleRepository)
 {
-    public async Task<Page<string>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<string>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var categories = await articleRepository.GetOwnerCategoryNamesAsync(query, cancellationToken);
-        return new Page<string>(categories.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), categories.ContinuationToken);
+        var response = new Page<string>(categories.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), categories.ContinuationToken);
+        return Result<Page<string>>.Success(response);
     }
 }
 
 public sealed class GetPublicArticleTagsHandler(IArticleRepository articleRepository)
 {
-    public async Task<Page<string>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<string>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var tags = await articleRepository.GetPublishedPublicTagNamesAsync(query, cancellationToken);
-        return new Page<string>(tags.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), tags.ContinuationToken);
+        var response = new Page<string>(tags.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), tags.ContinuationToken);
+        return Result<Page<string>>.Success(response);
     }
 }
 
 public sealed class SearchPublicArticlesHandler(IArticleRepository articleRepository)
 {
-    public async Task<Page<PublicArticleListItem>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<PublicArticleListItem>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(query.SearchTerm)) return new Page<PublicArticleListItem>([], null);
+        if (string.IsNullOrWhiteSpace(query.SearchTerm)) {
+            return Result<Page<PublicArticleListItem>>.Success(new Page<PublicArticleListItem>([], null));
+        }
 
         var articles = await articleRepository.SearchPublishedPublicArticlesAsync(query, cancellationToken);
-        return new Page<PublicArticleListItem>(articles.Items.Select(PublicArticleListItem.FromDomain).ToArray(), articles.ContinuationToken);
+        var response = new Page<PublicArticleListItem>(articles.Items.Select(PublicArticleListItem.FromDomain).ToArray(), articles.ContinuationToken);
+        return Result<Page<PublicArticleListItem>>.Success(response);
     }
 }
 
 public sealed class GetPublicArticleSearchIndexHandler(IArticleRepository articleRepository)
 {
-    public async Task<PublicSearchIndexResponse> HandleAsync(CancellationToken cancellationToken)
+    public async Task<Result<PublicSearchIndexResponse>> HandleAsync(CancellationToken cancellationToken)
     {
         var articles = await articleRepository.GetPublishedPublicArticlesAsync(cancellationToken);
-        return new PublicSearchIndexResponse(
+        var response = new PublicSearchIndexResponse(
             DateTimeOffset.UtcNow,
             articles.Select(PublicArticleSearchDocument.FromDomain).ToArray());
+
+        return Result<PublicSearchIndexResponse>.Success(response);
     }
 }
 

@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using SmartDev.Api.Functions.Functions;
 
 namespace SmartDev.Api.Functions.Configuration.Middleware;
 
@@ -28,9 +29,9 @@ public sealed class HttpRateLimitingMiddleware(HttpRateLimiter rateLimiter) : IF
         response.Headers.Add("Content-Type", "application/json");
         response.Headers.Add("Retry-After", Math.Ceiling(retryAfter.TotalSeconds).ToString("F0", CultureInfo.InvariantCulture));
 
-        await response.WriteStringAsync(JsonSerializer.Serialize(new RateLimitErrorResponse("Too many requests. Please try again later."), SerializerOptions));
+        await response.WriteStringAsync(JsonSerializer.Serialize(
+            new ApiErrorResponse((int)HttpStatusCode.TooManyRequests, "Too many requests. Please try again later."),
+            SerializerOptions));
         context.GetInvocationResult().Value = response;
     }
-
-    private sealed record RateLimitErrorResponse(string Error);
 }
