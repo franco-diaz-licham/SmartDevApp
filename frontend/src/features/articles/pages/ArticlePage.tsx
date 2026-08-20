@@ -102,7 +102,6 @@ export const ArticlePage = () => {
     isDirty: form.isDirty,
     isSaving: activeMutation.isPending || (!isNewArticle && articleQuery.isLoading),
     savedMessage,
-    errorMessage: activeMutation.error instanceof Error ? activeMutation.error.message : articleQuery.error instanceof Error ? articleQuery.error.message : undefined,
     cancel: handleCancel,
     blurField: handleFieldBlur,
     editField: handleEditField,
@@ -114,7 +113,7 @@ export const ArticlePage = () => {
   const content = (
     <div className="mx-auto h-full max-w-[1560px] overflow-y-auto lg:grid lg:grid-cols-[1fr_18rem] lg:overflow-hidden xl:grid-cols-[17rem_1fr_18rem]">
       <ArticlesSectionsPane sections={sections} />
-      <ArticleContent form={isPublicView ? undefined : formController} isEditable={!isPublicView} isLoading={!isNewArticle && articleQuery.isLoading} isError={!isNewArticle && articleQuery.isError} article={article} />
+      <ArticleContent form={isPublicView ? undefined : formController} isEditable={!isPublicView} isLoading={!isNewArticle && articleQuery.isLoading} article={article} />
       <ArticleMetadataPane form={isPublicView ? undefined : formController} isEditable={!isPublicView} article={article} />
     </div>
   );

@@ -29,10 +29,6 @@ export const HomePage = () => {
       });
       return true;
     } catch {
-      toast.error({
-        title: 'Message failed',
-        message: 'Message could not be sent. Please try again.'
-      });
       return false;
     }
   };

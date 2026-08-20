@@ -10,14 +10,13 @@ interface ArticlesMainContentProps {
   articles: PublicArticleListItemModel[];
   searchTerm: string;
   isArticlesLoading: boolean;
-  isArticlesError: boolean;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onSearchTermChange: (searchTerm: string) => void;
   onLoadMore: () => void;
 }
 
-export const ArticlesMainContent = ({ articles, searchTerm, isArticlesLoading, isArticlesError, hasNextPage, isFetchingNextPage, onSearchTermChange, onLoadMore }: ArticlesMainContentProps) => {
+export const ArticlesMainContent = ({ articles, searchTerm, isArticlesLoading, hasNextPage, isFetchingNextPage, onSearchTermChange, onLoadMore }: ArticlesMainContentProps) => {
   const navigate = useNavigate();
 
   return (
@@ -43,8 +42,6 @@ export const ArticlesMainContent = ({ articles, searchTerm, isArticlesLoading, i
 
         <div className="mt-6 grid gap-3">
           {isArticlesLoading && <ArticlesListSkeleton />}
-
-          {isArticlesError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Articles could not be loaded.</p>}
 
           {articles.map((article) => (
             <Link

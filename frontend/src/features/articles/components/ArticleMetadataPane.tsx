@@ -47,7 +47,6 @@ export const ArticleMetadataPane = ({ form, isEditable = false, article }: Artic
       </div>
 
       {form?.savedMessage ? <p className="mt-4 rounded-md border border-success-border bg-success p-3 text-sm font-bold text-success-heading">{form.savedMessage}</p> : null}
-      {form?.errorMessage ? <p className="mt-4 rounded-md border border-error-border bg-error p-3 text-sm font-bold text-error-heading">{form.errorMessage}</p> : null}
       {!article ? (
         <p className="mt-6 rounded-md border border-border p-4 text-sm text-muted-foreground">Loading article details...</p>
       ) : (

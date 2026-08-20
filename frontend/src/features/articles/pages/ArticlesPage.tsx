@@ -50,7 +50,6 @@ export const ArticlesPage = () => {
           articles={articles}
           searchTerm={searchTerm}
           isArticlesLoading={articlesQuery.isLoading}
-          isArticlesError={articlesQuery.isError}
           hasNextPage={articlesQuery.hasNextPage}
           isFetchingNextPage={articlesQuery.isFetchingNextPage}
           onSearchTermChange={setSearchTerm}

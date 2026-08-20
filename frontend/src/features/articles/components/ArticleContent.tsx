@@ -13,12 +13,11 @@ interface ArticleContentProps {
   isEditable?: boolean;
   article: PublicArticleDetailModel | undefined;
   isLoading: boolean;
-  isError: boolean;
 }
 
 const getInputValue = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => event.target.value;
 
-export const ArticleContent = ({ form, isEditable = false, article, isLoading, isError }: ArticleContentProps) => {
+export const ArticleContent = ({ form, isEditable = false, article, isLoading }: ArticleContentProps) => {
   const bodyEditorRef = useRef<HTMLDivElement>(null);
 
   const titleValue = form?.values.title ?? article?.title;
@@ -37,7 +36,6 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
   return (
     <article className="min-w-0 px-5 py-7 sm:px-8 lg:min-h-0 lg:overflow-y-auto lg:px-10">
       {isLoading && <ArticleContentSkeleton />}
-      {isError && <p className="rounded-md border border-error-border bg-error p-4 text-sm font-bold text-error-heading">Article could not be loaded.</p>}
       {article && (
         <div className="flex flex-col gap-3">
           <header id="overview" className="scroll-mt-28 border-b border-border pb-10 flex flex-col gap-3">

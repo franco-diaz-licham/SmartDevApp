@@ -1,5 +1,7 @@
 import { Toast } from 'primereact/toast';
-import { Toaster, useToasterContext } from 'primereact/toaster';
+import { toast, Toaster, useToasterContext } from 'primereact/toaster';
+import { useEffect } from 'react';
+import { subscribeToFeedback, type AppFeedbackSeverity } from '@/lib/feedback/feedbackEvents';
 import { cn } from '@/lib/cn';
 import type { AppToastIntent } from './AppToastContext';
 
@@ -22,6 +24,13 @@ const getToastIntent = (severity: string | undefined): AppToastIntent => {
   return 'info';
 };
 
+const toastDurationBySeverity: Record<AppFeedbackSeverity, number> = {
+  error: 7000,
+  info: 5000,
+  success: 5000,
+  warn: 5000
+};
+
 const AppToastContent = () => {
   const toaster = useToasterContext();
 
@@ -36,7 +45,7 @@ const AppToastContent = () => {
               <Toast.Content className="flex items-start gap-3">
                 <Toast.Message className="min-w-0 flex-1">
                   <Toast.Title className={cn('font-bold leading-tight', toastTitleClassNames[intent])} />
-                  <Toast.Description className="mt-1 text-sm leading-5 text-foreground" />
+                  <Toast.Description className="mt-1 max-h-48 overflow-auto whitespace-pre-wrap break-words text-sm leading-5 text-foreground" />
                 </Toast.Message>
                 <Toast.Close className="grid size-7 place-items-center rounded-md text-xl text-muted-foreground hover:bg-muted hover:text-foreground">
                   <span aria-hidden="true">×</span>
@@ -52,6 +61,17 @@ const AppToastContent = () => {
 };
 
 export const AppToast = () => {
+  useEffect(() => {
+    return subscribeToFeedback((message) => {
+      toast[message.severity]({
+        description: message.detail,
+        dismissible: true,
+        duration: message.duration ?? toastDurationBySeverity[message.severity],
+        title: message.summary
+      });
+    });
+  }, []);
+
   return (
     <Toaster.Root limit={4} mode="expanded" timeout={5000}>
       <AppToastContent />
