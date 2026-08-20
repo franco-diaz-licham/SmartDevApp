@@ -10,8 +10,15 @@ export type AppToastOptions = {
   title: ReactNode;
 };
 
+export type AppToastErrorOptions = {
+  duration?: number;
+  error?: unknown;
+  message?: ReactNode;
+  title?: ReactNode;
+};
+
 export type AppToastContextValue = {
-  error: (options: Omit<AppToastOptions, 'intent'>) => void;
+  error: (options: AppToastErrorOptions) => void;
   info: (options: Omit<AppToastOptions, 'intent'>) => void;
   show: (options: AppToastOptions) => void;
   success: (options: Omit<AppToastOptions, 'intent'>) => void;

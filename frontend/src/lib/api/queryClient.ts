@@ -1,7 +1,18 @@
-import { QueryClient } from '@tanstack/react-query';
+import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
+import { publishErrorFeedback } from '@/lib/feedback/feedbackEvents';
 import { shouldRetryQuery } from './retryPolicy';
 
 export const queryClient = new QueryClient({
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      publishErrorFeedback(error);
+    }
+  }),
+  queryCache: new QueryCache({
+    onError: (error) => {
+      publishErrorFeedback(error);
+    }
+  }),
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5,

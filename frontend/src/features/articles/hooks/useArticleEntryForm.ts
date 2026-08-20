@@ -14,7 +14,6 @@ export interface ArticleEntryFormController {
   isDirty: boolean;
   isSaving: boolean;
   savedMessage?: string;
-  errorMessage?: string;
   cancel: () => void;
   blurField: () => void;
   editField: (field: EditableArticleEntryField) => void;
