@@ -16,36 +16,28 @@ export interface PageResult<T> {
 }
 
 /**
- * Base shape shared by API error responses.
+ * Error response returned by the API for expected failures.
  */
-export interface ApiBaseError {
+export interface ApiError {
   /** HTTP status code associated with the failed request. */
   statusCode: number;
 
-  /** Optional short error summary suitable for user feedback. */
-  message?: string;
+  /** Short error message returned by the API. */
+  message: string;
 }
 
 /**
  * Error response used when the API rejects one or more submitted values.
  */
-export interface ApiValidationError extends ApiBaseError {
+export interface ApiValidationError extends ApiError {
   /** Field or rule validation messages returned by the API. */
   validationErrors?: string[];
 }
 
 /**
- * Error response used for non-validation failures.
- */
-export interface ApiError extends ApiBaseError {
-  /** Detailed error message returned by the API. */
-  details: string;
-}
-
-/**
  * Supported API error response shape, or `null` when an unknown error cannot be normalised.
  */
-export type ApiErrorResponse = ApiValidationError | ApiError | null;
+export type ApiErrorResponse = ApiError | ApiValidationError | null;
 
 /**
  * Filter descriptor sent to query endpoints that support structured filtering.

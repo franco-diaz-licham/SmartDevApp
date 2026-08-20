@@ -3,46 +3,34 @@ import type { ApiError, ApiErrorResponse, ApiValidationError } from './api.types
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
-const hasNumber = <TKey extends string>(value: Record<string, unknown>, key: TKey): value is Record<TKey, number> => typeof value[key] === 'number';
-
-const hasString = <TKey extends string>(value: Record<string, unknown>, key: TKey): value is Record<TKey, string> => typeof value[key] === 'string';
-
 const hasStringArray = <TKey extends string>(value: Record<string, unknown>, key: TKey): value is Record<TKey, string[]> => Array.isArray(value[key]) && value[key].every((item) => typeof item === 'string');
+
+/**
+ * Determines whether an unknown value is an API error object.
+ */
+export const isApiError = (error: unknown): error is ApiError => isObject(error);
 
 /**
  * Determines whether an unknown value matches the API validation-error shape.
  */
 export const isApiValidationError = (error: unknown): error is ApiValidationError => {
-  if (!isObject(error)) return false;
-  return hasNumber(error, 'statusCode') && (!('validationErrors' in error) || hasStringArray(error, 'validationErrors'));
-};
-
-/**
- * Determines whether an unknown value matches the general API error shape.
- */
-export const isApiError = (error: unknown): error is ApiError => {
-  if (!isObject(error)) return false;
-  return hasNumber(error, 'statusCode') && hasString(error, 'details');
+  if (!isObject(error) || !isApiError(error)) return false;
+  return hasStringArray(error, 'validationErrors');
 };
 
 /**
  * Determines whether an unknown value is any supported API error response.
  */
-export const isApiErrorResponse = (error: unknown): error is Exclude<ApiErrorResponse, null> => isApiError(error) || isApiValidationError(error);
+export const isApiErrorResponse = (error: unknown): error is Exclude<ApiErrorResponse, null> => isApiError(error);
 
 /**
- * Extracts the backend error response from either a raw API error object or an Axios error.
+ * Extracts the backend error response from an Axios error.
  *
- * Returns `null` when the error does not match a known API error contract.
+ * Returns `null` when the error does not include an API response body.
  */
 export const getApiErrorResponse = (error: unknown): ApiErrorResponse => {
-  if (isApiErrorResponse(error)) return error;
-
-  const axiosError = error as AxiosError;
-  const responseData = axiosError.response?.data;
-  if (isApiErrorResponse(responseData)) return responseData;
-
-  return null;
+  const axiosError = error as AxiosError<ApiErrorResponse>;
+  return axiosError.response?.data ?? null;
 };
 
 /**
@@ -61,7 +49,8 @@ export const getErrorStatusCode = (error: unknown): number | undefined => {
  */
 export const getErrorFeedbackSummary = (error: unknown): string => {
   const apiError = getApiErrorResponse(error);
-  return apiError?.message ?? 'Something went wrong';
+  if (!apiError) return 'Something went wrong';
+  return apiError.message;
 };
 
 /**
@@ -70,9 +59,8 @@ export const getErrorFeedbackSummary = (error: unknown): string => {
 export const getErrorFeedbackDetail = (error: unknown): string => {
   const apiError = getApiErrorResponse(error);
 
-  if (apiError && isApiError(apiError)) return apiError.details;
-  if (apiError?.validationErrors?.length) return apiError.validationErrors.join('\n');
-  if (apiError?.message) return apiError.message;
+  if (apiError && isApiValidationError(apiError) && apiError.validationErrors?.length) return apiError.validationErrors.join('\n');
+  if (apiError) return apiError.message;
   if (error instanceof Error) return error.message;
 
   return String(error);
