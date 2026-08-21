@@ -65,17 +65,8 @@ public static class ApiAppServices
 
         services.AddScoped<CreateContactEmailHandler>();
         services.AddScoped<UpdateContactEmailStatusHandler>();
-        services.AddScoped<GetPublicArticlesHandler>();
-        services.AddScoped<GetOwnerArticlesHandler>();
-        services.AddScoped<GetOwnerArticleByIdHandler>();
-        services.AddScoped<GetPublicArticleByIdHandler>();
-        services.AddScoped<GetPublicArticleCategoriesHandler>();
-        services.AddScoped<GetOwnerArticleCategoriesHandler>();
-        services.AddScoped<GetPublicArticleTagsHandler>();
-        services.AddScoped<SearchPublicArticlesHandler>();
-        services.AddScoped<GetPublicArticleSearchIndexHandler>();
-        services.AddScoped<CreateArticleHandler>();
-        services.AddScoped<UpdateArticleHandler>();
+        services.AddScoped<ArticlesQueryHandler>();
+        services.AddScoped<ArticlesCommandHandler>();
 
         return services;
     }

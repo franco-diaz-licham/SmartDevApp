@@ -32,9 +32,9 @@ public sealed record UpdateArticleCommand(
 
 public sealed record UpdateArticleResult(Guid ArticleId, string Slug);
 
-public sealed class CreateArticleHandler(IArticleRepository articleRepository, IDomainEventDispatcher domainEventDispatcher)
+public sealed class ArticlesCommandHandler(IArticleRepository articleRepository, IDomainEventDispatcher domainEventDispatcher)
 {
-    public async Task<Result<CreateArticleResult>> HandleAsync(CreateArticleCommand command, CancellationToken cancellationToken)
+    public async Task<Result<CreateArticleResult>> CreateArticleAsync(CreateArticleCommand command, CancellationToken cancellationToken)
     {
         try {
             if (command.Category is null) return Result<CreateArticleResult>.Fail("Article category is required.", ResultTypeEnum.Invalid);
@@ -64,11 +64,8 @@ public sealed class CreateArticleHandler(IArticleRepository articleRepository, I
             return Result<CreateArticleResult>.Fail(exception.Message, ResultTypeEnum.Conflict);
         }
     }
-}
 
-public sealed class UpdateArticleHandler(IArticleRepository articleRepository, IDomainEventDispatcher domainEventDispatcher)
-{
-    public async Task<Result<UpdateArticleResult>> HandleAsync(UpdateArticleCommand command, CancellationToken cancellationToken)
+    public async Task<Result<UpdateArticleResult>> UpdateArticleAsync(UpdateArticleCommand command, CancellationToken cancellationToken)
     {
         try {
             if (command.Category is null) return Result<UpdateArticleResult>.Fail("Article category is required.", ResultTypeEnum.Invalid);

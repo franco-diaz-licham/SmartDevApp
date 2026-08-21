@@ -3,40 +3,31 @@ using SmartDev.Api.Functions.Domain.Articles;
 
 namespace SmartDev.Api.Functions.Application.UsesCases;
 
-public sealed class GetPublicArticlesHandler(IArticleRepository articleRepository)
+public sealed class ArticlesQueryHandler(IArticleRepository articleRepository)
 {
-    public async Task<Result<Page<PublicArticleListItem>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<PublicArticleListItem>>> GetPublicArticlesAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var articles = await articleRepository.GetPublishedPublicArticlesAsync(query, cancellationToken);
         var response = new Page<PublicArticleListItem>(articles.Items.Select(PublicArticleListItem.FromDomain).ToArray(), articles.ContinuationToken);
         return Result<Page<PublicArticleListItem>>.Success(response);
     }
-}
 
-public sealed class GetOwnerArticlesHandler(IArticleRepository articleRepository)
-{
-    public async Task<Result<Page<PublicArticleListItem>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<PublicArticleListItem>>> GetOwnerArticlesAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var articles = await articleRepository.GetAllForOwnerAsync(query, cancellationToken);
         var response = new Page<PublicArticleListItem>(articles.Items.Select(PublicArticleListItem.FromDomain).ToArray(), articles.ContinuationToken);
         return Result<Page<PublicArticleListItem>>.Success(response);
     }
-}
 
-public sealed class GetOwnerArticleByIdHandler(IArticleRepository articleRepository)
-{
-    public async Task<Result<PublicArticleDetail>> HandleAsync(Guid articleId, CancellationToken cancellationToken)
+    public async Task<Result<PublicArticleDetail>> GetOwnerArticleByIdAsync(Guid articleId, CancellationToken cancellationToken)
     {
         var article = await articleRepository.GetByIdAsync(ArticleId.From(articleId), cancellationToken);
         return article is null
             ? Result<PublicArticleDetail>.Fail("Article was not found.", ResultTypeEnum.NotFound)
             : Result<PublicArticleDetail>.Success(PublicArticleDetail.FromDomain(article));
     }
-}
 
-public sealed class GetPublicArticleByIdHandler(IArticleRepository articleRepository)
-{
-    public async Task<Result<PublicArticleDetail>> HandleAsync(Guid articleId, CancellationToken cancellationToken)
+    public async Task<Result<PublicArticleDetail>> GetPublicArticleByIdAsync(Guid articleId, CancellationToken cancellationToken)
     {
         var article = await articleRepository.GetByIdAsync(ArticleId.From(articleId), cancellationToken);
         if (article is null || article.Status != ArticleStatus.Published || article.Visibility != ArticleVisibility.Public) {
@@ -45,41 +36,29 @@ public sealed class GetPublicArticleByIdHandler(IArticleRepository articleReposi
 
         return Result<PublicArticleDetail>.Success(PublicArticleDetail.FromDomain(article));
     }
-}
 
-public sealed class GetPublicArticleCategoriesHandler(IArticleRepository articleRepository)
-{
-    public async Task<Result<Page<string>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<string>>> GetPublicArticleCategoriesAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var categories = await articleRepository.GetPublishedPublicCategoryNamesAsync(query, cancellationToken);
         var response = new Page<string>(categories.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), categories.ContinuationToken);
         return Result<Page<string>>.Success(response);
     }
-}
 
-public sealed class GetOwnerArticleCategoriesHandler(IArticleRepository articleRepository)
-{
-    public async Task<Result<Page<string>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<string>>> GetOwnerArticleCategoriesAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var categories = await articleRepository.GetOwnerCategoryNamesAsync(query, cancellationToken);
         var response = new Page<string>(categories.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), categories.ContinuationToken);
         return Result<Page<string>>.Success(response);
     }
-}
 
-public sealed class GetPublicArticleTagsHandler(IArticleRepository articleRepository)
-{
-    public async Task<Result<Page<string>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<string>>> GetPublicArticleTagsAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         var tags = await articleRepository.GetPublishedPublicTagNamesAsync(query, cancellationToken);
         var response = new Page<string>(tags.Items.Order(StringComparer.OrdinalIgnoreCase).ToArray(), tags.ContinuationToken);
         return Result<Page<string>>.Success(response);
     }
-}
 
-public sealed class SearchPublicArticlesHandler(IArticleRepository articleRepository)
-{
-    public async Task<Result<Page<PublicArticleListItem>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
+    public async Task<Result<Page<PublicArticleListItem>>> SearchPublicArticlesAsync(BaseQuery query, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(query.SearchTerm)) {
             return Result<Page<PublicArticleListItem>>.Success(new Page<PublicArticleListItem>([], null));
@@ -89,11 +68,8 @@ public sealed class SearchPublicArticlesHandler(IArticleRepository articleReposi
         var response = new Page<PublicArticleListItem>(articles.Items.Select(PublicArticleListItem.FromDomain).ToArray(), articles.ContinuationToken);
         return Result<Page<PublicArticleListItem>>.Success(response);
     }
-}
 
-public sealed class GetPublicArticleSearchIndexHandler(IArticleRepository articleRepository)
-{
-    public async Task<Result<PublicSearchIndexResponse>> HandleAsync(CancellationToken cancellationToken)
+    public async Task<Result<PublicSearchIndexResponse>> GetPublicArticleSearchIndexAsync(CancellationToken cancellationToken)
     {
         var articles = await articleRepository.GetPublishedPublicArticlesAsync(cancellationToken);
         var response = new PublicSearchIndexResponse(

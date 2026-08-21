@@ -5,18 +5,7 @@ using SmartDev.Api.Functions.Application.UsesCases;
 
 namespace SmartDev.Api.Functions.Functions;
 
-public sealed class ArticlesFunction(
-    GetPublicArticlesHandler getPublicArticlesHandler,
-    GetOwnerArticlesHandler getOwnerArticlesHandler,
-    GetOwnerArticleByIdHandler getOwnerArticleByIdHandler,
-    GetPublicArticleByIdHandler getPublicArticleByIdHandler,
-    GetPublicArticleCategoriesHandler getPublicArticleCategoriesHandler,
-    GetOwnerArticleCategoriesHandler getOwnerArticleCategoriesHandler,
-    GetPublicArticleTagsHandler getPublicArticleTagsHandler,
-    SearchPublicArticlesHandler searchPublicArticlesHandler,
-    GetPublicArticleSearchIndexHandler getPublicArticleSearchIndexHandler,
-    CreateArticleHandler createArticleHandler,
-    UpdateArticleHandler updateArticleHandler)
+public sealed class ArticlesFunction(ArticlesQueryHandler articlesQueryHandler, ArticlesCommandHandler articlesCommandHandler)
 {
     [Function(nameof(GetPublicArticles))]
     public async Task<HttpResponseData> GetPublicArticles([HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "articles")] HttpRequestData request, CancellationToken cancellationToken)
@@ -24,7 +13,7 @@ public sealed class ArticlesFunction(
         var query = request.BindBaseQueryResult();
         if (!query.IsSuccess) return await query.ToHttpResponseAsync(request, cancellationToken);
 
-        var result = await getPublicArticlesHandler.HandleAsync(query.Value!, cancellationToken);
+        var result = await articlesQueryHandler.GetPublicArticlesAsync(query.Value!, cancellationToken);
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 
@@ -41,7 +30,7 @@ public sealed class ArticlesFunction(
         var query = request.BindBaseQueryResult(defaultPageSize: 30, maxPageSize: 100);
         if (!query.IsSuccess) return await query.ToHttpResponseAsync(request, cancellationToken);
 
-        var result = await getOwnerArticlesHandler.HandleAsync(query.Value!, cancellationToken);
+        var result = await articlesQueryHandler.GetOwnerArticlesAsync(query.Value!, cancellationToken);
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 
@@ -53,7 +42,7 @@ public sealed class ArticlesFunction(
         var command = body.ToCommandResult();
         if (!command.IsSuccess) return await command.ToHttpResponseAsync(request, cancellationToken);
 
-        var result = await createArticleHandler.HandleAsync(command.Value!, cancellationToken);
+        var result = await articlesCommandHandler.CreateArticleAsync(command.Value!, cancellationToken);
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 
@@ -68,7 +57,7 @@ public sealed class ArticlesFunction(
 
     private async Task<HttpResponseData> GetOwnerArticleByIdAsync(HttpRequestData request, Guid articleId, CancellationToken cancellationToken)
     {
-        var result = await getOwnerArticleByIdHandler.HandleAsync(articleId, cancellationToken);
+        var result = await articlesQueryHandler.GetOwnerArticleByIdAsync(articleId, cancellationToken);
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 
@@ -80,7 +69,7 @@ public sealed class ArticlesFunction(
         var command = body.ToCommandResult(articleId);
         if (!command.IsSuccess) return await command.ToHttpResponseAsync(request, cancellationToken);
 
-        var result = await updateArticleHandler.HandleAsync(command.Value!, cancellationToken);
+        var result = await articlesCommandHandler.UpdateArticleAsync(command.Value!, cancellationToken);
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 
@@ -90,7 +79,7 @@ public sealed class ArticlesFunction(
         var query = request.BindBaseQueryResult();
         if (!query.IsSuccess) return await query.ToHttpResponseAsync(request, cancellationToken);
 
-        var result = await getPublicArticleCategoriesHandler.HandleAsync(query.Value!, cancellationToken);
+        var result = await articlesQueryHandler.GetPublicArticleCategoriesAsync(query.Value!, cancellationToken);
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 
@@ -100,7 +89,7 @@ public sealed class ArticlesFunction(
         var query = request.BindBaseQueryResult();
         if (!query.IsSuccess) return await query.ToHttpResponseAsync(request, cancellationToken);
 
-        var result = await getOwnerArticleCategoriesHandler.HandleAsync(query.Value!, cancellationToken);
+        var result = await articlesQueryHandler.GetOwnerArticleCategoriesAsync(query.Value!, cancellationToken);
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 
@@ -110,7 +99,7 @@ public sealed class ArticlesFunction(
         var query = request.BindBaseQueryResult();
         if (!query.IsSuccess) return await query.ToHttpResponseAsync(request, cancellationToken);
 
-        var result = await getPublicArticleTagsHandler.HandleAsync(query.Value!, cancellationToken);
+        var result = await articlesQueryHandler.GetPublicArticleTagsAsync(query.Value!, cancellationToken);
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 
@@ -120,14 +109,14 @@ public sealed class ArticlesFunction(
         var query = request.BindBaseQueryResult();
         if (!query.IsSuccess) return await query.ToHttpResponseAsync(request, cancellationToken);
 
-        var result = await searchPublicArticlesHandler.HandleAsync(query.Value!, cancellationToken);
+        var result = await articlesQueryHandler.SearchPublicArticlesAsync(query.Value!, cancellationToken);
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 
     [Function(nameof(GetPublicArticleSearchIndex))]
     public async Task<HttpResponseData> GetPublicArticleSearchIndex([HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "articles/search-index")] HttpRequestData request, CancellationToken cancellationToken)
     {
-        var result = await getPublicArticleSearchIndexHandler.HandleAsync(cancellationToken);
+        var result = await articlesQueryHandler.GetPublicArticleSearchIndexAsync(cancellationToken);
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 
@@ -136,7 +125,7 @@ public sealed class ArticlesFunction(
     {
         if (!Guid.TryParse(articleId, out var parsedArticleId)) return await Result.Fail("Article id must be a valid GUID.").ToHttpResponseAsync(request, cancellationToken);
 
-        var result = await getPublicArticleByIdHandler.HandleAsync(parsedArticleId, cancellationToken);
+        var result = await articlesQueryHandler.GetPublicArticleByIdAsync(parsedArticleId, cancellationToken);
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 }
