@@ -9,8 +9,8 @@ import type { ArticlePublishedDateSortDirection } from '../stores/articlesUi.sto
 import type { PublicArticleListItemModel } from '../types/article.types';
 
 const publishedDateSortOptions = [
-  { label: 'Newest published', value: 'desc' },
-  { label: 'Oldest published', value: 'asc' }
+  { label: 'Newest', value: 'desc' },
+  { label: 'Oldest', value: 'asc' }
 ] as const;
 
 interface ArticlesMainContentProps {
@@ -48,7 +48,7 @@ export const ArticlesMainContent = ({ articles, searchTerm, publishedDateSortDir
             name="articlesPublishedDateSort"
             value={publishedDateSortDirection}
             options={publishedDateSortOptions}
-            className="w-full sm:w-48"
+            className="w-full sm:w-40"
             onChange={(event: ChangeEvent<HTMLSelectElement>) => onPublishedDateSortDirectionChange(event.target.value as ArticlePublishedDateSortDirection)}
           />
           <AuthenticatedOnly>
