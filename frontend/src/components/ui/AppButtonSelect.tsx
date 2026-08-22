@@ -24,9 +24,9 @@ export const AppButtonSelect = <TValue extends string = string>({ 'aria-label': 
           key={option.value}
           aria-selected={isSelected}
           className={cn(
-            'block w-full rounded-md px-3 py-2 text-left text-sm font-bold transition',
+            'block w-full rounded-md px-3 py-2 text-left text-sm font-bold transition cursor-pointer',
             'hover:bg-background focus:outline-none focus:ring-2 focus:ring-primary/30',
-            isSelected ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground'
+            isSelected ? 'border border-primary/40 bg-background text-primary shadow-sm' : 'border border-transparent text-muted-foreground'
           )}
           role="option"
           type="button"
