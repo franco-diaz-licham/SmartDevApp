@@ -21,35 +21,6 @@ public sealed class Article : Entity<ArticleId>
         ArticleVisibility visibility,
         IEnumerable<ArticleTagSnapshot> tags,
         IEnumerable<RelatedProjectReference> relatedProjects,
-        DateTimeOffset? updatedAt,
-        DateTimeOffset? publishedAt,
-        DateTimeOffset? archivedAt) : base(id)
-    {
-        Title = title;
-        Slug = slug;
-        Summary = summary;
-        Category = category;
-        Body = body;
-        Status = status;
-        Visibility = visibility;
-        _tags.AddRange(NormalizeTags(tags));
-        _relatedProjects.AddRange(relatedProjects.DistinctBy(project => project.ProjectId));
-        PublishedAt = publishedAt;
-        ArchivedAt = archivedAt;
-        if (updatedAt is not null) Touch(updatedAt.Value);
-    }
-
-    private Article(
-        ArticleId id,
-        ArticleTitle title,
-        ArticleSlug slug,
-        ArticleSummary summary,
-        ArticleCategorySnapshot category,
-        MarkdownContent body,
-        ArticleStatus status,
-        ArticleVisibility visibility,
-        IEnumerable<ArticleTagSnapshot> tags,
-        IEnumerable<RelatedProjectReference> relatedProjects,
         DateTimeOffset createdAt,
         DateTimeOffset? updatedAt,
         DateTimeOffset? publishedAt,
@@ -283,29 +254,15 @@ public sealed class Article : Entity<ArticleId>
         Status = status;
         Visibility = visibility;
 
-        if (Status == ArticleStatus.Published && PublishedAt is null) {
-            PublishedAt = now;
-        }
-
-        if (Status == ArticleStatus.Archived) {
-            ArchivedAt ??= now;
-        } else {
-            ArchivedAt = null;
-        }
-
-        if (Status == ArticleStatus.Draft) {
-            PublishedAt = null;
-        }
+        if (Status == ArticleStatus.Published && PublishedAt is null) PublishedAt = now;
+        if (Status == ArticleStatus.Archived) ArchivedAt ??= now;
+        else ArchivedAt = null;
+        if (Status == ArticleStatus.Draft) PublishedAt = null;
 
         MarkUpdated(now);
 
-        if (previousStatus != ArticleStatus.Published && Status == ArticleStatus.Published) {
-            RaiseDomainEvent(new ArticlePublishedEvent(Id, now));
-        }
-
-        if (previousStatus != ArticleStatus.Archived && Status == ArticleStatus.Archived) {
-            RaiseDomainEvent(new ArticleArchivedEvent(Id, now));
-        }
+        if (previousStatus != ArticleStatus.Published && Status == ArticleStatus.Published) RaiseDomainEvent(new ArticlePublishedEvent(Id, now));
+        if (previousStatus != ArticleStatus.Archived && Status == ArticleStatus.Archived) RaiseDomainEvent(new ArticleArchivedEvent(Id, now));
     }
 
     /// <summary>

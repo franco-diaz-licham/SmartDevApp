@@ -6,6 +6,8 @@ namespace SmartDev.Api.Functions.Infrastructure.Persistence;
 
 internal static class CosmosArticleQueries
 {
+    private const string DefaultArticlesOrderBy = "c.publishedAt DESC";
+
     public static QueryDefinition SlugIds(ArticleSlug slug)
     {
         return new QueryDefinition("""
@@ -27,37 +29,25 @@ internal static class CosmosArticleQueries
                 "c.status = @status",
                 "c.visibility = @visibility"
             ],
-            "c.publishedAt DESC")
+            DefaultArticlesOrderBy)
             .WithParameter("@type", ArticleDocument.DocumentType)
             .WithParameter("@status", ArticleStatus.Published.ToString())
             .WithParameter("@visibility", ArticleVisibility.Public.ToString());
     }
 
-    public static QueryDefinition PublishedPublicSearch(string searchTerm)
+    public static QueryDefinition PublishedPublicSearch(BaseQuery query)
     {
-        return new QueryDefinition("""
-            SELECT * FROM c
-            WHERE c.type = @type
-              AND c.status = @status
-              AND c.visibility = @visibility
-              AND (
-                CONTAINS(LOWER(c.title), @searchTerm)
-                OR CONTAINS(LOWER(c.summary), @searchTerm)
-                OR CONTAINS(LOWER(c.bodyMarkdown), @searchTerm)
-                OR CONTAINS(LOWER(c.category.displayName), @searchTerm)
-                OR EXISTS(
-                  SELECT VALUE tag
-                  FROM tag IN c.tags
-                  WHERE CONTAINS(LOWER(tag.displayName), @searchTerm)
-                     OR CONTAINS(LOWER(tag.slug), @searchTerm)
-                )
-              )
-            ORDER BY c.publishedAt DESC
-            """)
+        return BuildArticlesQuery(
+            query,
+            [
+                "c.type = @type",
+                "c.status = @status",
+                "c.visibility = @visibility"
+            ],
+            DefaultArticlesOrderBy)
             .WithParameter("@type", ArticleDocument.DocumentType)
             .WithParameter("@status", ArticleStatus.Published.ToString())
-            .WithParameter("@visibility", ArticleVisibility.Public.ToString())
-            .WithParameter("@searchTerm", searchTerm.Trim().ToLowerInvariant());
+            .WithParameter("@visibility", ArticleVisibility.Public.ToString());
     }
 
     public static QueryDefinition PublishedPublicCategoryNames()
@@ -104,7 +94,7 @@ internal static class CosmosArticleQueries
 
     public static QueryDefinition AllForOwner(BaseQuery? query = null)
     {
-        return BuildArticlesQuery(query, ["c.type = @type"], "c.updatedAt DESC")
+        return BuildArticlesQuery(query, ["c.type = @type"], DefaultArticlesOrderBy)
             .WithParameter("@type", ArticleDocument.DocumentType);
     }
 
@@ -138,11 +128,26 @@ internal static class CosmosArticleQueries
         var queryDefinition = new QueryDefinition($"""
             SELECT * FROM c
             WHERE {string.Join($"{Environment.NewLine} AND ", conditions)}
-            ORDER BY {orderBy}
+            ORDER BY {ResolveArticleOrderBy(query, orderBy)}
             """);
 
         if (!string.IsNullOrWhiteSpace(query?.SearchTerm)) queryDefinition = queryDefinition.WithParameter("@searchTerm", query.SearchTerm.Trim().ToLowerInvariant());
         if (categoryFilter is not null) queryDefinition = queryDefinition.WithParameter("@category", categoryFilter.Value.Trim().ToLowerInvariant());
         return queryDefinition;
+    }
+
+    private static string ResolveArticleOrderBy(BaseQuery? query, string defaultOrderBy)
+    {
+        if (string.IsNullOrWhiteSpace(query?.SortBy)) return defaultOrderBy;
+
+        var field = query.SortBy.Trim().ToLowerInvariant() switch {
+            "publishedat" or "publisheddate" => "c.publishedAt",
+            _ => null
+        };
+
+        if (field is null) return defaultOrderBy;
+
+        var direction = query.SortDirection == SortDirection.Asc ? "ASC" : "DESC";
+        return $"{field} {direction}";
     }
 }

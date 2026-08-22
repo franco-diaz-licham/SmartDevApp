@@ -55,7 +55,7 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
 
         var documents = await documentStore.QueryPageAsync<ArticleDocument>(
             ArticleDocument.ContainerName,
-            CosmosArticleQueries.PublishedPublicSearch(query.SearchTerm),
+            CosmosArticleQueries.PublishedPublicSearch(query),
             query.PageSize,
             query.ContinuationToken,
             ArticleDocument.PublicPartitionKey,
