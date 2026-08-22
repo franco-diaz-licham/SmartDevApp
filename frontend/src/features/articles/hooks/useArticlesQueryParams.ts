@@ -12,7 +12,7 @@ type ArticleCategoryFilter = QueryFilter & {
   value: string;
 };
 
-type ArticlesQuerySource = Pick<ArticlesUiState, 'searchTerm' | 'selectedCategory'>;
+type ArticlesQuerySource = Pick<ArticlesUiState, 'publishedDateSortDirection' | 'searchTerm' | 'selectedCategory'>;
 
 const articlesSearchDebounceMs = 300;
 
@@ -27,7 +27,7 @@ const useDebouncedValue = <TValue>(value: TValue, delayMs: number) => {
   return debouncedValue;
 };
 
-export const selectArticlesQueryParams = ({ searchTerm, selectedCategory }: ArticlesQuerySource): BaseQuery => {
+export const selectArticlesQueryParams = ({ publishedDateSortDirection, searchTerm, selectedCategory }: ArticlesQuerySource): BaseQuery => {
   const filters: ArticleCategoryFilter[] =
     selectedCategory === allArticlesCategory
       ? []
@@ -41,6 +41,8 @@ export const selectArticlesQueryParams = ({ searchTerm, selectedCategory }: Arti
 
   return {
     pageSize: 30,
+    sortBy: 'publishedAt',
+    sortDirection: publishedDateSortDirection,
     searchTerm: searchTerm.trim() || null,
     filterMatch: filters.length > 0 ? 'all' : null,
     filters
@@ -50,6 +52,7 @@ export const selectArticlesQueryParams = ({ searchTerm, selectedCategory }: Arti
 export const useArticlesQueryParams = () => {
   const searchTerm = useArticlesUiStore((state) => state.searchTerm);
   const selectedCategory = useArticlesUiStore((state) => state.selectedCategory);
+  const publishedDateSortDirection = useArticlesUiStore((state) => state.publishedDateSortDirection);
   const debouncedSearchTerm = useDebouncedValue(searchTerm, articlesSearchDebounceMs);
-  return useMemo(() => selectArticlesQueryParams({ searchTerm: debouncedSearchTerm, selectedCategory }), [debouncedSearchTerm, selectedCategory]);
+  return useMemo(() => selectArticlesQueryParams({ publishedDateSortDirection, searchTerm: debouncedSearchTerm, selectedCategory }), [debouncedSearchTerm, publishedDateSortDirection, selectedCategory]);
 };

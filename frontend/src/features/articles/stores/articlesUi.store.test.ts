@@ -11,6 +11,8 @@ describe('useArticlesUiStore', () => {
   test('derives default query params from empty UI state', () => {
     expect(selectArticlesQueryParams(useArticlesUiStore.getState())).toEqual({
       pageSize: 30,
+      sortBy: 'publishedAt',
+      sortDirection: 'desc',
       searchTerm: null,
       filterMatch: null,
       filters: []
@@ -20,9 +22,12 @@ describe('useArticlesUiStore', () => {
   test('derives query params from search and selected category', () => {
     useArticlesUiStore.getState().setSearchTerm(' cosmos ');
     useArticlesUiStore.getState().selectCategory('Backend');
+    useArticlesUiStore.getState().setPublishedDateSortDirection('asc');
 
     expect(selectArticlesQueryParams(useArticlesUiStore.getState())).toEqual({
       pageSize: 30,
+      sortBy: 'publishedAt',
+      sortDirection: 'asc',
       searchTerm: 'cosmos',
       filterMatch: 'all',
       filters: [
@@ -38,9 +43,11 @@ describe('useArticlesUiStore', () => {
   test('resets filter UI state', () => {
     useArticlesUiStore.getState().setSearchTerm('cosmos');
     useArticlesUiStore.getState().selectCategory('Backend');
+    useArticlesUiStore.getState().setPublishedDateSortDirection('asc');
 
     useArticlesUiStore.getState().resetFilters();
 
+    expect(useArticlesUiStore.getState().publishedDateSortDirection).toBe('desc');
     expect(useArticlesUiStore.getState().searchTerm).toBe('');
     expect(useArticlesUiStore.getState().selectedCategory).toBe(allArticlesCategory);
   });
