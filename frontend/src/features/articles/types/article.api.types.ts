@@ -2,7 +2,7 @@ export type ArticleStatusDto = 'Draft' | 'Published' | 'Archived';
 
 export type ArticleVisibilityDto = 'Private' | 'Public';
 
-export type ArticleTypeDto = 'DeepDive' | 'Note' | 'BookSummary' | 'ProjectWriteup' | 'DebuggingStory' | 'Reflection' | 'Experiment';
+export type ArticleTypeDto = 'DeepDive' | 'BookSummary' | 'ProjectWriteup' | 'Reflection';
 
 export interface PublicArticleCategoryResponse {
   slug: string;

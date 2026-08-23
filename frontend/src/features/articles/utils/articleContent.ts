@@ -12,12 +12,9 @@ export const allArticleTypes = 'All types';
 
 export const articleTypeLabels: Record<ArticleTypeModel, string> = {
   DeepDive: 'Deep dive',
-  Note: 'Note',
   BookSummary: 'Book summary',
   ProjectWriteup: 'Project writeup',
-  DebuggingStory: 'Debugging story',
-  Reflection: 'Reflection',
-  Experiment: 'Experiment'
+  Reflection: 'Reflection'
 };
 
 export const getArticleTypeLabel = (articleType: ArticleTypeModel) => articleTypeLabels[articleType];

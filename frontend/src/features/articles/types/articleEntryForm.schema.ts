@@ -14,7 +14,7 @@ export const articleStatusOptions = ['Draft', 'Published', 'Archived'] as const;
 
 export const articleVisibilityOptions = ['Private', 'Public'] as const;
 
-export const articleTypeOptions = ['DeepDive', 'Note', 'BookSummary', 'ProjectWriteup', 'DebuggingStory', 'Reflection', 'Experiment'] as const;
+export const articleTypeOptions = ['DeepDive', 'BookSummary', 'ProjectWriteup', 'Reflection'] as const;
 
 export const articleEntryFormSchema = z.object({
   title: z.string().trim().min(1, 'Title is required.').max(articleEntryFormLimits.title, `Title must be ${articleEntryFormLimits.title} characters or less.`),

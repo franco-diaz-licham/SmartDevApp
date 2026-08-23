@@ -2,7 +2,7 @@ export type ArticleStatusModel = 'Draft' | 'Published' | 'Archived';
 
 export type ArticleVisibilityModel = 'Private' | 'Public';
 
-export type ArticleTypeModel = 'DeepDive' | 'Note' | 'BookSummary' | 'ProjectWriteup' | 'DebuggingStory' | 'Reflection' | 'Experiment';
+export type ArticleTypeModel = 'DeepDive' | 'BookSummary' | 'ProjectWriteup' | 'Reflection';
 
 export interface PublicArticleCategoryModel {
   slug: string;
