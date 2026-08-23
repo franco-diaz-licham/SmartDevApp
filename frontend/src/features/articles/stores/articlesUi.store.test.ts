@@ -22,7 +22,7 @@ describe('useArticlesUiStore', () => {
   test('derives query params from search, selected category, and selected article type', () => {
     useArticlesUiStore.getState().setSearchTerm(' cosmos ');
     useArticlesUiStore.getState().selectCategory('Backend');
-    useArticlesUiStore.getState().selectArticleType('Note');
+    useArticlesUiStore.getState().selectArticleType('BookSummary');
     useArticlesUiStore.getState().setPublishedDateSortDirection('asc');
 
     expect(selectArticlesQueryParams(useArticlesUiStore.getState())).toEqual({
@@ -40,7 +40,7 @@ describe('useArticlesUiStore', () => {
         {
           field: 'articleType',
           operator: 'equals',
-          value: 'Note'
+          value: 'BookSummary'
         }
       ]
     });
@@ -49,7 +49,7 @@ describe('useArticlesUiStore', () => {
   test('resets filter UI state', () => {
     useArticlesUiStore.getState().setSearchTerm('cosmos');
     useArticlesUiStore.getState().selectCategory('Backend');
-    useArticlesUiStore.getState().selectArticleType('Note');
+    useArticlesUiStore.getState().selectArticleType('BookSummary');
     useArticlesUiStore.getState().setPublishedDateSortDirection('asc');
 
     useArticlesUiStore.getState().resetFilters();

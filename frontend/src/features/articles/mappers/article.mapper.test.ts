@@ -67,7 +67,7 @@ describe('article mapper', () => {
           slug: 'cosmos-articles',
       title: 'Cosmos Articles',
       summary: 'Articles about Cosmos DB.',
-      articleType: 'Note',
+      articleType: 'BookSummary',
       category: 'Backend',
           tags: ['.NET'],
           bodyText: 'Cosmos DB articles.',
@@ -87,7 +87,7 @@ describe('article mapper', () => {
       id: 'article-1',
       type: 'article',
       slug: 'cosmos-articles',
-      articleType: 'Note',
+      articleType: 'BookSummary',
       category: 'Backend',
       tags: ['.NET'],
       publishedAt: null

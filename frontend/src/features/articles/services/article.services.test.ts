@@ -278,7 +278,7 @@ describe('articleService', () => {
       title: 'Updated Cosmos Articles',
       slug: 'updated-cosmos-articles',
       summary: 'Updated articles about Cosmos DB.',
-      articleType: 'Note',
+      articleType: 'ProjectWriteup',
       category: {
         slug: 'backend',
         displayName: 'Backend'
