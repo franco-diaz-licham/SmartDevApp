@@ -15,9 +15,11 @@ export const ArticlesPage = () => {
 
   const searchTerm = useArticlesUiStore((state) => state.searchTerm);
   const selectedCategory = useArticlesUiStore((state) => state.selectedCategory);
+  const selectedArticleType = useArticlesUiStore((state) => state.selectedArticleType);
   const publishedDateSortDirection = useArticlesUiStore((state) => state.publishedDateSortDirection);
   const setSearchTerm = useArticlesUiStore((state) => state.setSearchTerm);
   const selectCategory = useArticlesUiStore((state) => state.selectCategory);
+  const selectArticleType = useArticlesUiStore((state) => state.selectArticleType);
   const setPublishedDateSortDirection = useArticlesUiStore((state) => state.setPublishedDateSortDirection);
   const articlesQueryParams = useArticlesQueryParams();
   const publicArticlesQuery = usePublicArticlesQuery(articlesQueryParams, isAuthReady && isPublicView);
@@ -51,11 +53,13 @@ export const ArticlesPage = () => {
         <ArticlesMainContent
           articles={articles}
           searchTerm={searchTerm}
+          selectedArticleType={selectedArticleType}
           publishedDateSortDirection={publishedDateSortDirection}
           isArticlesLoading={articlesQuery.isLoading}
           hasNextPage={articlesQuery.hasNextPage}
           isFetchingNextPage={articlesQuery.isFetchingNextPage}
           onSearchTermChange={setSearchTerm}
+          onArticleTypeChange={selectArticleType}
           onPublishedDateSortDirectionChange={setPublishedDateSortDirection}
           onLoadMore={handleLoadMore}
         />

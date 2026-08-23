@@ -2,6 +2,8 @@ export type ArticleStatusModel = 'Draft' | 'Published' | 'Archived';
 
 export type ArticleVisibilityModel = 'Private' | 'Public';
 
+export type ArticleTypeModel = 'DeepDive' | 'Note' | 'BookSummary' | 'ProjectWriteup' | 'DebuggingStory' | 'Reflection' | 'Experiment';
+
 export interface PublicArticleCategoryModel {
   slug: string;
   displayName: string;
@@ -22,6 +24,7 @@ export interface PublicArticleListItemModel {
   slug: string;
   title: string;
   summary: string;
+  articleType: ArticleTypeModel;
   category: PublicArticleCategoryModel;
   tags: PublicArticleTagModel[];
   status: ArticleStatusModel;
@@ -41,6 +44,7 @@ export interface PublicArticleSearchDocumentModel {
   slug: string;
   title: string;
   summary: string;
+  articleType: ArticleTypeModel;
   category: string;
   tags: string[];
   bodyText: string;
@@ -58,6 +62,7 @@ export interface ArticleEntryModel {
   title: string;
   slug: string;
   summary: string;
+  articleType: ArticleTypeModel;
   category: string;
   tags: string;
   bodyMarkdown: string;

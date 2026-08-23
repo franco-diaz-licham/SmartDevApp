@@ -4,9 +4,9 @@ import { AppInputText } from '@/components/ui/AppInputText';
 import { AppSelect } from '@/components/ui/AppSelect';
 import { AuthenticatedOnly } from '@/features/auth';
 import type { ArticleEntryFormController } from '../hooks/useArticleEntryForm';
-import type { ArticleStatusModel, ArticleVisibilityModel, PublicArticleDetailModel } from '../types/article.types';
-import { articleStatusOptions, articleVisibilityOptions } from '../types/articleEntryForm.schema';
-import { formatArticleDate } from '../utils/articleContent';
+import type { ArticleStatusModel, ArticleTypeModel, ArticleVisibilityModel, PublicArticleDetailModel } from '../types/article.types';
+import { articleStatusOptions, articleTypeOptions, articleVisibilityOptions } from '../types/articleEntryForm.schema';
+import { formatArticleDate, getArticleTypeLabel } from '../utils/articleContent';
 
 interface ArticleMetadataPaneProps {
   form?: ArticleEntryFormController;
@@ -17,6 +17,7 @@ interface ArticleMetadataPaneProps {
 const getInputValue = (event: ChangeEvent<HTMLInputElement>) => event.target.value;
 const statusSelectOptions = articleStatusOptions.map((status) => ({ label: status, value: status }));
 const visibilitySelectOptions = articleVisibilityOptions.map((visibility) => ({ label: visibility, value: visibility }));
+const typeSelectOptions = articleTypeOptions.map((articleType) => ({ label: getArticleTypeLabel(articleType), value: articleType }));
 
 export const ArticleMetadataPane = ({ form, isEditable = false, article }: ArticleMetadataPaneProps) => {
   const tagNames = form?.values.tags ?? article?.tags.map((tag) => tag.displayName).join(', ') ?? '';
@@ -53,6 +54,19 @@ export const ArticleMetadataPane = ({ form, isEditable = false, article }: Artic
         <div className="mt-6 space-y-5 text-sm">
           <AuthenticatedOnly>
             <AppSelect
+              error={form?.errors.articleType}
+              inline
+              inlineStatus={isEditable ? 'edit' : 'read'}
+              label="Type"
+              name="articleType"
+              options={typeSelectOptions}
+              required={isEditable}
+              value={form?.values.articleType ?? article.articleType}
+              onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+                form?.updateField('articleType', event.target.value as ArticleTypeModel);
+              }}
+            />
+            <AppSelect
               error={form?.errors.status}
               inline
               inlineStatus={isEditable ? 'edit' : 'read'}
@@ -79,6 +93,12 @@ export const ArticleMetadataPane = ({ form, isEditable = false, article }: Artic
               }}
             />
           </AuthenticatedOnly>
+          {!isEditable ? (
+            <div>
+              <p className="font-extrabold text-foreground">Type</p>
+              <p className="mt-1 text-muted-foreground">{getArticleTypeLabel(article.articleType)}</p>
+            </div>
+          ) : null}
           <AppInputText
             autoFocus={isEditable && form?.editingField === 'category'}
             inline

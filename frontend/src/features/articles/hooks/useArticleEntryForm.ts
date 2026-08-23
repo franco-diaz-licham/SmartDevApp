@@ -44,6 +44,7 @@ const getArticleEntryFormValues = (article: PublicArticleDetailModel): ArticleEn
   title: article.title,
   slug: article.slug,
   summary: article.summary,
+  articleType: article.articleType,
   category: article.category.displayName,
   tags: article.tags.map((tag) => tag.displayName).join(', '),
   bodyMarkdown: article.bodyMarkdown,
@@ -60,6 +61,7 @@ const getDraftArticle = (draft: ArticleEntryModel): PublicArticleDetailModel => 
   slug: draft.slug,
   title: draft.title || 'Untitled article',
   summary: draft.summary || 'Click to add a summary.',
+  articleType: draft.articleType,
   category: {
     slug: draft.category.trim().toLowerCase().replace(/\s+/g, '-'),
     displayName: draft.category || 'Uncategorised'

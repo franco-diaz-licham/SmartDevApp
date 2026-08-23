@@ -26,6 +26,7 @@ const articleListItemResponse: PublicArticleListItemResponse = {
   slug: 'cosmos-articles',
   title: 'Cosmos Articles',
   summary: 'Articles about Cosmos DB.',
+  articleType: 'DeepDive',
   category: {
     slug: 'backend',
     displayName: 'Backend'
@@ -240,6 +241,7 @@ describe('articleService', () => {
       title: 'Cosmos Articles',
       slug: 'cosmos-articles',
       summary: 'Articles about Cosmos DB.',
+      articleType: 'DeepDive',
       category: {
         slug: 'backend',
         displayName: 'Backend'
@@ -276,6 +278,7 @@ describe('articleService', () => {
       title: 'Updated Cosmos Articles',
       slug: 'updated-cosmos-articles',
       summary: 'Updated articles about Cosmos DB.',
+      articleType: 'Note',
       category: {
         slug: 'backend',
         displayName: 'Backend'

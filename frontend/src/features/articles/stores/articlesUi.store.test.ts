@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'vitest';
-import { allArticlesCategory } from '../utils/articleContent';
+import { allArticlesCategory, allArticleTypes } from '../utils/articleContent';
 import { selectArticlesQueryParams } from '../hooks/useArticlesQueryParams';
 import { useArticlesUiStore } from './articlesUi.store';
 
@@ -19,9 +19,10 @@ describe('useArticlesUiStore', () => {
     });
   });
 
-  test('derives query params from search and selected category', () => {
+  test('derives query params from search, selected category, and selected article type', () => {
     useArticlesUiStore.getState().setSearchTerm(' cosmos ');
     useArticlesUiStore.getState().selectCategory('Backend');
+    useArticlesUiStore.getState().selectArticleType('Note');
     useArticlesUiStore.getState().setPublishedDateSortDirection('asc');
 
     expect(selectArticlesQueryParams(useArticlesUiStore.getState())).toEqual({
@@ -35,6 +36,11 @@ describe('useArticlesUiStore', () => {
           field: 'category',
           operator: 'equals',
           value: 'Backend'
+        },
+        {
+          field: 'articleType',
+          operator: 'equals',
+          value: 'Note'
         }
       ]
     });
@@ -43,6 +49,7 @@ describe('useArticlesUiStore', () => {
   test('resets filter UI state', () => {
     useArticlesUiStore.getState().setSearchTerm('cosmos');
     useArticlesUiStore.getState().selectCategory('Backend');
+    useArticlesUiStore.getState().selectArticleType('Note');
     useArticlesUiStore.getState().setPublishedDateSortDirection('asc');
 
     useArticlesUiStore.getState().resetFilters();
@@ -50,5 +57,6 @@ describe('useArticlesUiStore', () => {
     expect(useArticlesUiStore.getState().publishedDateSortDirection).toBe('desc');
     expect(useArticlesUiStore.getState().searchTerm).toBe('');
     expect(useArticlesUiStore.getState().selectedCategory).toBe(allArticlesCategory);
+    expect(useArticlesUiStore.getState().selectedArticleType).toBe(allArticleTypes);
   });
 });

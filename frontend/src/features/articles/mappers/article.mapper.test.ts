@@ -10,6 +10,7 @@ describe('article mapper', () => {
       slug: 'cosmos-articles',
       title: 'Cosmos Articles',
       summary: 'Articles about Cosmos DB.',
+      articleType: 'DeepDive',
       category: {
         slug: 'backend',
         displayName: 'Backend'
@@ -64,9 +65,10 @@ describe('article mapper', () => {
           id: 'article-1',
           type: 'article',
           slug: 'cosmos-articles',
-          title: 'Cosmos Articles',
-          summary: 'Articles about Cosmos DB.',
-          category: 'Backend',
+      title: 'Cosmos Articles',
+      summary: 'Articles about Cosmos DB.',
+      articleType: 'Note',
+      category: 'Backend',
           tags: ['.NET'],
           bodyText: 'Cosmos DB articles.',
           url: '/workspace/articles/1f4d0b3f-10a9-4c59-9e91-65cb3770887f',
@@ -85,6 +87,7 @@ describe('article mapper', () => {
       id: 'article-1',
       type: 'article',
       slug: 'cosmos-articles',
+      articleType: 'Note',
       category: 'Backend',
       tags: ['.NET'],
       publishedAt: null

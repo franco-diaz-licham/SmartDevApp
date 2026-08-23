@@ -2,6 +2,8 @@ export type ArticleStatusDto = 'Draft' | 'Published' | 'Archived';
 
 export type ArticleVisibilityDto = 'Private' | 'Public';
 
+export type ArticleTypeDto = 'DeepDive' | 'Note' | 'BookSummary' | 'ProjectWriteup' | 'DebuggingStory' | 'Reflection' | 'Experiment';
+
 export interface PublicArticleCategoryResponse {
   slug: string;
   displayName: string;
@@ -22,6 +24,7 @@ export interface PublicArticleListItemResponse {
   slug: string;
   title: string;
   summary: string;
+  articleType: ArticleTypeDto;
   category: PublicArticleCategoryResponse;
   tags: PublicArticleTagResponse[];
   status: ArticleStatusDto;
@@ -41,6 +44,7 @@ export interface PublicArticleSearchDocumentResponse {
   slug: string;
   title: string;
   summary: string;
+  articleType: ArticleTypeDto;
   category: string;
   tags: string[];
   bodyText: string;
@@ -68,6 +72,7 @@ export interface CreateArticleRequestDto {
   title: string;
   slug: string;
   summary: string;
+  articleType: ArticleTypeDto;
   category: CreateArticleCategoryDto;
   tags: CreateArticleTagDto[];
   bodyMarkdown: string;
@@ -84,6 +89,7 @@ export interface UpdateArticleRequestDto {
   title: string;
   slug: string;
   summary: string;
+  articleType: ArticleTypeDto;
   category: CreateArticleCategoryDto;
   tags: CreateArticleTagDto[];
   bodyMarkdown: string;

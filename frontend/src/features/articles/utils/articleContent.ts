@@ -1,3 +1,5 @@
+import type { ArticleTypeModel } from '../types/article.types';
+
 export interface ArticleSectionModel {
   id: string;
   title: string;
@@ -5,6 +7,20 @@ export interface ArticleSectionModel {
 }
 
 export const allArticlesCategory = 'All articles';
+
+export const allArticleTypes = 'All types';
+
+export const articleTypeLabels: Record<ArticleTypeModel, string> = {
+  DeepDive: 'Deep dive',
+  Note: 'Note',
+  BookSummary: 'Book summary',
+  ProjectWriteup: 'Project writeup',
+  DebuggingStory: 'Debugging story',
+  Reflection: 'Reflection',
+  Experiment: 'Experiment'
+};
+
+export const getArticleTypeLabel = (articleType: ArticleTypeModel) => articleTypeLabels[articleType];
 
 export const getArticleSectionId = (value: string) =>
   value
