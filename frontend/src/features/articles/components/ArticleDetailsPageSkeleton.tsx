@@ -3,7 +3,7 @@ import { ArticleContentSkeleton } from './ArticleContentSkeleton';
 import { ArticleMetadataSkeleton } from './ArticleMetadataSkeleton';
 import { ArticleSectionsPaneSkeleton } from './ArticleSectionsPaneSkeleton';
 
-export const ArticlePageSkeleton = () => (
+export const ArticleDetailsPageSkeleton = () => (
   <WorkspacePageWrapper>
     <div className="mx-auto h-full max-w-[1560px] overflow-y-auto lg:grid lg:grid-cols-[1fr_18rem] lg:overflow-hidden xl:grid-cols-[17rem_1fr_18rem]" role="status" aria-label="Loading article">
       <ArticleSectionsPaneSkeleton />

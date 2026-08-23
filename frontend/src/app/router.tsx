@@ -1,13 +1,13 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth, LoginPage } from '@/features/auth';
-import { ArticlePageSkeleton } from '@/features/articles/components/ArticlePageSkeleton';
+import { ArticleDetailsPageSkeleton } from '@/features/articles/components/ArticleDetailsPageSkeleton';
 import { HomePage } from '@/features/home/pages/HomePage';
 import { PersonalProjectPage } from '@/features/portfolio/pages/PersonalProjectPage';
 import { ProfessionalWorkPage } from '@/features/portfolio/pages/ProfessionalWorkPage';
 import { AppShell } from '@/layouts/AppShell';
 import { WorkspaceLayout } from '@/layouts/WorkspaceLayout';
 import { NotFoundPage } from '@/pages/NotFoundPage';
-import { ArticlePageRoute, ArticlesPageRoute } from './workspaceRouteComponents';
+import { ArticleDetailsPageRoute, ArticlesPageRoute } from './workspaceRouteComponents';
 
 export const router = createBrowserRouter([
   {
@@ -29,10 +29,10 @@ export const router = createBrowserRouter([
     children: [
       { path: '/workspace', element: <ArticlesPageRoute /> },
       { path: '/articles', element: <Navigate to="/workspace" replace /> },
-      { path: '/workspace/articles/:articleId', element: <ArticlePageRoute /> },
+      { path: '/workspace/articles/:articleId', element: <ArticleDetailsPageRoute /> },
       {
-        element: <RequireAuth fallback={<ArticlePageSkeleton />} />,
-        children: [{ path: '/workspace/articles/new', element: <ArticlePageRoute /> }]
+        element: <RequireAuth fallback={<ArticleDetailsPageSkeleton />} />,
+        children: [{ path: '/workspace/articles/new', element: <ArticleDetailsPageRoute /> }]
       }
     ]
   },

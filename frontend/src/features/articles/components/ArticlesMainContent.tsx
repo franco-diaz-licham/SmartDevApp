@@ -66,7 +66,7 @@ export const ArticlesMainContent = ({
             name="articlesType"
             value={selectedArticleType}
             options={articleTypeFilterOptions}
-            className="w-full sm:w-48"
+            className="w-full sm:w-38"
             onChange={(event: ChangeEvent<HTMLSelectElement>) => onArticleTypeChange(event.target.value as ArticleTypeModel | typeof allArticleTypes)}
           />
           <AppSelect
@@ -75,11 +75,11 @@ export const ArticlesMainContent = ({
             name="articlesPublishedDateSort"
             value={publishedDateSortDirection}
             options={publishedDateSortOptions}
-            className="w-full sm:w-40"
+            className="w-full sm:w-38"
             onChange={(event: ChangeEvent<HTMLSelectElement>) => onPublishedDateSortDirectionChange(event.target.value as ArticlePublishedDateSortDirection)}
           />
           <AuthenticatedOnly>
-            <AppButton className="mb-0 mt-0 w-full text-sm sm:w-35" type="button" onClick={() => navigate('/workspace/articles/new')}>
+            <AppButton className="mb-0 mt-0 w-full text-sm sm:w-42" type="button" onClick={() => navigate('/workspace/articles/new')}>
               New article
             </AppButton>
           </AuthenticatedOnly>

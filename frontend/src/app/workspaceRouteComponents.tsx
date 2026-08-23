@@ -1,9 +1,9 @@
 import { lazy, Suspense } from 'react';
-import { ArticlePageSkeleton } from '@/features/articles/components/ArticlePageSkeleton';
+import { ArticleDetailsPageSkeleton } from '@/features/articles/components/ArticleDetailsPageSkeleton';
 import { ArticlesPageSkeleton } from '@/features/articles/components/ArticlesPageSkeleton';
 
 const LazyArticlesPage = lazy(() => import('@/features/articles/pages/ArticlesPage').then((module) => ({ default: module.ArticlesPage })));
-const LazyArticlePage = lazy(() => import('@/features/articles/pages/ArticlePage').then((module) => ({ default: module.ArticlePage })));
+const LazyArticleDetailsPage = lazy(() => import('@/features/articles/pages/ArticleDetailsPage').then((module) => ({ default: module.ArticleDetailsPage })));
 
 export const ArticlesPageRoute = () => (
   <Suspense fallback={<ArticlesPageSkeleton />}>
@@ -11,8 +11,8 @@ export const ArticlesPageRoute = () => (
   </Suspense>
 );
 
-export const ArticlePageRoute = () => (
-  <Suspense fallback={<ArticlePageSkeleton />}>
-    <LazyArticlePage />
+export const ArticleDetailsPageRoute = () => (
+  <Suspense fallback={<ArticleDetailsPageSkeleton />}>
+    <LazyArticleDetailsPage />
   </Suspense>
 );

@@ -5,14 +5,14 @@ import { WorkspacePageWrapper } from '@/components/common/WorkspacePageWrapper';
 import { useAuth } from '@/features/auth';
 import { ArticleContent } from '../components/ArticleContent';
 import { ArticleMetadataPane } from '../components/ArticleMetadataPane';
-import { ArticlePageSkeleton } from '../components/ArticlePageSkeleton';
+import { ArticleDetailsPageSkeleton } from '../components/ArticleDetailsPageSkeleton';
 import { ArticlesSectionsPane } from '../components/ArticlesSectionsPane';
 import { useArticleEntryForm, type EditableArticleEntryField, type ArticleEntryFormController } from '../hooks/useArticleEntryForm';
 import { useCreateArticleMutation, useUpdateArticleMutation } from '../queries/article.mutations';
 import { useOwnerArticleQuery, usePublicArticleQuery } from '../queries/article.queries';
 import { getArticleSections } from '../utils/articleContent';
 
-export const ArticlePage = () => {
+export const ArticleDetailsPage = () => {
   const navigate = useNavigate();
   const newArticleMatch = useMatch('/workspace/articles/new');
   const { articleId = '' } = useParams();
@@ -108,7 +108,7 @@ export const ArticlePage = () => {
     updateField
   };
 
-  if (!isAuthReady || (!isNewArticle && articleQuery.isLoading)) return <ArticlePageSkeleton />;
+  if (!isAuthReady || (!isNewArticle && articleQuery.isLoading)) return <ArticleDetailsPageSkeleton />;
 
   const content = (
     <div className="mx-auto h-full max-w-[1560px] overflow-y-auto lg:grid lg:grid-cols-[1fr_18rem] lg:overflow-hidden xl:grid-cols-[17rem_1fr_18rem]">
