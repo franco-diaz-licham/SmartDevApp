@@ -7,6 +7,7 @@ public sealed record CreateArticleCommand(
     string Title,
     string Slug,
     string Summary,
+    ArticleType ArticleType,
     CreateArticleCategory? Category,
     IReadOnlyCollection<CreateArticleTag>? Tags,
     string BodyMarkdown,
@@ -24,6 +25,7 @@ public sealed record UpdateArticleCommand(
     string Title,
     string Slug,
     string Summary,
+    ArticleType ArticleType,
     CreateArticleCategory? Category,
     IReadOnlyCollection<CreateArticleTag>? Tags,
     string BodyMarkdown,
@@ -45,6 +47,7 @@ public sealed class ArticlesCommandHandler(IArticleRepository articleRepository,
                 ArticleTitle.Create(command.Title),
                 ArticleSlug.Create(command.Slug),
                 ArticleSummary.Create(command.Summary),
+                command.ArticleType,
                 ArticleCategorySnapshot.Create(ArticleCategorySlug.Create(command.Category.Slug), command.Category.DisplayName),
                 MarkdownContent.Create(command.BodyMarkdown),
                 (command.Tags ?? []).Select(tag => ArticleTagSnapshot.Create(ArticleTagSlug.Create(tag.Slug), tag.DisplayName)),
@@ -76,6 +79,7 @@ public sealed class ArticlesCommandHandler(IArticleRepository articleRepository,
             var now = DateTimeOffset.UtcNow;
             article.Rename(ArticleTitle.Create(command.Title), ArticleSlug.Create(command.Slug), now);
             article.UpdateSummary(ArticleSummary.Create(command.Summary), now);
+            article.ChangeType(command.ArticleType, now);
             article.ChangeCategory(ArticleCategorySnapshot.Create(ArticleCategorySlug.Create(command.Category.Slug), command.Category.DisplayName), now);
             article.ReplaceTags((command.Tags ?? []).Select(tag => ArticleTagSnapshot.Create(ArticleTagSlug.Create(tag.Slug), tag.DisplayName)), now);
             article.UpdateBody(MarkdownContent.Create(command.BodyMarkdown), now);

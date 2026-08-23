@@ -106,6 +106,7 @@ internal static class CosmosArticleQueries
                 (
                   CONTAINS(LOWER(c.title), @searchTerm)
                   OR CONTAINS(LOWER(c.summary), @searchTerm)
+                  OR CONTAINS(LOWER(c.articleType), @searchTerm)
                   OR CONTAINS(LOWER(c.bodyMarkdown), @searchTerm)
                   OR CONTAINS(LOWER(c.category.displayName), @searchTerm)
                   OR EXISTS(
@@ -125,6 +126,20 @@ internal static class CosmosArticleQueries
 
         if (categoryFilter is not null) conditions.Add("LOWER(c.category.displayName) = @category");
 
+        var articleTypeFilter = query?.Filters.FirstOrDefault(filter =>
+            string.Equals(filter.Field, "articleType", StringComparison.OrdinalIgnoreCase)
+            && filter.Operator == FilterOperator.Equals
+            && !string.IsNullOrWhiteSpace(filter.Value));
+
+        if (articleTypeFilter is not null) {
+            conditions.Add("""
+                (
+                  c.articleType = @articleType
+                  OR (NOT IS_DEFINED(c.articleType) AND @articleType = @defaultArticleType)
+                )
+                """);
+        }
+
         var queryDefinition = new QueryDefinition($"""
             SELECT * FROM c
             WHERE {string.Join($"{Environment.NewLine} AND ", conditions)}
@@ -133,6 +148,11 @@ internal static class CosmosArticleQueries
 
         if (!string.IsNullOrWhiteSpace(query?.SearchTerm)) queryDefinition = queryDefinition.WithParameter("@searchTerm", query.SearchTerm.Trim().ToLowerInvariant());
         if (categoryFilter is not null) queryDefinition = queryDefinition.WithParameter("@category", categoryFilter.Value.Trim().ToLowerInvariant());
+        if (articleTypeFilter is not null) {
+            queryDefinition = queryDefinition
+                .WithParameter("@articleType", articleTypeFilter.Value.Trim())
+                .WithParameter("@defaultArticleType", ArticleType.DeepDive.ToString());
+        }
         return queryDefinition;
     }
 

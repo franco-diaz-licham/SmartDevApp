@@ -29,6 +29,7 @@ internal static class ArticleRequestMapping
             request.Title,
             request.Slug,
             request.Summary,
+            BindArticleType(request.ArticleType),
             request.Category is null ? null : new CreateArticleCategory(request.Category.Slug, request.Category.DisplayName),
             request.Tags?.Select(tag => new CreateArticleTag(tag.Slug, tag.DisplayName)).ToArray(),
             request.BodyMarkdown,
@@ -43,6 +44,7 @@ internal static class ArticleRequestMapping
             request.Title,
             request.Slug,
             request.Summary,
+            BindArticleType(request.ArticleType),
             request.Category is null ? null : new CreateArticleCategory(request.Category.Slug, request.Category.DisplayName),
             request.Tags?.Select(tag => new CreateArticleTag(tag.Slug, tag.DisplayName)).ToArray(),
             request.BodyMarkdown,
@@ -55,6 +57,13 @@ internal static class ArticleRequestMapping
         if (string.IsNullOrWhiteSpace(status)) return ArticleStatus.Draft;
         if (Enum.TryParse<ArticleStatus>(status.Trim(), ignoreCase: true, out var parsedStatus) && Enum.IsDefined(parsedStatus)) return parsedStatus;
         throw new ArgumentException("Article status must be Draft, Published, or Archived.");
+    }
+
+    private static ArticleType BindArticleType(string? articleType)
+    {
+        if (string.IsNullOrWhiteSpace(articleType)) return ArticleType.DeepDive;
+        if (Enum.TryParse<ArticleType>(articleType.Trim(), ignoreCase: true, out var parsedArticleType) && Enum.IsDefined(parsedArticleType)) return parsedArticleType;
+        throw new ArgumentException("Article type must be DeepDive, Note, BookSummary, ProjectWriteup, DebuggingStory, Reflection, or Experiment.");
     }
 
     private static ArticleVisibility BindArticleVisibility(string? visibility)

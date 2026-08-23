@@ -15,6 +15,7 @@ public sealed class Article : Entity<ArticleId>
         ArticleTitle title,
         ArticleSlug slug,
         ArticleSummary summary,
+        ArticleType articleType,
         ArticleCategorySnapshot category,
         MarkdownContent body,
         ArticleStatus status,
@@ -29,6 +30,7 @@ public sealed class Article : Entity<ArticleId>
         Title = title;
         Slug = slug;
         Summary = summary;
+        ArticleType = articleType;
         Category = category;
         Body = body;
         Status = status;
@@ -53,6 +55,11 @@ public sealed class Article : Entity<ArticleId>
     /// Gets the short article summary used in lists and search results.
     /// </summary>
     public ArticleSummary Summary { get; private set; }
+
+    /// <summary>
+    /// Gets the article's content type.
+    /// </summary>
+    public ArticleType ArticleType { get; private set; }
 
     /// <summary>
     /// Gets the broad category assigned to the article.
@@ -101,6 +108,7 @@ public sealed class Article : Entity<ArticleId>
         " ",
         Title.Value,
         Summary.Value,
+        ArticleType.ToString(),
         Category.Slug.Value,
         Category.DisplayName,
         string.Join(" ", Tags.Select(tag => $"{tag.Slug.Value} {tag.DisplayName}")),
@@ -115,6 +123,7 @@ public sealed class Article : Entity<ArticleId>
         ArticleTitle title,
         ArticleSlug slug,
         ArticleSummary summary,
+        ArticleType articleType,
         ArticleCategorySnapshot category,
         MarkdownContent body,
         IEnumerable<ArticleTagSnapshot> tags,
@@ -127,6 +136,7 @@ public sealed class Article : Entity<ArticleId>
             title,
             slug,
             summary,
+            articleType,
             category,
             body,
             ArticleStatus.Draft,
@@ -150,6 +160,7 @@ public sealed class Article : Entity<ArticleId>
         ArticleTitle title,
         ArticleSlug slug,
         ArticleSummary summary,
+        ArticleType articleType,
         ArticleCategorySnapshot category,
         MarkdownContent body,
         ArticleStatus status,
@@ -161,7 +172,7 @@ public sealed class Article : Entity<ArticleId>
         DateTimeOffset? publishedAt,
         DateTimeOffset? archivedAt)
     {
-        return new Article(id, title, slug, summary, category, body, status, visibility, tags, relatedProjects, createdAt, updatedAt, publishedAt, archivedAt);
+        return new Article(id, title, slug, summary, articleType, category, body, status, visibility, tags, relatedProjects, createdAt, updatedAt, publishedAt, archivedAt);
     }
 
     /// <summary>
@@ -180,6 +191,16 @@ public sealed class Article : Entity<ArticleId>
     public void UpdateSummary(ArticleSummary summary, DateTimeOffset now)
     {
         Summary = summary;
+        MarkUpdated(now);
+    }
+
+    /// <summary>
+    /// Changes the article content type.
+    /// </summary>
+    public void ChangeType(ArticleType articleType, DateTimeOffset now)
+    {
+        if (ArticleType == articleType) return;
+        ArticleType = articleType;
         MarkUpdated(now);
     }
 

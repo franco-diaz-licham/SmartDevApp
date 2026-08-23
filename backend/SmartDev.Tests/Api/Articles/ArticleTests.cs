@@ -1,5 +1,6 @@
 using SmartDev.Api.Functions.Domain.Articles;
 using static SmartDev.Tests.TestData.AggregateTestData;
+using DomainArticleType = SmartDev.Api.Functions.Domain.Articles.ArticleType;
 
 namespace SmartDev.Tests.Api.Articles;
 
@@ -44,6 +45,7 @@ public sealed class ArticleTests
             ArticleTitle.Create("Persisted Article"),
             ArticleSlug.Create("persisted-article"),
             ArticleSummary.Create("Persisted summary."),
+            DomainArticleType.Reflection,
             ArticleCategorySnapshot.Create(ArticleCategorySlug.Create("backend"), "Backend"),
             MarkdownContent.Create("# Persisted"),
             ArticleStatus.Archived,
@@ -61,11 +63,29 @@ public sealed class ArticleTests
         article.UpdatedAt.ShouldBe(updatedAt);
         article.PublishedAt.ShouldBe(publishedAt);
         article.ArchivedAt.ShouldBe(archivedAt);
+        article.ArticleType.ShouldBe(DomainArticleType.Reflection);
         article.Status.ShouldBe(ArticleStatus.Archived);
         article.Visibility.ShouldBe(ArticleVisibility.Private);
         article.Tags.Single().Slug.Value.ShouldBe("dotnet");
         article.RelatedProjects.Single().ProjectId.ShouldBe("smart-dev");
         article.DomainEvents.ShouldBeEmpty();
+    }
+
+    [Test]
+    public void ChangeType_NewType_UpdatesArticleAndRaisesUpdatedEvent()
+    {
+        // Arrange
+        var article = CreateArticle();
+        article.ClearDomainEvents();
+        var updatedAt = new DateTimeOffset(2026, 8, 5, 12, 37, 0, TimeSpan.Zero);
+
+        // Act
+        article.ChangeType(DomainArticleType.Note, updatedAt);
+
+        // Assert
+        article.ArticleType.ShouldBe(DomainArticleType.Note);
+        article.UpdatedAt.ShouldBe(updatedAt);
+        article.DomainEvents.OfType<ArticleUpdatedEvent>().Single().OccurredAt.ShouldBe(updatedAt);
     }
 
     [Test]
@@ -410,6 +430,7 @@ public sealed class ArticleTests
         // Assert
         searchableText.ShouldContain("Azure Functions Articles");
         searchableText.ShouldContain("Useful articles about Azure Functions.");
+        searchableText.ShouldContain("DeepDive");
         searchableText.ShouldContain("backend");
         searchableText.ShouldContain("Backend");
         searchableText.ShouldContain("azure-functions Azure Functions");

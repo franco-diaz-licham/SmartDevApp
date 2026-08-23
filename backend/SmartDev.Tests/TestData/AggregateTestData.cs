@@ -1,5 +1,6 @@
 using SmartDev.Api.Functions.Domain.Contact;
 using SmartDev.Api.Functions.Domain.Articles;
+using DomainArticleType = SmartDev.Api.Functions.Domain.Articles.ArticleType;
 
 namespace SmartDev.Tests.TestData;
 
@@ -22,6 +23,7 @@ internal static class AggregateTestData
         string title = "Azure Functions Articles",
         string slug = "azure-functions-articles",
         string summary = "Useful articles about Azure Functions.",
+        DomainArticleType articleType = DomainArticleType.DeepDive,
         string category = "Backend",
         string bodyMarkdown = "# Azure Functions\n\nArticles.",
         IEnumerable<string>? tags = null,
@@ -32,6 +34,7 @@ internal static class AggregateTestData
             title: ArticleTitle.Create(title),
             slug: ArticleSlug.Create(slug),
             summary: ArticleSummary.Create(summary),
+            articleType: articleType,
             category: ArticleCategorySnapshot.Create(ArticleCategorySlug.Create(ToSlug(category)), category.Trim()),
             body: MarkdownContent.Create(bodyMarkdown),
             tags: (tags ?? ["azure-functions", "dotnet"])

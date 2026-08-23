@@ -22,6 +22,8 @@ public sealed class ArticleDocument
 
     public string Summary { get; init; } = string.Empty;
 
+    public string ArticleType { get; init; } = global::SmartDev.Api.Functions.Domain.Articles.ArticleType.DeepDive.ToString();
+
     public ArticleCategoryDocument Category { get; init; } = new(string.Empty, string.Empty);
 
     public IReadOnlyCollection<ArticleTagDocument> Tags { get; init; } = [];
@@ -49,6 +51,7 @@ public sealed class ArticleDocument
             Slug = article.Slug.Value,
             Title = article.Title.Value,
             Summary = article.Summary.Value,
+            ArticleType = article.ArticleType.ToString(),
             Category = new ArticleCategoryDocument(article.Category.Slug.Value, article.Category.DisplayName),
             Tags = article.Tags.Select(tag => new ArticleTagDocument(tag.Slug.Value, tag.DisplayName)).ToArray(),
             BodyMarkdown = article.Body.Value,
@@ -71,6 +74,7 @@ public sealed class ArticleDocument
             ArticleTitle.Create(Title),
             ArticleSlug.Create(Slug),
             ArticleSummary.Create(Summary),
+            ResolveArticleType(ArticleType),
             ArticleCategorySnapshot.Create(ArticleCategorySlug.Create(Category.Slug), Category.DisplayName),
             MarkdownContent.Create(BodyMarkdown),
             Enum.Parse<ArticleStatus>(Status),
@@ -84,6 +88,16 @@ public sealed class ArticleDocument
     }
 
     public string PartitionKey => Visibility;
+
+    private static global::SmartDev.Api.Functions.Domain.Articles.ArticleType ResolveArticleType(string? articleType)
+    {
+        if (string.Equals(articleType, "DecisionRecord", StringComparison.OrdinalIgnoreCase)) return global::SmartDev.Api.Functions.Domain.Articles.ArticleType.ProjectWriteup;
+        if (string.Equals(articleType, "WeeklyReflection", StringComparison.OrdinalIgnoreCase)) return global::SmartDev.Api.Functions.Domain.Articles.ArticleType.Reflection;
+
+        return Enum.TryParse<global::SmartDev.Api.Functions.Domain.Articles.ArticleType>(articleType, ignoreCase: true, out var parsedArticleType) && Enum.IsDefined(parsedArticleType)
+            ? parsedArticleType
+            : global::SmartDev.Api.Functions.Domain.Articles.ArticleType.DeepDive;
+    }
 }
 
 public sealed record RelatedProjectDocument(string ProjectId, string Label);
