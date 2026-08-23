@@ -63,7 +63,7 @@ internal static class ArticleRequestMapping
     {
         if (string.IsNullOrWhiteSpace(articleType)) return ArticleType.DeepDive;
         if (Enum.TryParse<ArticleType>(articleType.Trim(), ignoreCase: true, out var parsedArticleType) && Enum.IsDefined(parsedArticleType)) return parsedArticleType;
-        throw new ArgumentException("Article type must be DeepDive, Note, BookSummary, ProjectWriteup, DebuggingStory, Reflection, or Experiment.");
+        throw new ArgumentException("Article type must be DeepDive, BookSummary, ProjectWriteup, or Reflection.");
     }
 
     private static ArticleVisibility BindArticleVisibility(string? visibility)

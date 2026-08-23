@@ -80,10 +80,10 @@ public sealed class ArticleTests
         var updatedAt = new DateTimeOffset(2026, 8, 5, 12, 37, 0, TimeSpan.Zero);
 
         // Act
-        article.ChangeType(DomainArticleType.Note, updatedAt);
+        article.ChangeType(DomainArticleType.ProjectWriteup, updatedAt);
 
         // Assert
-        article.ArticleType.ShouldBe(DomainArticleType.Note);
+        article.ArticleType.ShouldBe(DomainArticleType.ProjectWriteup);
         article.UpdatedAt.ShouldBe(updatedAt);
         article.DomainEvents.OfType<ArticleUpdatedEvent>().Single().OccurredAt.ShouldBe(updatedAt);
     }

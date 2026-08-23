@@ -11,11 +11,6 @@ public enum ArticleType
     DeepDive,
 
     /// <summary>
-    /// A lightweight captured idea, reminder, snippet, or rough understanding.
-    /// </summary>
-    Note,
-
-    /// <summary>
     /// A summary, takeaway, or reflection from a book or book chapter.
     /// </summary>
     BookSummary,
@@ -26,17 +21,7 @@ public enum ArticleType
     ProjectWriteup,
 
     /// <summary>
-    /// A problem investigation covering symptoms, root cause, fix, and lessons learned.
-    /// </summary>
-    DebuggingStory,
-
-    /// <summary>
     /// A reflection on learning, building, reading, blockers, and next steps.
     /// </summary>
-    Reflection,
-
-    /// <summary>
-    /// A small prototype, demo, technical exercise, or experiment writeup.
-    /// </summary>
-    Experiment
+    Reflection
 }
