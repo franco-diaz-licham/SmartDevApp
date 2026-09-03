@@ -158,8 +158,19 @@ docker/
 ### Infrastructure
 
 ```text
-infra/                 # Simple production Terraform for Azure resources
+infra/                 # Production Azure Bicep modules and parameters
 ```
+
+SmartDevApp can be provisioned to Azure with Bicep. The infrastructure lives under `infra/`, and deployment is wrapped by `scripts/provision-infra.ps1`.
+
+Review `infra/.env.example`, create an ignored `infra/.env`, and set the required Azure and Entra values:
+
+```powershell
+./scripts/provision-infra.ps1 -WhatIfOnly
+./scripts/provision-infra.ps1 -SkipWhatIf
+```
+
+See `infra/README.md` for the full Azure deployment notes, emitted GitHub secret names, and deprovisioning command.
 
 ## 🔁 Contact Email Workflow
 

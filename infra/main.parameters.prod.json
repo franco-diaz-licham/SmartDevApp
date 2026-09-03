@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "australiaeast"
+    },
+    "staticWebAppLocation": {
+      "value": "eastasia"
+    },
+    "workloadName": {
+      "value": "smartdevapp"
+    },
+    "environmentName": {
+      "value": "prod"
+    },
+    "dnsZoneName": {
+      "value": "smartdev.com.au"
+    },
+    "communicationDataLocation": {
+      "value": "Australia"
+    },
+    "cosmosDatabaseName": {
+      "value": "smartdev"
+    },
+    "cosmosThroughput": {
+      "value": 1000
+    },
+    "contactMessageTtlSeconds": {
+      "value": 86400
+    },
+    "functionRuntimeVersion": {
+      "value": "10.0"
+    },
+    "apiMaximumInstanceCount": {
+      "value": 10
+    },
+    "workerMaximumInstanceCount": {
+      "value": 5
+    },
+    "functionInstanceMemoryMB": {
+      "value": 2048
+    },
+    "apiHttpPerInstanceConcurrency": {
+      "value": 16
+    },
+    "tags": {
+      "value": {
+        "owner": "smartdevapp"
+      }
+    }
+  }
+}
