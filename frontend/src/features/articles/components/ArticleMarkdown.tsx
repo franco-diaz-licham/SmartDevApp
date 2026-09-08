@@ -4,6 +4,47 @@ interface ArticleMarkdownProps {
   markdown: string;
 }
 
+const splitMarkdownBlocks = (markdown: string): string[] => {
+  const blocks: string[] = [];
+  let lines: string[] = [];
+  let blockType: 'paragraph' | 'list' | 'code' | null = null;
+
+  const flush = () => {
+    if (lines.length > 0) blocks.push(lines.join('\n'));
+    lines = [];
+    blockType = null;
+  };
+
+  for (const line of markdown.replace(/\r\n?/g, '\n').split('\n')) {
+    const trimmedLine = line.trim();
+
+    if (blockType === 'code') {
+      lines.push(line);
+      if (trimmedLine === '```') flush();
+      continue;
+    }
+
+    if (trimmedLine.startsWith('```')) {
+      flush();
+      blockType = 'code';
+      lines.push(line);
+    } else if (!trimmedLine) {
+      flush();
+    } else if (/^#{1,4}\s+.+$/.test(trimmedLine)) {
+      flush();
+      blocks.push(trimmedLine);
+    } else {
+      const nextType = /^[-*]\s+.+$/.test(trimmedLine) ? 'list' : 'paragraph';
+      if (blockType !== nextType) flush();
+      blockType = nextType;
+      lines.push(line);
+    }
+  }
+
+  flush();
+  return blocks;
+};
+
 const renderMarkdownBlock = (block: string, index: number, usedHeadingIds: Map<string, number>) => {
   const trimmedBlock = block.trim();
   const heading = /^(#{1,4})\s+(.+)$/.exec(trimmedBlock);
@@ -56,7 +97,7 @@ const renderMarkdownBlock = (block: string, index: number, usedHeadingIds: Map<s
 };
 
 export const ArticleMarkdown = ({ markdown }: ArticleMarkdownProps) => {
-  const blocks = markdown.split(/\n{2,}/).filter((block) => block.trim().length > 0);
+  const blocks = splitMarkdownBlocks(markdown);
   const usedHeadingIds = new Map<string, number>();
   return <>{blocks.map((block, index) => renderMarkdownBlock(block, index, usedHeadingIds))}</>;
 };
