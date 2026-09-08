@@ -146,7 +146,7 @@ public sealed record MarkdownContent
     /// <summary>
     /// Gets the maximum allowed Markdown body length.
     /// </summary>
-    public const int MaxLength = 50_000;
+    public const int MaxLength = 200_000;
 
     private MarkdownContent(string value) => Value = value;
 

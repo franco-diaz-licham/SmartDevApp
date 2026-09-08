@@ -175,6 +175,19 @@ public sealed class ArticleValueObjectTests
     }
 
     [Test]
+    public void MarkdownContent_Create_ValueAtMaximumLength_Succeeds()
+    {
+        // Arrange
+        var value = new string('a', MarkdownContent.MaxLength);
+
+        // Act
+        var content = MarkdownContent.Create(value);
+
+        // Assert
+        content.Value.Length.ShouldBe(200_000);
+    }
+
+    [Test]
     public void ArticleTagSlug_Create_NormalizesToLowercase()
     {
         // Arrange

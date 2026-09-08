@@ -7,7 +7,7 @@ export const articleEntryFormLimits = {
   summary: 500,
   category: 120,
   tags: 500,
-  bodyMarkdown: 50_000
+  bodyMarkdown: 200_000
 } as const;
 
 export const articleStatusOptions = ['Draft', 'Published', 'Archived'] as const;
