@@ -24,6 +24,31 @@ describe('ArticleMarkdown', () => {
     expect(screen.getByText('Following paragraph')).toBeInTheDocument();
   });
 
+  test('renders indented bullets as a nested list', () => {
+    const markdown = [
+      "- Always the provider's responsibility:",
+      '  - Physical datacenter',
+      '  - Physical network',
+      '  - Physical hosts',
+      '  - Physical security, power, cooling, network connectivity'
+    ].join('\n');
+    const { container } = render(<ArticleMarkdown markdown={markdown} />);
+
+    const lists = container.querySelectorAll('ul');
+    const parentItem = lists[0].children[0];
+
+    expect(lists).toHaveLength(2);
+    expect(lists[0].children).toHaveLength(1);
+    expect(parentItem.childNodes[0].textContent).toBe("Always the provider's responsibility:");
+    expect(parentItem.lastElementChild).toBe(lists[1]);
+    expect(Array.from(lists[1].children, (item) => item.textContent)).toEqual([
+      'Physical datacenter',
+      'Physical network',
+      'Physical hosts',
+      'Physical security, power, cooling, network connectivity'
+    ]);
+  });
+
   test('keeps blank lines and markdown syntax inside fenced code', () => {
     const { container } = render(<ArticleMarkdown markdown={'# Heading\n```md\n## Code heading\n\n- Code list\n```\n## Subheading'} />);
 

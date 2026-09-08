@@ -4,6 +4,16 @@ interface ArticleMarkdownProps {
   markdown: string;
 }
 
+interface MarkdownListItem {
+  content: string;
+  children: MarkdownListItem[];
+}
+
+interface ParsedListItem {
+  content: string;
+  indentation: number;
+}
+
 const splitMarkdownBlocks = (markdown: string): string[] => {
   const blocks: string[] = [];
   let lines: string[] = [];
@@ -45,6 +55,54 @@ const splitMarkdownBlocks = (markdown: string): string[] => {
   return blocks;
 };
 
+const getIndentation = (value: string) => value.replace(/\t/g, '    ').length;
+
+const parseMarkdownList = (block: string): MarkdownListItem[] => {
+  const parsedItems = block.split('\n').flatMap((line): ParsedListItem[] => {
+    const match = /^(\s*)[-*]\s+(.+)$/.exec(line);
+    return match ? [{ content: match[2], indentation: getIndentation(match[1]) }] : [];
+  });
+
+  const parseLevel = (startIndex: number, indentation: number): [MarkdownListItem[], number] => {
+    const items: MarkdownListItem[] = [];
+    let index = startIndex;
+
+    while (index < parsedItems.length) {
+      const parsedItem = parsedItems[index];
+
+      if (parsedItem.indentation < indentation) break;
+
+      if (parsedItem.indentation > indentation) {
+        const parent = items.at(-1);
+        if (!parent) break;
+
+        const [children, nextIndex] = parseLevel(index, parsedItem.indentation);
+        parent.children.push(...children);
+        index = nextIndex;
+        continue;
+      }
+
+      items.push({ content: parsedItem.content, children: [] });
+      index += 1;
+    }
+
+    return [items, index];
+  };
+
+  return parsedItems.length > 0 ? parseLevel(0, parsedItems[0].indentation)[0] : [];
+};
+
+const renderMarkdownList = (items: MarkdownListItem[], depth = 0, key?: number) => (
+  <ul key={key} className={`${depth === 0 ? 'list-disc' : depth === 1 ? 'list-[circle]' : 'list-[square]'} ${depth === 0 ? 'pl-5' : 'mt-2 pl-6'} space-y-2 text-base leading-7 text-foreground`}>
+    {items.map((item, index) => (
+      <li key={`${item.content}-${index}`}>
+        {item.content}
+        {item.children.length > 0 ? renderMarkdownList(item.children, depth + 1) : null}
+      </li>
+    ))}
+  </ul>
+);
+
 const renderMarkdownBlock = (block: string, index: number, usedHeadingIds: Map<string, number>) => {
   const trimmedBlock = block.trim();
   const heading = /^(#{1,4})\s+(.+)$/.exec(trimmedBlock);
@@ -74,19 +132,10 @@ const renderMarkdownBlock = (block: string, index: number, usedHeadingIds: Map<s
     );
   }
 
-  const listItemMatches = trimmedBlock
-    .split('\n')
-    .map((line) => /^[-*]\s+(.+)$/.exec(line.trim()))
-    .filter((match): match is RegExpExecArray => match !== null);
+  const listItems = parseMarkdownList(block);
 
-  if (listItemMatches.length > 0) {
-    return (
-      <ul key={index} className="list-disc space-y-2 pl-5 text-base leading-7 text-foreground">
-        {listItemMatches.map((item) => (
-          <li key={item[1]}>{item[1]}</li>
-        ))}
-      </ul>
-    );
+  if (listItems.length > 0) {
+    return renderMarkdownList(listItems, 0, index);
   }
 
   return (
