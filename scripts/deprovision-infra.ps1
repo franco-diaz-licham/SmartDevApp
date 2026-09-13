@@ -5,119 +5,136 @@
 Deletes the SmartDevApp Azure infrastructure resource group.
 
 .DESCRIPTION
-Reads the target subscription and resource group from infra/.env, confirms the
-resource group contents, and deletes the group through Azure CLI.
+Reads the target subscription and resource group from the repository-root .env file,
+requires typed confirmation, and waits for Azure to complete the deletion.
 
 .EXAMPLE
 ./scripts/deprovision-infra.ps1
-
-.EXAMPLE
-./scripts/deprovision-infra.ps1 -Subscription "00000000-0000-0000-0000-000000000000"
-
-.EXAMPLE
-./scripts/deprovision-infra.ps1 -Force
-
-.EXAMPLE
-./scripts/deprovision-infra.ps1 -Force -NoWait
 #>
-
 [CmdletBinding()]
-param(
-    [string]$Subscription,
-    [string]$EnvFile = (Join-Path $PSScriptRoot "../infra/.env"),
-    [switch]$Force,
-    [switch]$NoWait
-)
+param()
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-# Load reusable helper functions from the local script module.
-Import-Module (Join-Path $PSScriptRoot "InfraHelpers.psm1") -Force
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "ScriptHelpers.psm1") -Force
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "ProvisioningHelpers.psm1") -Force
 
-# Validate required local tooling before reading configuration.
-if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
-    throw "Azure CLI was not found. Install it from https://learn.microsoft.com/cli/azure/install-azure-cli, then run this script again."
-}
+function Invoke-Main {
+    [CmdletBinding()]
+    param()
 
-# Load environment-driven Azure configuration.
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$envFilePath = if ([IO.Path]::IsPathRooted($EnvFile)) { $EnvFile } else { Join-Path $repoRoot $EnvFile }
-Import-DotEnv -Path $envFilePath
+    # Environment
+    $repoRoot = Split-Path -Path $PSScriptRoot -Parent
+    $envFile = Join-Path -Path $repoRoot -ChildPath ".env"
+    Import-DotEnv -Path $envFile
 
-# Resolve the subscription and resource group that will be deleted.
-$subscriptionName = if ([string]::IsNullOrWhiteSpace($Subscription)) { Get-Config -Name "AZURE_SUBSCRIPTION" } else { $Subscription }
-$resourceGroupName = Get-Config -Name "AZURE_RESOURCE_GROUP_NAME"
+    # Variables
+    $subscriptionName = Get-Config -Name "AZURE_SUBSCRIPTION"
+    $resourceGroupName = Get-Config -Name "AZURE_RESOURCE_GROUP_NAME"
+    $deleteArguments = @(
+        "group", "delete"
+        "--name", $resourceGroupName
+        "--yes"
+    )
+    $azureCliAvailable = Test-CommandAvailable -Name "az"
 
-# Ensure Azure CLI is authenticated before attempting deletion.
-$account = $null
-try {
-    $account = Invoke-AzJson -Arguments @("account", "show", "--output", "json")
-} catch {
-    Write-Host "Azure CLI is not logged in. Starting az login..." -ForegroundColor Yellow
-    Invoke-Az -Arguments @("login", "--output", "none")
-    $account = Invoke-AzJson -Arguments @("account", "show", "--output", "json")
-}
+    # Validation
+    if (-not $azureCliAvailable) { throw "Azure CLI was not found. Install it, then run this script again." }
 
-# Select the target subscription from .env or the explicit script parameter.
-Write-Host "Using Azure subscription: $subscriptionName" -ForegroundColor Cyan
-Invoke-Az -Arguments @("account", "set", "--subscription", $subscriptionName)
-$account = Invoke-AzJson -Arguments @("account", "show", "--output", "json")
+    # Resource-group discovery
+    $null = Connect-AzSubscription -Subscription $subscriptionName
+    Write-Host -Object "Target resource group: $resourceGroupName" -ForegroundColor Yellow
 
-Write-Host "Active subscription: $($account.name) [$($account.id)]" -ForegroundColor Cyan
-Write-Host "Target resource group: $resourceGroupName" -ForegroundColor Yellow
-
-# Exit cleanly when the resource group has already been removed.
-$resourceGroupExists = Invoke-AzJson -Arguments @(
-    "group", "exists",
-    "--name", $resourceGroupName,
-    "--output", "json"
-)
-
-if (-not $resourceGroupExists) {
-    Write-Host "Resource group does not exist. Nothing to delete." -ForegroundColor Green
-    return
-}
-
-# Show the resources that will be removed with the resource group.
-Write-Host ""
-Write-Host "Resources that will be deleted:" -ForegroundColor Yellow
-Invoke-Az -Arguments @(
-    "resource", "list",
-    "--resource-group", $resourceGroupName,
-    "--query", "[].{Name:name, Type:type, Location:location}",
-    "--output", "table"
-)
-
-# Require an explicit confirmation unless the script is intentionally forced.
-if (-not $Force.IsPresent) {
-    Write-Host ""
-    Write-Host "This will delete the entire resource group and every resource inside it." -ForegroundColor Red
-    $confirmation = Read-Host "Type '$resourceGroupName' to confirm"
-
-    if ($confirmation -ne $resourceGroupName) {
-        Write-Host "Confirmation did not match. No resources were deleted." -ForegroundColor Yellow
+    $resourceGroupExists = Test-AzResourceGroupExists -ResourceGroupName $resourceGroupName
+    if (-not $resourceGroupExists) {
+        Write-Host -Object "Resource group does not exist. Nothing to delete." -ForegroundColor Green
         return
     }
+
+    # Resource-group confirmation
+    Show-AzResourceGroupResources -ResourceGroupName $resourceGroupName
+    $deletionConfirmed = Confirm-AzResourceGroupDeletion -ResourceGroupName $resourceGroupName
+    if (-not $deletionConfirmed) {
+        Write-Host -Object "Confirmation did not match. No resources were deleted." -ForegroundColor Yellow
+        return
+    }
+
+    # Resource-group deletion
+    Write-Host -Object ""
+    Write-Host -Object "Deleting resource group: $resourceGroupName" -ForegroundColor Cyan
+    Invoke-Az -Arguments $deleteArguments
+    Write-Host -Object "Resource group deleted." -ForegroundColor Green
 }
 
-# Delete the resource group. This is the deprovisioning boundary for the environment.
-$deleteArguments = @(
-    "group", "delete",
-    "--name", $resourceGroupName,
-    "--yes"
-)
+<#
+.SYNOPSIS
+Checks whether an Azure resource group exists.
 
-if ($NoWait.IsPresent) {
-    $deleteArguments += "--no-wait"
+.PARAMETER ResourceGroupName
+Name of the Azure resource group.
+
+.OUTPUTS
+System.Boolean
+#>
+function Test-AzResourceGroupExists {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)] [string]$ResourceGroupName
+    )
+
+    return Invoke-AzJson -Arguments @(
+        "group", "exists"
+        "--name", $ResourceGroupName
+        "--output", "json"
+    )
 }
 
-Write-Host ""
-Write-Host "Deleting resource group: $resourceGroupName" -ForegroundColor Cyan
-Invoke-Az -Arguments $deleteArguments
+<#
+.SYNOPSIS
+Displays the resources contained in an Azure resource group.
 
-if ($NoWait.IsPresent) {
-    Write-Host "Deletion started. Azure will continue deleting the resource group in the background." -ForegroundColor Green
-} else {
-    Write-Host "Resource group deleted." -ForegroundColor Green
+.PARAMETER ResourceGroupName
+Name of the Azure resource group.
+#>
+function Show-AzResourceGroupResources {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)] [string]$ResourceGroupName
+    )
+
+    Write-Host -Object ""
+    Write-Host -Object "Resources that will be deleted:" -ForegroundColor Yellow
+    Invoke-Az -Arguments @(
+        "resource", "list"
+        "--resource-group", $ResourceGroupName
+        "--query", "[].{Name:name, Type:type, Location:location}"
+        "--output", "table"
+    )
 }
+
+<#
+.SYNOPSIS
+Requires the operator to type the target resource-group name before deletion.
+
+.PARAMETER ResourceGroupName
+Name that must be entered exactly to confirm deletion.
+
+.OUTPUTS
+System.Boolean
+#>
+function Confirm-AzResourceGroupDeletion {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)] [string]$ResourceGroupName
+    )
+
+    Write-Host -Object ""
+    Write-Host -Object "This will delete the entire resource group and every resource inside it." -ForegroundColor Red
+    $confirmation = Read-Host -Prompt "Type '$ResourceGroupName' to confirm"
+    return $confirmation -eq $ResourceGroupName
+}
+
+Invoke-Main

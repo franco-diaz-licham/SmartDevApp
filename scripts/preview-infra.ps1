@@ -2,13 +2,13 @@
 
 <#
 .SYNOPSIS
-Provisions the SmartDevApp Azure infrastructure with Bicep.
+Validates and previews the SmartDevApp Azure infrastructure with Bicep.
 .DESCRIPTION
 Reads configuration from the repository-root .env. Local deployment inputs are
 merged into a temporary parameter file and removed in finally.
-Creates the resource group and deploys the configured environment. Use preview-infra.ps1 first for an existing environment.
+The target resource group must already exist. This script never creates resources.
 .EXAMPLE
-./scripts/provision-infra.ps1
+./scripts/preview-infra.ps1
 #>
 [CmdletBinding()]
 param()
@@ -50,9 +50,8 @@ function Invoke-Main {
     try {
         Write-JsonFile -Value $parameters -Path $temporaryParametersFile
         $null = Connect-AzSubscription -Subscription $subscriptionName
-        New-AzResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation
         $deploymentArguments = @(
-            "deployment", "group", "create",
+            "deployment", "group", "validate",
             "--name", $deploymentName,
             "--resource-group", $resourceGroupName,
             "--template-file", $templatePath,
@@ -60,8 +59,9 @@ function Invoke-Main {
             "--output", "json"
         )
         $deployment = Invoke-AzJson -Arguments $deploymentArguments
-        Write-Host -Object "Infrastructure provisioning complete. Application delivery is a separate step." -ForegroundColor Green
-        $deployment.properties.outputs.githubSecrets.value | Format-List
+        $deploymentArguments[2] = "what-if"
+        Invoke-Az -Arguments $deploymentArguments
+        Write-Host -Object "Validation and preview complete. No resources were created." -ForegroundColor Green
     } finally {
         if (Test-Path -LiteralPath $temporaryParametersFile) { Remove-Item -LiteralPath $temporaryParametersFile -Force }
         $parameters = $null
