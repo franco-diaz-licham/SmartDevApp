@@ -1,3 +1,6 @@
+@description('Environment-specific resource sizing, retention and SKU configuration.')
+param config object
+
 // ------------------------------------- Parameters -------------------------------------
 
 @description('Azure region for Storage resources.')
@@ -20,7 +23,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   tags: tags
   kind: 'StorageV2'
   sku: {
-    name: 'Standard_LRS'
+    name: config.skuName
   }
   properties: {
     accessTier: 'Hot'

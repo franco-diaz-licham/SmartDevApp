@@ -102,16 +102,21 @@ var secureAppSettingsArray = [
   }
 ]
 
-var scaleAndConcurrency = union({
-  instanceMemoryMB: instanceMemoryMB
-  maximumInstanceCount: maximumInstanceCount
-}, httpPerInstanceConcurrency > 0 ? {
-  triggers: {
-    http: {
-      perInstanceConcurrency: httpPerInstanceConcurrency
-    }
-  }
-} : {})
+var scaleAndConcurrency = union(
+  {
+    instanceMemoryMB: instanceMemoryMB
+    maximumInstanceCount: maximumInstanceCount
+  },
+  httpPerInstanceConcurrency > 0
+    ? {
+        triggers: {
+          http: {
+            perInstanceConcurrency: httpPerInstanceConcurrency
+          }
+        }
+      }
+    : {}
+)
 
 // ------------------------------------- Resources -------------------------------------
 

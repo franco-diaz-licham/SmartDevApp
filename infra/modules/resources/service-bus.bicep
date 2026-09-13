@@ -1,3 +1,6 @@
+@description('Environment-specific resource sizing, retention and SKU configuration.')
+param config object
+
 // ------------------------------------- Parameters -------------------------------------
 
 @description('Azure region for Service Bus.')
@@ -16,8 +19,8 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
   location: location
   tags: tags
   sku: {
-    name: 'Standard'
-    tier: 'Standard'
+    name: config.skuName
+    tier: config.skuTier
   }
   properties: {
     publicNetworkAccess: 'Enabled'

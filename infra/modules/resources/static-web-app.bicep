@@ -1,3 +1,6 @@
+@description('Environment-specific resource sizing, retention and SKU configuration.')
+param config object
+
 // ------------------------------------- Parameters -------------------------------------
 
 @description('Azure region for Static Web Apps.')
@@ -16,8 +19,8 @@ resource staticWebApp 'Microsoft.Web/staticSites@2025-03-01' = {
   location: location
   tags: tags
   sku: {
-    name: 'Free'
-    tier: 'Free'
+    name: config.skuName
+    tier: config.skuTier
   }
   properties: {}
 }

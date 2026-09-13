@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "value": "australiaeast"
+      "value": "canadacentral"
     },
     "workloadName": {
       "value": "smartdevapp"
     },
     "environmentName": {
-      "value": "prod"
+      "value": "dev"
     },
     "tags": {
       "value": {
@@ -18,14 +18,14 @@
     },
     "staticWebAppConfig": {
       "value": {
-        "location": "eastasia",
+        "location": "eastus2",
         "skuName": "Free",
         "skuTier": "Free"
       }
     },
     "dnsConfig": {
       "value": {
-        "zoneName": "smartdev.com.au"
+        "zoneName": ""
       }
     },
     "communicationConfig": {
@@ -36,7 +36,7 @@
     "cosmosConfig": {
       "value": {
         "databaseName": "smartdev",
-        "throughput": 1000,
+        "throughput": 400,
         "contactMessageTtlSeconds": 86400
       }
     },
@@ -61,7 +61,7 @@
     "observabilityConfig": {
       "value": {
         "retentionInDays": 30,
-        "dailyQuotaGb": -1
+        "dailyQuotaGb": 1
       }
     },
     "serviceBusConfig": {

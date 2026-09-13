@@ -163,11 +163,11 @@ infra/                 # Production Azure Bicep modules and parameters
 
 SmartDevApp can be provisioned to Azure with Bicep. The infrastructure lives under `infra/`, and deployment is wrapped by `scripts/provision-infra.ps1`.
 
-Review `infra/.env.example`, create an ignored `infra/.env`, and set the required Azure and Entra values:
+Review `infra/README.md`, create an ignored `.env`, and set the required Azure and Entra values:
 
 ```powershell
-./scripts/provision-infra.ps1 -WhatIfOnly
-./scripts/provision-infra.ps1 -SkipWhatIf
+./scripts/preview-infra.ps1
+./scripts/provision-infra.ps1
 ```
 
 See `infra/README.md` for the full Azure deployment notes, emitted GitHub secret names, and deprovisioning command.

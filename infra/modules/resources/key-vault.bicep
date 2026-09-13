@@ -1,3 +1,6 @@
+@description('Environment-specific resource sizing, retention and SKU configuration.')
+param config object
+
 // ------------------------------------- Parameters -------------------------------------
 
 @description('Azure region for Key Vault.')
@@ -44,7 +47,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
       family: 'A'
       name: 'standard'
     }
-    softDeleteRetentionInDays: 7
+    softDeleteRetentionInDays: config.softDeleteRetentionInDays
     tenantId: tenant().tenantId
   }
 }

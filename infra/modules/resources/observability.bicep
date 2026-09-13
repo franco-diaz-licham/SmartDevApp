@@ -1,3 +1,6 @@
+@description('Environment-specific resource sizing, retention and SKU configuration.')
+param config object
+
 // ------------------------------------- Parameters -------------------------------------
 
 @description('Azure region for observability resources.')
@@ -22,7 +25,10 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09
     sku: {
       name: 'PerGB2018'
     }
-    retentionInDays: 30
+    retentionInDays: config.retentionInDays
+    workspaceCapping: {
+      dailyQuotaGb: config.dailyQuotaGb
+    }
   }
 }
 

@@ -5,9 +5,6 @@ targetScope = 'resourceGroup'
 @description('Azure region for regional resources.')
 param location string
 
-@description('Azure region for Static Web Apps. Static Web Apps Free is not available in every Azure region.')
-param staticWebAppLocation string
-
 @description('Short workload name used in Azure resource names.')
 param workloadName string
 
@@ -16,9 +13,6 @@ param environmentName string
 
 @description('Tags applied to all Azure resources.')
 param tags object
-
-@description('Custom DNS zone name for the public site. Leave empty to skip DNS zone creation.')
-param dnsZoneName string = ''
 
 @description('Microsoft Entra tenant ID expected by the API Functions app.')
 param apiEntraTenantId string
@@ -38,46 +32,125 @@ param frontendEntraAuthority string
 @description('Frontend Microsoft Entra API scope emitted for GitHub Actions.')
 param frontendEntraApiScope string
 
-@description('Azure Communication Services data residency geography.')
-param communicationDataLocation string
-
 @description('Override sender address. Leave empty to use the Azure managed email domain default DoNotReply sender.')
 param communicationSenderAddress string = ''
 
-@description('Cosmos DB database name used by the API.')
-param cosmosDatabaseName string
+type StaticWebAppConfiguration = {
+  @description('Azure region for Static Web Apps. Static Web Apps Free is not available in every Azure region.')
+  location: string
+  @description('staticWebApp skuName.')
+  skuName: string
+  @description('staticWebApp skuTier.')
+  skuTier: string
+}
 
-@description('Cosmos DB database shared throughput.')
-@minValue(400)
-param cosmosThroughput int
+@description('Environment configuration for staticWebApp.')
+param staticWebAppConfig StaticWebAppConfiguration
 
-@description('Default TTL in seconds for short-lived contact-message documents.')
-@minValue(60)
-param contactMessageTtlSeconds int
+type DnsConfiguration = {
+  @description('Custom DNS zone name for the public site. Leave empty to skip DNS zone creation.')
+  zoneName: string
+}
 
-@description('Azure Functions runtime version used by both Function Apps.')
-param functionRuntimeVersion string
+@description('Environment configuration for dns.')
+param dnsConfig DnsConfiguration
 
-@description('Maximum Flex Consumption instances for the API Function App.')
-@minValue(1)
-param apiMaximumInstanceCount int
+type CommunicationConfiguration = {
+  @description('Azure Communication Services data residency geography.')
+  dataLocation: string
+}
 
-@description('Maximum Flex Consumption instances for the Worker Function App.')
-@minValue(1)
-param workerMaximumInstanceCount int
+@description('Environment configuration for communication.')
+param communicationConfig CommunicationConfiguration
 
-@description('Flex Consumption memory size in MB for each Function App instance.')
-@allowed([
-  2048
-  4096
-])
-param functionInstanceMemoryMB int
+type CosmosConfiguration = {
+  @description('Cosmos DB database name used by the API.')
+  databaseName: string
+  @description('Cosmos DB database shared throughput.')
+  @minValue(400)
+  throughput: int
+  @description('Default TTL in seconds for short-lived contact-message documents.')
+  @minValue(60)
+  contactMessageTtlSeconds: int
+}
 
-@description('Per-instance HTTP concurrency for the API Function App.')
-@minValue(1)
-param apiHttpPerInstanceConcurrency int
+@description('Environment configuration for cosmos.')
+param cosmosConfig CosmosConfiguration
+
+type ApiConfiguration = {
+  @description('Azure Functions runtime version used by both Function Apps.')
+  functionRuntimeVersion: string
+  @description('Maximum Flex Consumption instances for the API Function App.')
+  @minValue(1)
+  maximumInstanceCount: int
+  @description('Flex Consumption memory size in MB for each Function App instance.')
+  functionInstanceMemoryMB: 2048 | 4096
+  @description('Per-instance HTTP concurrency for the API Function App.')
+  @minValue(1)
+  httpPerInstanceConcurrency: int
+}
+
+@description('Environment configuration for api.')
+param apiConfig ApiConfiguration
+
+type WorkerConfiguration = {
+  @description('Maximum Flex Consumption instances for the Worker Function App.')
+  @minValue(1)
+  maximumInstanceCount: int
+}
+
+@description('Environment configuration for worker.')
+param workerConfig WorkerConfiguration
+
+type KeyVaultConfiguration = {
+  @description('keyVault softDeleteRetentionInDays.')
+  softDeleteRetentionInDays: int
+}
+
+@description('Environment configuration for keyVault.')
+param keyVaultConfig KeyVaultConfiguration
+
+type ObservabilityConfiguration = {
+  @description('observability retentionInDays.')
+  retentionInDays: int
+  @description('observability dailyQuotaGb.')
+  dailyQuotaGb: int
+}
+
+@description('Environment configuration for observability.')
+param observabilityConfig ObservabilityConfiguration
+
+type ServiceBusConfiguration = {
+  @description('serviceBus skuName.')
+  skuName: string
+  @description('serviceBus skuTier.')
+  skuTier: string
+}
+
+@description('Environment configuration for serviceBus.')
+param serviceBusConfig ServiceBusConfiguration
+
+type StorageConfiguration = {
+  @description('storage skuName.')
+  skuName: string
+}
+
+@description('Environment configuration for storage.')
+param storageConfig StorageConfiguration
 
 // ------------------------------------- Variables -------------------------------------
+
+var staticWebAppLocation = staticWebAppConfig.location
+var dnsZoneName = dnsConfig.zoneName
+var communicationDataLocation = communicationConfig.dataLocation
+var cosmosDatabaseName = cosmosConfig.databaseName
+var cosmosThroughput = cosmosConfig.throughput
+var contactMessageTtlSeconds = cosmosConfig.contactMessageTtlSeconds
+var functionRuntimeVersion = apiConfig.functionRuntimeVersion
+var apiMaximumInstanceCount = apiConfig.maximumInstanceCount
+var workerMaximumInstanceCount = workerConfig.maximumInstanceCount
+var functionInstanceMemoryMB = apiConfig.functionInstanceMemoryMB
+var apiHttpPerInstanceConcurrency = apiConfig.httpPerInstanceConcurrency
 
 var normalizedWorkloadName = toLower(replace(workloadName, '_', '-'))
 var normalizedEnvironmentName = toLower(replace(environmentName, '_', '-'))
@@ -108,18 +181,20 @@ var names = {
 
 // ------------------------------------- Modules -------------------------------------
 
-module frontend './modules/static-web-app.bicep' = {
+module frontend './modules/resources/static-web-app.bicep' = {
   name: 'static-web-app'
   params: {
+    config: staticWebAppConfig
     location: staticWebAppLocation
     name: names.staticWebApp
     tags: sharedTags
   }
 }
 
-module observability './modules/observability.bicep' = {
+module observability './modules/resources/observability.bicep' = {
   name: 'observability'
   params: {
+    config: observabilityConfig
     appInsightsName: names.appInsights
     location: location
     logAnalyticsWorkspaceName: names.logAnalyticsWorkspace
@@ -127,9 +202,10 @@ module observability './modules/observability.bicep' = {
   }
 }
 
-module storage './modules/storage-account.bicep' = {
+module storage './modules/resources/storage-account.bicep' = {
   name: 'storage-account'
   params: {
+    config: storageConfig
     deploymentContainerNames: [
       'api-functions-deployments'
       'worker-functions-deployments'
@@ -140,16 +216,17 @@ module storage './modules/storage-account.bicep' = {
   }
 }
 
-module serviceBus './modules/service-bus.bicep' = {
+module serviceBus './modules/resources/service-bus.bicep' = {
   name: 'service-bus'
   params: {
+    config: serviceBusConfig
     location: location
     namespaceName: names.serviceBusNamespace
     tags: sharedTags
   }
 }
 
-module cosmos './modules/cosmos-db.bicep' = {
+module cosmos './modules/resources/cosmos-db.bicep' = {
   name: 'cosmos-db'
   params: {
     accountName: names.cosmosAccount
@@ -161,7 +238,7 @@ module cosmos './modules/cosmos-db.bicep' = {
   }
 }
 
-module communication './modules/communication-services.bicep' = {
+module communication './modules/resources/communication-services.bicep' = {
   name: 'communication-services'
   params: {
     communicationServiceName: names.communicationService
@@ -175,9 +252,10 @@ var resolvedCommunicationSenderAddress = empty(communicationSenderAddress)
   ? 'DoNotReply@${communication.outputs.mailFromSenderDomain}'
   : communicationSenderAddress
 
-module keyVault './modules/key-vault.bicep' = {
+module keyVault './modules/resources/key-vault.bicep' = {
   name: 'key-vault'
   params: {
+    config: keyVaultConfig
     azureCommunicationServiceConnectionString: communication.outputs.communicationServiceConnectionString
     azureServiceBusConnectionString: serviceBus.outputs.connectionString
     azureWebJobsStorageConnectionString: storage.outputs.connectionString
@@ -189,7 +267,7 @@ module keyVault './modules/key-vault.bicep' = {
   }
 }
 
-module apiFunction './modules/function-app.bicep' = {
+module apiFunction './modules/resources/function-app.bicep' = {
   name: 'api-function-app'
   params: {
     appInsightsConnectionString: observability.outputs.applicationInsightsConnectionString
@@ -245,7 +323,7 @@ module apiFunction './modules/function-app.bicep' = {
   }
 }
 
-module workerFunction './modules/function-app.bicep' = {
+module workerFunction './modules/resources/function-app.bicep' = {
   name: 'worker-function-app'
   params: {
     appInsightsConnectionString: observability.outputs.applicationInsightsConnectionString
@@ -277,7 +355,7 @@ module workerFunction './modules/function-app.bicep' = {
   }
 }
 
-module dns './modules/dns-zone.bicep' = if (!empty(dnsZoneName)) {
+module dns './modules/resources/dns-zone.bicep' = if (!empty(dnsZoneName)) {
   name: 'dns-zone'
   params: {
     dnsZoneName: names.dnsZone
