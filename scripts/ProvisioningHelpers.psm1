@@ -97,5 +97,55 @@ function New-AzResourceGroup {
     )
 }
 
+<#
+.SYNOPSIS
+Prints failed Azure deployment operations for a group deployment.
+.PARAMETER ResourceGroupName
+Name of the Azure resource group.
+.PARAMETER DeploymentName
+Name of the deployment to inspect.
+#>
+function Write-AzDeploymentFailures {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)] [string]$ResourceGroupName,
+        [Parameter(Mandatory)] [string]$DeploymentName
+    )
 
-Export-ModuleMember -Function @( "Invoke-Az", "Invoke-AzJson", "Connect-AzSubscription", "New-AzResourceGroup" )
+    try {
+        $operations = Invoke-AzJson -Arguments @(
+            "deployment", "operation", "group", "list",
+            "--resource-group", $ResourceGroupName,
+            "--name", $DeploymentName,
+            "--output", "json"
+        )
+    } catch {
+        Write-Host -Object "Could not read deployment operations for '$DeploymentName': $($_.Exception.Message)" -ForegroundColor Yellow
+        return
+    }
+
+    $failedOperations = @($operations | Where-Object { $_.properties.provisioningState -eq "Failed" })
+    if ($failedOperations.Count -eq 0) {
+        Write-Host -Object "No failed deployment operations were available for '$DeploymentName'." -ForegroundColor Yellow
+        return
+    }
+
+    Write-Host -Object "Failed deployment operations:" -ForegroundColor Red
+    foreach ($operation in $failedOperations) {
+        $targetName = $operation.properties.targetResource.resourceName
+        $targetType = $operation.properties.targetResource.resourceType
+        $status = $operation.properties.statusCode
+        $statusMessage = $operation.properties.statusMessage
+        $errorCode = $statusMessage.error.code
+        $errorMessage = $statusMessage.error.message
+
+        Write-Host -Object ""
+        Write-Host -Object "Resource: $targetName" -ForegroundColor Yellow
+        Write-Host -Object "Type: $targetType"
+        Write-Host -Object "Status: $status"
+        if (-not [string]::IsNullOrWhiteSpace($errorCode)) { Write-Host -Object "Error code: $errorCode" }
+        if (-not [string]::IsNullOrWhiteSpace($errorMessage)) { Write-Host -Object "Message: $errorMessage" }
+    }
+}
+
+Export-ModuleMember -Function @( "Invoke-Az", "Invoke-AzJson", "Connect-AzSubscription", "New-AzResourceGroup", "Write-AzDeploymentFailures" )

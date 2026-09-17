@@ -267,7 +267,7 @@
     "resourceNameConfiguration": {
       "value": {
         "apiFunctionApp": "smartdevapp-api-af",
-        "apiServicePlan": "ASP-SmartDevApp-91b9",
+        "apiServicePlan": "ASP-SmartDevApp-a0fb",
         "appInsights": "smartdevapp-ai",
         "communicationService": "SmartDevApp",
         "cosmosAccount": "smartdevapp-cdb",
@@ -278,7 +278,7 @@
         "staticWebApp": "SmartDevApp",
         "storageAccount": "smartdevappsa",
         "workerFunctionApp": "smartdevapp-worker-af",
-        "workerServicePlan": "ASP-SmartDevApp-a0fb"
+        "workerServicePlan": "ASP-SmartDevApp-91b9"
       }
     }
   }

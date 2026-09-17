@@ -64,7 +64,7 @@ FRONTEND_ENTRA_API_SCOPE=<api-scope>
 COMMUNICATION_SENDER_ADDRESS=
 ```
 
-The Entra values are required because SmartDevApp reuses existing application registrations. `API_ENTRA_AUDIENCE` is the audience your API accepts, either the API Application ID URI or client ID depending on how the API registration is configured. `API_ENTRA_OWNER_OBJECT_ID` is the Azure AD object ID of the user or principal that should receive access to the API registration where the template needs ownership metadata.
+The Entra values are required because SmartDevApp reuses existing application registrations. `API_ENTRA_AUDIENCE` is the audience your API accepts, either the API Application ID URI or client ID depending on how the API registration is configured. `API_ENTRA_OWNER_OBJECT_ID` is the Entra object ID of the one user or service principal allowed to call `/api/owner/...` administration endpoints. It does not control who can sign in to the tenant or frontend.
 
 The development parameters deliberately minimise standing cost and align with the current `SmartDevApp` resource group:
 

@@ -58,7 +58,13 @@ function Invoke-Main {
             "--parameters", "@$temporaryParametersFile",
             "--output", "json"
         )
-        $deployment = Invoke-AzJson -Arguments $deploymentArguments
+        try {
+            $deployment = Invoke-AzJson -Arguments $deploymentArguments
+        } catch {
+            Write-AzDeploymentFailures -ResourceGroupName $resourceGroupName -DeploymentName $deploymentName
+            throw
+        }
+
         $deploymentArguments[2] = "what-if"
         Invoke-Az -Arguments $deploymentArguments
         Write-Host -Object "Validation and preview complete. No resources were created." -ForegroundColor Green

@@ -14,7 +14,7 @@ param tags object
 
 // ------------------------------------- Resources -------------------------------------
 
-resource emailService 'Microsoft.Communication/emailServices@2025-05-01' = {
+resource emailService 'Microsoft.Communication/emailServices@2025-09-01' = {
   name: emailServiceName
   location: configuration.location
   tags: tags
@@ -23,7 +23,7 @@ resource emailService 'Microsoft.Communication/emailServices@2025-05-01' = {
   }
 }
 
-resource azureManagedDomain 'Microsoft.Communication/emailServices/domains@2025-05-01' = {
+resource azureManagedDomain 'Microsoft.Communication/emailServices/domains@2025-09-01' = {
   name: configuration.managedDomainName
   parent: emailService
   location: configuration.location

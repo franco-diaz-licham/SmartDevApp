@@ -59,7 +59,13 @@ function Invoke-Main {
             "--parameters", "@$temporaryParametersFile",
             "--output", "json"
         )
-        $deployment = Invoke-AzJson -Arguments $deploymentArguments
+        try {
+            $deployment = Invoke-AzJson -Arguments $deploymentArguments
+        } catch {
+            Write-AzDeploymentFailures -ResourceGroupName $resourceGroupName -DeploymentName $deploymentName
+            throw
+        }
+
         Write-Host -Object "Infrastructure provisioning complete. Application delivery is a separate step." -ForegroundColor Green
         $deployment.properties.outputs.githubSecrets.value | Format-List
     } finally {
