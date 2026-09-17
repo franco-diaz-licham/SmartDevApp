@@ -30,6 +30,12 @@ param appSettings array
 @secure()
 param secureAppSettings object = {}
 
+@description('Optional user-assigned identity attached to the Function App.')
+param userAssignedIdentityResourceId string = ''
+
+@description('Optional identity used by Function App Key Vault references.')
+param keyVaultReferenceIdentityResourceId string = ''
+
 @description('Tags applied to Function App resources.')
 param tags object
 
@@ -55,10 +61,6 @@ var baseAppSettings = [
   {
     name: 'FUNCTIONS_EXTENSION_VERSION'
     value: configuration.runtime.extensionVersion
-  }
-  {
-    name: 'FUNCTIONS_WORKER_RUNTIME'
-    value: configuration.runtime.name
   }
   {
     name: 'DOTNET_ENVIRONMENT'
@@ -97,31 +99,23 @@ var scaleAndConcurrency = union(
     : {}
 )
 
-// ------------------------------------- Resources -------------------------------------
+var functionAppIdentity = union(
+  {
+    type: empty(userAssignedIdentityResourceId)
+      ? configuration.site.identityType
+      : '${configuration.site.identityType}, UserAssigned'
+  },
+  empty(userAssignedIdentityResourceId)
+    ? {}
+    : {
+        userAssignedIdentities: {
+          '${userAssignedIdentityResourceId}': {}
+        }
+      }
+)
 
-resource plan 'Microsoft.Web/serverfarms@2024-04-01' = {
-  name: planName
-  location: configuration.location
-  tags: tags
-  kind: configuration.plan.kind
-  sku: {
-    name: configuration.plan.skuName
-    tier: configuration.plan.skuTier
-  }
-  properties: {
-    reserved: configuration.plan.reserved
-  }
-}
-
-resource functionApp 'Microsoft.Web/sites@2024-11-01' = {
-  name: appName
-  location: configuration.location
-  tags: tags
-  kind: configuration.site.kind
-  identity: {
-    type: configuration.site.identityType
-  }
-  properties: {
+var functionAppProperties = union(
+  {
     functionAppConfig: {
       deployment: {
         storage: {
@@ -146,7 +140,37 @@ resource functionApp 'Microsoft.Web/sites@2024-11-01' = {
       ftpsState: configuration.site.ftpsState
       minTlsVersion: configuration.site.minimumTlsVersion
     }
+  },
+  empty(keyVaultReferenceIdentityResourceId)
+    ? {}
+    : {
+        keyVaultReferenceIdentity: keyVaultReferenceIdentityResourceId
+      }
+)
+
+// ------------------------------------- Resources -------------------------------------
+
+resource plan 'Microsoft.Web/serverfarms@2024-04-01' = {
+  name: planName
+  location: configuration.location
+  tags: tags
+  kind: configuration.plan.kind
+  sku: {
+    name: configuration.plan.skuName
+    tier: configuration.plan.skuTier
   }
+  properties: {
+    reserved: configuration.plan.reserved
+  }
+}
+
+resource functionApp 'Microsoft.Web/sites@2024-11-01' = {
+  name: appName
+  location: configuration.location
+  tags: tags
+  kind: configuration.site.kind
+  identity: functionAppIdentity
+  properties: functionAppProperties
 }
 
 // ------------------------------------- Outputs -------------------------------------

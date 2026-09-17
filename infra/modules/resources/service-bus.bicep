@@ -23,22 +23,19 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
   }
 }
 
-resource contactMessageCreatedQueue 'Microsoft.ServiceBus/namespaces/queues@2024-01-01' = {
+resource contactMessageCreatedQueue 'Microsoft.ServiceBus/namespaces/queues@2024-01-01' existing = {
   name: configuration.queues.contactMessageCreated
   parent: serviceBusNamespace
-  properties: configuration.queue
 }
 
-resource contactEmailDeliveryResultQueue 'Microsoft.ServiceBus/namespaces/queues@2024-01-01' = {
+resource contactEmailDeliveryResultQueue 'Microsoft.ServiceBus/namespaces/queues@2024-01-01' existing = {
   name: configuration.queues.contactEmailDeliveryResult
   parent: serviceBusNamespace
-  properties: configuration.queue
 }
 
-resource articleNarrationRequestedQueue 'Microsoft.ServiceBus/namespaces/queues@2024-01-01' = {
+resource articleNarrationRequestedQueue 'Microsoft.ServiceBus/namespaces/queues@2024-01-01' existing = {
   name: configuration.queues.articleNarrationRequested
   parent: serviceBusNamespace
-  properties: configuration.queue
 }
 
 resource functionAppsAuthorizationRule 'Microsoft.ServiceBus/namespaces/authorizationRules@2024-01-01' = {

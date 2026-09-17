@@ -3,6 +3,27 @@ $ErrorActionPreference = "Stop"
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "ScriptHelpers.psm1") -ErrorAction Stop
 
+$script:AzureCliExtensionDirectory = Join-Path -Path ([IO.Path]::GetTempPath()) -ChildPath "smartdevapp-az-cli-extensions"
+if (-not (Test-Path -LiteralPath $script:AzureCliExtensionDirectory)) {
+    New-Item -Path $script:AzureCliExtensionDirectory -ItemType Directory -Force | Out-Null
+}
+
+function Invoke-AzCommand {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] [string[]]$Arguments
+    )
+
+    $previousExtensionDirectory = [Environment]::GetEnvironmentVariable("AZURE_EXTENSION_DIR", "Process")
+    try {
+        [Environment]::SetEnvironmentVariable("AZURE_EXTENSION_DIR", $script:AzureCliExtensionDirectory, "Process")
+        return (& az @Arguments 2>&1) -join [Environment]::NewLine
+    } finally {
+        [Environment]::SetEnvironmentVariable("AZURE_EXTENSION_DIR", $previousExtensionDirectory, "Process")
+    }
+}
+
 <#
 .SYNOPSIS
 Runs an Azure CLI command and fails on a non-zero exit code.
@@ -17,8 +38,14 @@ function Invoke-Az {
         [Parameter(Mandatory)] [string[]]$Arguments
     )
 
-    & az @Arguments
-    if ($LASTEXITCODE -ne 0) { throw "Azure CLI command failed with exit code $LASTEXITCODE." }
+    $cliArguments = $Arguments + @("--only-show-errors")
+    $output = Invoke-AzCommand -Arguments $cliArguments
+    if ($LASTEXITCODE -ne 0) {
+        if (-not [string]::IsNullOrWhiteSpace($output)) { Write-Error -Message $output -ErrorAction Continue }
+        throw "Azure CLI command failed with exit code $LASTEXITCODE."
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($output)) { Write-Host -Object $output }
 }
 
 <#
@@ -38,8 +65,12 @@ function Invoke-AzJson {
         [Parameter(Mandatory)] [string[]]$Arguments
     )
 
-    $output = (& az @Arguments) -join [Environment]::NewLine
-    if ($LASTEXITCODE -ne 0) { throw "Azure CLI command failed with exit code $LASTEXITCODE." }
+    $cliArguments = $Arguments + @("--only-show-errors")
+    $output = Invoke-AzCommand -Arguments $cliArguments
+    if ($LASTEXITCODE -ne 0) {
+        if (-not [string]::IsNullOrWhiteSpace($output)) { Write-Error -Message $output -ErrorAction Continue }
+        throw "Azure CLI command failed with exit code $LASTEXITCODE."
+    }
 
     return ConvertFrom-Json -InputObject $output
 }

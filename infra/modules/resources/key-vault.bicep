@@ -20,11 +20,23 @@ param cosmosDbConnectionString string
 @secure()
 param azureCommunicationServiceConnectionString string
 
+@description('Azure Speech subscription key stored as a Key Vault secret.')
+@secure()
+param azureSpeechSubscriptionKey string
+
 @description('Contact email sender address stored as a Key Vault secret.')
 param communicationSenderAddress string
 
+@description('Principal ID that can read Key Vault secrets.')
+param keyVaultReaderPrincipalId string
+
 @description('Tags applied to Key Vault resources.')
 param tags object
+
+// ------------------------------------- Variables -------------------------------------
+
+// Key Vault Secrets User
+var keyVaultSecretsUserRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
 
 // ------------------------------------- Resources -------------------------------------
 
@@ -79,6 +91,14 @@ resource azureCommunicationServiceConnectionSecret 'Microsoft.KeyVault/vaults/se
   }
 }
 
+resource azureSpeechSubscriptionKeySecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  name: configuration.secrets.azureSpeechSubscriptionKey
+  parent: keyVault
+  properties: {
+    value: azureSpeechSubscriptionKey
+  }
+}
+
 resource communicationSenderAddressSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   name: configuration.secrets.communicationSenderAddress
   parent: keyVault
@@ -87,10 +107,21 @@ resource communicationSenderAddressSecret 'Microsoft.KeyVault/vaults/secrets@202
   }
 }
 
+resource secretReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyVault.id, keyVaultReaderPrincipalId, keyVaultSecretsUserRoleDefinitionId)
+  scope: keyVault
+  properties: {
+    principalId: keyVaultReaderPrincipalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: keyVaultSecretsUserRoleDefinitionId
+  }
+}
+
 // ------------------------------------- Outputs -------------------------------------
 
 output azureCommunicationServiceConnectionSecretUri string = azureCommunicationServiceConnectionSecret.properties.secretUri
 output azureServiceBusSecretUri string = azureServiceBusSecret.properties.secretUri
+output azureSpeechSubscriptionKeySecretUri string = azureSpeechSubscriptionKeySecret.properties.secretUri
 output azureWebJobsStorageSecretUri string = azureWebJobsStorageSecret.properties.secretUri
 output communicationSenderAddressSecretUri string = communicationSenderAddressSecret.properties.secretUri
 output cosmosDbConnectionSecretUri string = cosmosDbConnectionSecret.properties.secretUri

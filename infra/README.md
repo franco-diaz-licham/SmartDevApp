@@ -5,7 +5,7 @@ The Bicep deployment provisions the implemented SmartDevApp workloads as a cost-
 - SmartDev API on Azure Functions Flex Consumption
 - SmartDev worker on Azure Functions Flex Consumption
 - SmartDev frontend on Azure Static Web Apps
-- Cosmos DB, Service Bus, Storage, Communication Services, Key Vault, DNS, and optional observability required by those workloads
+- Cosmos DB, Service Bus, Storage, Communication Services, Speech, Key Vault, DNS, and optional observability required by those workloads
 
 `main.bicep` is the infrastructure composition root. It invokes every module and owns the dependencies between them. Resource modules live in the flat `modules/resources/` directory and do not call other modules:
 
@@ -74,12 +74,12 @@ The development parameters deliberately minimise standing cost and align with th
 | Static Web App | Free tier, using the existing East Asia Static Web App region. |
 | API Function | Flex Consumption, 512 MB memory, one on-demand instance at most, no always-ready instances. |
 | Worker Function | Flex Consumption, 512 MB memory, one on-demand instance at most, no always-ready instances. |
-| Cosmos DB | Serverless account with `articles` and `contact-messages` containers using `/partitionKey`; no provisioned throughput. |
+| Cosmos DB | Existing free-tier account with 1000 RU/s database throughput and `articles` and `contact-messages` containers using `/partitionKey`. Azure does not allow converting this account to serverless in place. |
 | Service Bus | Basic tier. Duplicate detection is disabled because Basic does not support broker duplicate detection. |
 | Storage | Standard locally redundant storage, private containers, and seven-day blob/container soft delete. |
 | Key Vault | Standard tier with seven-day soft-delete retention. |
 | Observability | Disabled in development so Log Analytics and Application Insights are not provisioned by this template. |
-| Speech | Azure Speech is not provisioned. The worker receives `AzureSpeech__Enabled=false` and uses the local speech adapter. |
+| Speech | Azure AI Speech `F0` free SKU in Australia East. Bicep stores the Speech key in Key Vault. The deployed worker reads it through a Key Vault app-setting reference using the Bicep-managed `smartdevapp-kv-ref-mi` user-assigned managed identity. |
 | Communication Services | Existing Communication Services and Email Communication resources are referenced by name; usage can still incur metered charges. |
 
 This parameter set prioritises development cost over production capacity and resilience. Add a separate production parameter file before deploying a production environment.

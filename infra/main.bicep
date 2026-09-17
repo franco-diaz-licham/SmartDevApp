@@ -94,8 +94,10 @@ var names = {
   dnsZone: dnsZoneName
   emailService: resourceNameConfiguration.emailService
   keyVault: resourceNameConfiguration.keyVault
+  keyVaultReferenceIdentity: resourceNameConfiguration.keyVaultReferenceIdentity
   logAnalyticsWorkspace: resourceNameConfiguration.logAnalyticsWorkspace
   serviceBusNamespace: resourceNameConfiguration.serviceBusNamespace
+  speechService: resourceNameConfiguration.speechService
   staticWebApp: resourceNameConfiguration.staticWebApp
   storageAccount: resourceNameConfiguration.storageAccount
   workerFunctionApp: resourceNameConfiguration.workerFunctionApp
@@ -163,6 +165,24 @@ module communication './modules/resources/communication-services.bicep' = {
   }
 }
 
+module speech './modules/resources/speech-service.bicep' = {
+  name: 'speech-service'
+  params: {
+    accountName: names.speechService
+    configuration: speechConfiguration
+    tags: sharedTags
+  }
+}
+
+module keyVaultReferenceIdentity './modules/resources/managed-identity.bicep' = {
+  name: 'key-vault-reference-identity'
+  params: {
+    identityName: names.keyVaultReferenceIdentity
+    location: location
+    tags: sharedTags
+  }
+}
+
 var resolvedCommunicationSenderAddress = empty(communicationSenderAddress)
   ? 'DoNotReply@${communication.outputs.mailFromSenderDomain}'
   : communicationSenderAddress
@@ -173,10 +193,12 @@ module keyVault './modules/resources/key-vault.bicep' = {
     configuration: keyVaultConfiguration
     azureCommunicationServiceConnectionString: communication.outputs.communicationServiceConnectionString
     azureServiceBusConnectionString: serviceBus.outputs.connectionString
+    azureSpeechSubscriptionKey: speech.outputs.subscriptionKey
     azureWebJobsStorageConnectionString: storage.outputs.connectionString
     communicationSenderAddress: resolvedCommunicationSenderAddress
     cosmosDbConnectionString: cosmos.outputs.connectionString
     keyVaultName: names.keyVault
+    keyVaultReaderPrincipalId: keyVaultReferenceIdentity.outputs.principalId
     tags: sharedTags
   }
 }
@@ -226,13 +248,15 @@ module apiFunction './modules/resources/function-app.bicep' = {
     ]
     azureServiceBusConnectionString: serviceBus.outputs.connectionString
     configuration: apiFunctionConfiguration
+    keyVaultReferenceIdentityResourceId: keyVaultReferenceIdentity.outputs.resourceId
     planName: names.apiServicePlan
     secureAppSettings: {
-      CosmosDb__ConnectionString: cosmos.outputs.connectionString
+      CosmosDb__ConnectionString: '@Microsoft.KeyVault(SecretUri=${keyVault.outputs.cosmosDbConnectionSecretUri})'
     }
     storageAccountBlobEndpoint: storage.outputs.blobEndpoint
     storageConnectionString: storage.outputs.connectionString
     tags: sharedTags
+    userAssignedIdentityResourceId: keyVaultReferenceIdentity.outputs.resourceId
   }
 }
 
@@ -255,19 +279,30 @@ module workerFunction './modules/resources/function-app.bicep' = {
         value: string(speechEnabled)
       }
       {
+        name: 'AzureSpeech__Region'
+        value: speechEnabled ? speechConfiguration.location : ''
+      }
+      {
+        name: 'AzureSpeech__VoiceName'
+        value: speechEnabled ? speechConfiguration.voiceName : ''
+      }
+      {
         name: 'ArticleAudioStorage__ContainerName'
         value: storage.outputs.articleAudioContainerName
       }
     ]
     azureServiceBusConnectionString: serviceBus.outputs.connectionString
     configuration: workerFunctionConfiguration
+    keyVaultReferenceIdentityResourceId: keyVaultReferenceIdentity.outputs.resourceId
     planName: names.workerServicePlan
     secureAppSettings: {
-      AzureCommunicationService__ConnectionString: communication.outputs.communicationServiceConnectionString
+      AzureCommunicationService__ConnectionString: '@Microsoft.KeyVault(SecretUri=${keyVault.outputs.azureCommunicationServiceConnectionSecretUri})'
+      AzureSpeech__SubscriptionKey: '@Microsoft.KeyVault(SecretUri=${keyVault.outputs.azureSpeechSubscriptionKeySecretUri})'
     }
     storageAccountBlobEndpoint: storage.outputs.blobEndpoint
     storageConnectionString: storage.outputs.connectionString
     tags: sharedTags
+    userAssignedIdentityResourceId: keyVaultReferenceIdentity.outputs.resourceId
   }
 }
 
@@ -288,9 +323,11 @@ output communicationServiceName string = communication.outputs.communicationServ
 output cosmosDbAccountName string = cosmos.outputs.accountName
 output dnsZoneName string = dnsZoneName
 output keyVaultName string = keyVault.outputs.keyVaultName
+output keyVaultReferenceIdentityName string = keyVaultReferenceIdentity.outputs.identityName
 output logAnalyticsWorkspaceName string = observabilityEnabled ? observability!.outputs.logAnalyticsWorkspaceName : ''
 output resourceGroupName string = resourceGroup().name
 output serviceBusNamespaceName string = serviceBus.outputs.namespaceName
+output speechServiceName string = speech.outputs.accountName
 output staticWebAppName string = frontend.outputs.name
 output staticWebAppUrl string = frontend.outputs.origin
 output storageAccountName string = storage.outputs.storageAccountName

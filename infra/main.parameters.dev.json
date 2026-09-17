@@ -42,27 +42,31 @@
     },
     "speechConfiguration": {
       "value": {
-        "enabled": false
+        "enabled": true,
+        "kind": "SpeechServices",
+        "location": "australiaeast",
+        "sku": {
+          "name": "F0"
+        },
+        "customSubDomainName": "smartdevapp-speech",
+        "publicNetworkAccess": "Enabled",
+        "voiceName": "en-AU-NatashaNeural"
       }
     },
     "cosmosConfiguration": {
       "value": {
         "databaseName": "smartdev",
-        "serverless": true,
-        "throughput": 0,
+        "serverless": false,
+        "throughput": 1000,
         "contactMessageTtlSeconds": 86400,
         "kind": "GlobalDocumentDB",
         "consistencyPolicy": {
           "defaultConsistencyLevel": "Session"
         },
         "databaseAccountOfferType": "Standard",
-        "enableAutomaticFailover": false,
-        "enableFreeTier": false,
-        "serverlessCapabilities": [
-          {
-            "name": "EnableServerless"
-          }
-        ],
+        "enableAutomaticFailover": true,
+        "enableFreeTier": true,
+        "serverlessCapabilities": [],
         "locations": [
           {
             "locationName": "australiaeast",
@@ -100,7 +104,7 @@
           "environmentName": "Production",
           "name": "dotnet-isolated",
           "extensionVersion": "~4",
-          "version": "10.0"
+          "version": "10"
         },
         "location": "australiaeast",
         "plan": {
@@ -136,7 +140,7 @@
           "environmentName": "Production",
           "name": "dotnet-isolated",
           "extensionVersion": "~4",
-          "version": "10.0"
+          "version": "10"
         },
         "location": "australiaeast",
         "plan": {
@@ -176,6 +180,7 @@
         "secrets": {
           "azureWebJobsStorage": "AzureWebJobsStorage",
           "azureCommunicationServiceConnectionString": "AzureCommunicationServiceConnectionString",
+          "azureSpeechSubscriptionKey": "AzureSpeechSubscriptionKey",
           "cosmosDbConnectionString": "CosmosDbConnectionString",
           "communicationSenderAddress": "AzureCommunicationServiceSenderAddress",
           "azureServiceBus": "AzureServiceBus"
@@ -215,8 +220,7 @@
           "lockDuration": "PT1M",
           "defaultMessageTimeToLive": "PT1H",
           "maxDeliveryCount": 5,
-          "requiresDuplicateDetection": false,
-          "duplicateDetectionHistoryTimeWindow": "PT5M"
+          "requiresDuplicateDetection": false
         },
         "location": "australiaeast",
         "publicNetworkAccess": "Enabled",
@@ -273,8 +277,10 @@
         "cosmosAccount": "smartdevapp-cdb",
         "emailService": "SmartDevApp",
         "keyVault": "smartdevapp-kv",
+        "keyVaultReferenceIdentity": "smartdevapp-kv-ref-mi",
         "logAnalyticsWorkspace": "smartdevapp-law",
         "serviceBusNamespace": "smartdevappsb",
+        "speechService": "smartdevapp-speech",
         "staticWebApp": "SmartDevApp",
         "storageAccount": "smartdevappsa",
         "workerFunctionApp": "smartdevapp-worker-af",
