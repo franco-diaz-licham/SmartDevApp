@@ -7,9 +7,8 @@ public sealed class ArticleDocument
 {
     public const string ContainerName = "articles";
     public const string DocumentType = "article";
-    public const string PartitionKeyPath = "/visibility";
-    public const string PublicPartitionKey = "Public";
-    public const string PrivatePartitionKey = "Private";
+    public const string PartitionKeyPath = "/partitionKey";
+    public const string PartitionKey = "articles";
 
     [JsonProperty("id")]
     public string Id { get; init; } = string.Empty;
@@ -88,7 +87,8 @@ public sealed class ArticleDocument
             ArchivedAt);
     }
 
-    public string PartitionKey => Visibility;
+    [JsonProperty("partitionKey")]
+    public string PartitionKeyValue { get; init; } = PartitionKey;
 
     private static ArticleType ResolveArticleType(string? articleType)
     {

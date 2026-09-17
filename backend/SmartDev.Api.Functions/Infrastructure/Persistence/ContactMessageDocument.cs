@@ -6,7 +6,7 @@ namespace SmartDev.Api.Functions.Infrastructure.Persistence;
 public sealed class ContactMessageDocument
 {
     public const string ContainerName = "contact-messages";
-    public const string PartitionKey = "contact-message";
+    public const string PartitionKey = "contact-messages";
     public const string PartitionKeyPath = "/partitionKey";
 
     [JsonProperty("id")]
