@@ -158,12 +158,12 @@ docker/
 ### Infrastructure
 
 ```text
-infra/                 # Production Azure Bicep modules and parameters
+infra/                 # Azure Bicep modules and development parameters
 ```
 
 SmartDevApp can be provisioned to Azure with Bicep. The infrastructure lives under `infra/`, and deployment is wrapped by `scripts/provision-infra.ps1`.
 
-Review `infra/README.md`, create an ignored `.env`, and set the required Azure and Entra values:
+Review `infra/README.md`, keep the repository-root `.env` out of source control, and set the required Azure and Entra values there. The deployment scripts read that file directly and take no command-line configuration overrides:
 
 ```powershell
 ./scripts/preview-infra.ps1
@@ -290,4 +290,4 @@ The Docker environment sets the frontend API base URL to:
 http://localhost:7084
 ```
 
-For local frontend-only development, use a local `.env` file and keep it out of source control.
+For local frontend-only overrides, use the frontend tooling's ignored local environment file and keep it out of source control. The repository-root `.env` remains the deployment script configuration file.

@@ -35,148 +35,71 @@ param frontendEntraApiScope string
 @description('Override sender address. Leave empty to use the Azure managed email domain default DoNotReply sender.')
 param communicationSenderAddress string = ''
 
-type StaticWebAppConfiguration = {
-  @description('Azure region for Static Web Apps. Static Web Apps Free is not available in every Azure region.')
-  location: string
-  @description('staticWebApp skuName.')
-  skuName: string
-  @description('staticWebApp skuTier.')
-  skuTier: string
-}
-
 @description('Environment configuration for staticWebApp.')
-param staticWebAppConfig StaticWebAppConfiguration
-
-type DnsConfiguration = {
-  @description('Custom DNS zone name for the public site. Leave empty to skip DNS zone creation.')
-  zoneName: string
-}
+param staticWebAppConfiguration object
 
 @description('Environment configuration for dns.')
-param dnsConfig DnsConfiguration
-
-type CommunicationConfiguration = {
-  @description('Azure Communication Services data residency geography.')
-  dataLocation: string
-}
+param dnsConfiguration object
 
 @description('Environment configuration for communication.')
-param communicationConfig CommunicationConfiguration
+param communicationConfiguration object
 
-type CosmosConfiguration = {
-  @description('Cosmos DB database name used by the API.')
-  databaseName: string
-  @description('Cosmos DB database shared throughput.')
-  @minValue(400)
-  throughput: int
-  @description('Default TTL in seconds for short-lived contact-message documents.')
-  @minValue(60)
-  contactMessageTtlSeconds: int
-}
+@description('Environment configuration for article speech generation.')
+param speechConfiguration object
 
 @description('Environment configuration for cosmos.')
-param cosmosConfig CosmosConfiguration
-
-type ApiConfiguration = {
-  @description('Azure Functions runtime version used by both Function Apps.')
-  functionRuntimeVersion: string
-  @description('Maximum Flex Consumption instances for the API Function App.')
-  @minValue(1)
-  maximumInstanceCount: int
-  @description('Flex Consumption memory size in MB for each Function App instance.')
-  functionInstanceMemoryMB: 2048 | 4096
-  @description('Per-instance HTTP concurrency for the API Function App.')
-  @minValue(1)
-  httpPerInstanceConcurrency: int
-}
+param cosmosConfiguration object
 
 @description('Environment configuration for api.')
-param apiConfig ApiConfiguration
-
-type WorkerConfiguration = {
-  @description('Maximum Flex Consumption instances for the Worker Function App.')
-  @minValue(1)
-  maximumInstanceCount: int
-}
+param apiFunctionConfiguration object
 
 @description('Environment configuration for worker.')
-param workerConfig WorkerConfiguration
-
-type KeyVaultConfiguration = {
-  @description('keyVault softDeleteRetentionInDays.')
-  softDeleteRetentionInDays: int
-}
+param workerFunctionConfiguration object
 
 @description('Environment configuration for keyVault.')
-param keyVaultConfig KeyVaultConfiguration
-
-type ObservabilityConfiguration = {
-  @description('observability retentionInDays.')
-  retentionInDays: int
-  @description('observability dailyQuotaGb.')
-  dailyQuotaGb: int
-}
+param keyVaultConfiguration object
 
 @description('Environment configuration for observability.')
-param observabilityConfig ObservabilityConfiguration
-
-type ServiceBusConfiguration = {
-  @description('serviceBus skuName.')
-  skuName: string
-  @description('serviceBus skuTier.')
-  skuTier: string
-}
+param observabilityConfiguration object
 
 @description('Environment configuration for serviceBus.')
-param serviceBusConfig ServiceBusConfiguration
-
-type StorageConfiguration = {
-  @description('storage skuName.')
-  skuName: string
-}
+param serviceBusConfiguration object
 
 @description('Environment configuration for storage.')
-param storageConfig StorageConfiguration
+param storageConfiguration object
+
+@description('Existing Azure resource names. Set these to avoid creating parallel resources.')
+param resourceNameConfiguration object
 
 // ------------------------------------- Variables -------------------------------------
 
-var staticWebAppLocation = staticWebAppConfig.location
-var dnsZoneName = dnsConfig.zoneName
-var communicationDataLocation = communicationConfig.dataLocation
-var cosmosDatabaseName = cosmosConfig.databaseName
-var cosmosThroughput = cosmosConfig.throughput
-var contactMessageTtlSeconds = cosmosConfig.contactMessageTtlSeconds
-var functionRuntimeVersion = apiConfig.functionRuntimeVersion
-var apiMaximumInstanceCount = apiConfig.maximumInstanceCount
-var workerMaximumInstanceCount = workerConfig.maximumInstanceCount
-var functionInstanceMemoryMB = apiConfig.functionInstanceMemoryMB
-var apiHttpPerInstanceConcurrency = apiConfig.httpPerInstanceConcurrency
+var dnsZoneName = dnsConfiguration.zoneName
+var speechEnabled = speechConfiguration.enabled
+var cosmosDatabaseName = cosmosConfiguration.databaseName
+var cosmosThroughput = cosmosConfiguration.throughput
+var contactMessageTtlSeconds = cosmosConfiguration.contactMessageTtlSeconds
+var observabilityEnabled = observabilityConfiguration.enabled
 
-var normalizedWorkloadName = toLower(replace(workloadName, '_', '-'))
-var normalizedEnvironmentName = toLower(replace(environmentName, '_', '-'))
-var compactName = toLower(replace(replace('${normalizedWorkloadName}${normalizedEnvironmentName}', '-', ''), '_', ''))
-var resourceToken = uniqueString(resourceGroup().id, normalizedWorkloadName, normalizedEnvironmentName)
-var resourcePrefix = '${normalizedWorkloadName}-${normalizedEnvironmentName}'
 var sharedTags = union(tags, {
   workload: workloadName
   environment: environmentName
 })
 
 var names = {
-  apiFunctionApp: take('${resourcePrefix}-api-af', 60)
-  apiServicePlan: take('${resourcePrefix}-api-asp', 40)
-  appInsights: take('${resourcePrefix}-ai', 255)
-  communicationService: take('${compactName}acs${resourceToken}', 63)
-  cosmosAccount: take('${resourcePrefix}-cdb-${resourceToken}', 44)
+  apiFunctionApp: resourceNameConfiguration.apiFunctionApp
+  apiServicePlan: resourceNameConfiguration.apiServicePlan
+  appInsights: resourceNameConfiguration.appInsights
+  communicationService: resourceNameConfiguration.communicationService
+  cosmosAccount: resourceNameConfiguration.cosmosAccount
   dnsZone: dnsZoneName
-  emailService: take('${compactName}email${resourceToken}', 63)
-  keyVault: take('kv-${compactName}-${resourceToken}', 24)
-  logAnalyticsWorkspace: take('${resourcePrefix}-law', 63)
-  serviceBusNamespace: take('${resourcePrefix}-sb-${resourceToken}', 50)
-  staticWebApp: take('${resourcePrefix}-swa', 40)
-  storageAccount: take('${compactName}sa${resourceToken}', 24)
-  workerFunctionApp: take('${resourcePrefix}-worker-af', 60)
-  workerServicePlan: take('${resourcePrefix}-worker-asp', 40)
+  emailService: resourceNameConfiguration.emailService
+  keyVault: resourceNameConfiguration.keyVault
+  logAnalyticsWorkspace: resourceNameConfiguration.logAnalyticsWorkspace
+  serviceBusNamespace: resourceNameConfiguration.serviceBusNamespace
+  staticWebApp: resourceNameConfiguration.staticWebApp
+  storageAccount: resourceNameConfiguration.storageAccount
+  workerFunctionApp: resourceNameConfiguration.workerFunctionApp
+  workerServicePlan: resourceNameConfiguration.workerServicePlan
 }
 
 // ------------------------------------- Modules -------------------------------------
@@ -184,17 +107,17 @@ var names = {
 module frontend './modules/resources/static-web-app.bicep' = {
   name: 'static-web-app'
   params: {
-    config: staticWebAppConfig
-    location: staticWebAppLocation
+    config: staticWebAppConfiguration
+    location: staticWebAppConfiguration.location
     name: names.staticWebApp
     tags: sharedTags
   }
 }
 
-module observability './modules/resources/observability.bicep' = {
+module observability './modules/resources/observability.bicep' = if (observabilityEnabled) {
   name: 'observability'
   params: {
-    config: observabilityConfig
+    config: observabilityConfiguration
     appInsightsName: names.appInsights
     location: location
     logAnalyticsWorkspaceName: names.logAnalyticsWorkspace
@@ -205,12 +128,7 @@ module observability './modules/resources/observability.bicep' = {
 module storage './modules/resources/storage-account.bicep' = {
   name: 'storage-account'
   params: {
-    config: storageConfig
-    deploymentContainerNames: [
-      'api-functions-deployments'
-      'worker-functions-deployments'
-    ]
-    location: location
+    configuration: storageConfiguration
     storageAccountName: names.storageAccount
     tags: sharedTags
   }
@@ -219,8 +137,7 @@ module storage './modules/resources/storage-account.bicep' = {
 module serviceBus './modules/resources/service-bus.bicep' = {
   name: 'service-bus'
   params: {
-    config: serviceBusConfig
-    location: location
+    configuration: serviceBusConfiguration
     namespaceName: names.serviceBusNamespace
     tags: sharedTags
   }
@@ -230,11 +147,9 @@ module cosmos './modules/resources/cosmos-db.bicep' = {
   name: 'cosmos-db'
   params: {
     accountName: names.cosmosAccount
-    contactMessageTtlSeconds: contactMessageTtlSeconds
-    databaseName: cosmosDatabaseName
+    configuration: cosmosConfiguration
     location: location
     tags: sharedTags
-    throughput: cosmosThroughput
   }
 }
 
@@ -242,7 +157,7 @@ module communication './modules/resources/communication-services.bicep' = {
   name: 'communication-services'
   params: {
     communicationServiceName: names.communicationService
-    dataLocation: communicationDataLocation
+    configuration: communicationConfiguration
     emailServiceName: names.emailService
     tags: sharedTags
   }
@@ -255,14 +170,13 @@ var resolvedCommunicationSenderAddress = empty(communicationSenderAddress)
 module keyVault './modules/resources/key-vault.bicep' = {
   name: 'key-vault'
   params: {
-    config: keyVaultConfig
+    configuration: keyVaultConfiguration
     azureCommunicationServiceConnectionString: communication.outputs.communicationServiceConnectionString
     azureServiceBusConnectionString: serviceBus.outputs.connectionString
     azureWebJobsStorageConnectionString: storage.outputs.connectionString
     communicationSenderAddress: resolvedCommunicationSenderAddress
     cosmosDbConnectionString: cosmos.outputs.connectionString
     keyVaultName: names.keyVault
-    location: location
     tags: sharedTags
   }
 }
@@ -270,7 +184,7 @@ module keyVault './modules/resources/key-vault.bicep' = {
 module apiFunction './modules/resources/function-app.bicep' = {
   name: 'api-function-app'
   params: {
-    appInsightsConnectionString: observability.outputs.applicationInsightsConnectionString
+    appInsightsConnectionString: observabilityEnabled ? observability!.outputs.applicationInsightsConnectionString : ''
     appName: names.apiFunctionApp
     appSettings: [
       {
@@ -303,16 +217,15 @@ module apiFunction './modules/resources/function-app.bicep' = {
       }
       {
         name: 'LoggingOptions__ServiceName'
-        value: 'SmartDev.Api.Functions'
+        value: apiFunctionConfiguration.loggingServiceName
+      }
+      {
+        name: 'ArticleAudioStorage__ContainerName'
+        value: storage.outputs.articleAudioContainerName
       }
     ]
     azureServiceBusConnectionString: serviceBus.outputs.connectionString
-    deploymentContainerName: 'api-functions-deployments'
-    functionRuntimeVersion: functionRuntimeVersion
-    httpPerInstanceConcurrency: apiHttpPerInstanceConcurrency
-    instanceMemoryMB: functionInstanceMemoryMB
-    location: location
-    maximumInstanceCount: apiMaximumInstanceCount
+    configuration: apiFunctionConfiguration
     planName: names.apiServicePlan
     secureAppSettings: {
       CosmosDb__ConnectionString: cosmos.outputs.connectionString
@@ -326,7 +239,7 @@ module apiFunction './modules/resources/function-app.bicep' = {
 module workerFunction './modules/resources/function-app.bicep' = {
   name: 'worker-function-app'
   params: {
-    appInsightsConnectionString: observability.outputs.applicationInsightsConnectionString
+    appInsightsConnectionString: observabilityEnabled ? observability!.outputs.applicationInsightsConnectionString : ''
     appName: names.workerFunctionApp
     appSettings: [
       {
@@ -335,16 +248,19 @@ module workerFunction './modules/resources/function-app.bicep' = {
       }
       {
         name: 'LoggingOptions__ServiceName'
-        value: 'SmartDev.Worker.Functions'
+        value: workerFunctionConfiguration.loggingServiceName
+      }
+      {
+        name: 'AzureSpeech__Enabled'
+        value: string(speechEnabled)
+      }
+      {
+        name: 'ArticleAudioStorage__ContainerName'
+        value: storage.outputs.articleAudioContainerName
       }
     ]
     azureServiceBusConnectionString: serviceBus.outputs.connectionString
-    deploymentContainerName: 'worker-functions-deployments'
-    functionRuntimeVersion: functionRuntimeVersion
-    httpPerInstanceConcurrency: 0
-    instanceMemoryMB: functionInstanceMemoryMB
-    location: location
-    maximumInstanceCount: workerMaximumInstanceCount
+    configuration: workerFunctionConfiguration
     planName: names.workerServicePlan
     secureAppSettings: {
       AzureCommunicationService__ConnectionString: communication.outputs.communicationServiceConnectionString
@@ -367,12 +283,12 @@ module dns './modules/resources/dns-zone.bicep' = if (!empty(dnsZoneName)) {
 
 output apiBaseUrl string = apiFunction.outputs.defaultOrigin
 output apiFunctionAppName string = apiFunction.outputs.functionAppName
-output applicationInsightsName string = observability.outputs.applicationInsightsName
+output applicationInsightsName string = observabilityEnabled ? observability!.outputs.applicationInsightsName : ''
 output communicationServiceName string = communication.outputs.communicationServiceName
 output cosmosDbAccountName string = cosmos.outputs.accountName
 output dnsZoneName string = dnsZoneName
 output keyVaultName string = keyVault.outputs.keyVaultName
-output logAnalyticsWorkspaceName string = observability.outputs.logAnalyticsWorkspaceName
+output logAnalyticsWorkspaceName string = observabilityEnabled ? observability!.outputs.logAnalyticsWorkspaceName : ''
 output resourceGroupName string = resourceGroup().name
 output serviceBusNamespaceName string = serviceBus.outputs.namespaceName
 output staticWebAppName string = frontend.outputs.name

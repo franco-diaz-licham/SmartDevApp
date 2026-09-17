@@ -23,11 +23,11 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09
   tags: tags
   properties: {
     sku: {
-      name: 'PerGB2018'
+      name: config.logAnalytics.skuName
     }
-    retentionInDays: config.retentionInDays
+    retentionInDays: config.logAnalytics.retentionInDays
     workspaceCapping: {
-      dailyQuotaGb: config.dailyQuotaGb
+      dailyQuotaGb: config.logAnalytics.dailyQuotaGb
     }
   }
 }
@@ -36,12 +36,12 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
   location: location
   tags: tags
-  kind: 'web'
+  kind: config.applicationInsights.kind
   properties: {
-    Application_Type: 'web'
-    Flow_Type: 'Bluefield'
-    IngestionMode: 'LogAnalytics'
-    Request_Source: 'rest'
+    Application_Type: config.applicationInsights.applicationType
+    Flow_Type: config.applicationInsights.flowType
+    IngestionMode: config.applicationInsights.ingestionMode
+    Request_Source: config.applicationInsights.requestSource
     WorkspaceResourceId: logAnalyticsWorkspace.id
   }
 }

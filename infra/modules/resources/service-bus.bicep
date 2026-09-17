@@ -1,10 +1,5 @@
-@description('Environment-specific resource sizing, retention and SKU configuration.')
-param config object
-
-// ------------------------------------- Parameters -------------------------------------
-
-@description('Azure region for Service Bus.')
-param location string
+@description('Service Bus namespace, queue, and authorization settings.')
+param configuration object
 
 @description('Service Bus namespace name.')
 param namespaceName string
@@ -16,50 +11,41 @@ param tags object
 
 resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
   name: namespaceName
-  location: location
+  location: configuration.location
   tags: tags
   sku: {
-    name: config.skuName
-    tier: config.skuTier
+    name: configuration.sku.name
+    tier: configuration.sku.tier
   }
   properties: {
-    publicNetworkAccess: 'Enabled'
-    minimumTlsVersion: '1.2'
+    publicNetworkAccess: configuration.publicNetworkAccess
+    minimumTlsVersion: configuration.minimumTlsVersion
   }
-}
-
-var queueDefaults = {
-  deadLetteringOnMessageExpiration: true
-  defaultMessageTimeToLive: 'PT1H'
-  duplicateDetectionHistoryTimeWindow: 'PT5M'
-  enableBatchedOperations: true
-  enablePartitioning: false
-  lockDuration: 'PT1M'
-  maxDeliveryCount: 5
-  requiresDuplicateDetection: true
-  requiresSession: false
 }
 
 resource contactMessageCreatedQueue 'Microsoft.ServiceBus/namespaces/queues@2024-01-01' = {
-  name: 'contact-message-created'
+  name: configuration.queues.contactMessageCreated
   parent: serviceBusNamespace
-  properties: queueDefaults
+  properties: configuration.queue
 }
 
 resource contactEmailDeliveryResultQueue 'Microsoft.ServiceBus/namespaces/queues@2024-01-01' = {
-  name: 'contact-email-delivery-result'
+  name: configuration.queues.contactEmailDeliveryResult
   parent: serviceBusNamespace
-  properties: queueDefaults
+  properties: configuration.queue
+}
+
+resource articleNarrationRequestedQueue 'Microsoft.ServiceBus/namespaces/queues@2024-01-01' = {
+  name: configuration.queues.articleNarrationRequested
+  parent: serviceBusNamespace
+  properties: configuration.queue
 }
 
 resource functionAppsAuthorizationRule 'Microsoft.ServiceBus/namespaces/authorizationRules@2024-01-01' = {
-  name: 'SmartDevFunctionApps'
+  name: configuration.authorizationRule.name
   parent: serviceBusNamespace
   properties: {
-    rights: [
-      'Listen'
-      'Send'
-    ]
+    rights: configuration.authorizationRule.rights
   }
 }
 
@@ -71,4 +57,5 @@ output namespaceName string = serviceBusNamespace.name
 output queueNames array = [
   contactMessageCreatedQueue.name
   contactEmailDeliveryResultQueue.name
+  articleNarrationRequestedQueue.name
 ]

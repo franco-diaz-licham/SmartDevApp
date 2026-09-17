@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "value": "canadacentral"
+      "value": "australiaeast"
     },
     "workloadName": {
       "value": "smartdevapp"
@@ -16,63 +16,269 @@
         "owner": "smartdevapp"
       }
     },
-    "staticWebAppConfig": {
+    "staticWebAppConfiguration": {
       "value": {
-        "location": "eastus2",
-        "skuName": "Free",
-        "skuTier": "Free"
+        "location": "eastasia",
+        "sku": {
+          "name": "Free",
+          "tier": "Free"
+        }
       }
     },
-    "dnsConfig": {
+    "dnsConfiguration": {
       "value": {
-        "zoneName": ""
+        "zoneName": "smartdev.com.au"
       }
     },
-    "communicationConfig": {
+    "communicationConfiguration": {
       "value": {
+        "userEngagementTracking": "Disabled",
+        "location": "global",
+        "managedDomainName": "AzureManagedDomain",
+        "domainManagement": "AzureManaged",
+        "publicNetworkAccess": "Enabled",
         "dataLocation": "Australia"
       }
     },
-    "cosmosConfig": {
+    "speechConfiguration": {
+      "value": {
+        "enabled": false
+      }
+    },
+    "cosmosConfiguration": {
       "value": {
         "databaseName": "smartdev",
-        "throughput": 400,
-        "contactMessageTtlSeconds": 86400
+        "serverless": true,
+        "throughput": 0,
+        "contactMessageTtlSeconds": 86400,
+        "kind": "GlobalDocumentDB",
+        "consistencyPolicy": {
+          "defaultConsistencyLevel": "Session"
+        },
+        "databaseAccountOfferType": "Standard",
+        "enableAutomaticFailover": false,
+        "enableFreeTier": false,
+        "serverlessCapabilities": [
+          {
+            "name": "EnableServerless"
+          }
+        ],
+        "locations": [
+          {
+            "locationName": "australiaeast",
+            "failoverPriority": 0,
+            "isZoneRedundant": false
+          }
+        ],
+        "publicNetworkAccess": "Enabled",
+        "containers": {
+          "contactMessages": {
+            "partitionKey": {
+              "paths": [
+                "/partitionKey"
+              ],
+              "kind": "Hash"
+            },
+            "defaultTtl": 86400,
+            "name": "contact-messages"
+          },
+          "articles": {
+            "name": "articles",
+            "partitionKey": {
+              "paths": [
+                "/partitionKey"
+              ],
+              "kind": "Hash"
+            }
+          }
+        }
       }
     },
-    "apiConfig": {
+    "apiFunctionConfiguration": {
       "value": {
-        "functionRuntimeVersion": "10.0",
-        "maximumInstanceCount": 10,
-        "functionInstanceMemoryMB": 2048,
-        "httpPerInstanceConcurrency": 16
+        "runtime": {
+          "environmentName": "Production",
+          "name": "dotnet-isolated",
+          "extensionVersion": "~4",
+          "version": "10.0"
+        },
+        "location": "australiaeast",
+        "plan": {
+          "reserved": true,
+          "skuTier": "FlexConsumption",
+          "kind": "functionapp",
+          "skuName": "FC1"
+        },
+        "scale": {
+          "maximumInstanceCount": 1,
+          "instanceMemoryMB": 512,
+          "httpPerInstanceConcurrency": 4
+        },
+        "site": {
+          "httpsOnly": true,
+          "ftpsState": "Disabled",
+          "identityType": "SystemAssigned",
+          "kind": "functionapp,linux",
+          "minimumTlsVersion": "1.2"
+        },
+        "deployment": {
+          "storageConnectionSettingName": "DEPLOYMENT_STORAGE_CONNECTION_STRING",
+          "authenticationType": "StorageAccountConnectionString",
+          "storageType": "blobContainer",
+          "containerName": "api-functions-deployments"
+        },
+        "loggingServiceName": "SmartDev.Api.Functions"
       }
     },
-    "workerConfig": {
+    "workerFunctionConfiguration": {
       "value": {
-        "maximumInstanceCount": 5
+        "runtime": {
+          "environmentName": "Production",
+          "name": "dotnet-isolated",
+          "extensionVersion": "~4",
+          "version": "10.0"
+        },
+        "location": "australiaeast",
+        "plan": {
+          "reserved": true,
+          "skuTier": "FlexConsumption",
+          "kind": "functionapp",
+          "skuName": "FC1"
+        },
+        "scale": {
+          "maximumInstanceCount": 1,
+          "instanceMemoryMB": 512,
+          "httpPerInstanceConcurrency": 0
+        },
+        "site": {
+          "httpsOnly": true,
+          "ftpsState": "Disabled",
+          "identityType": "SystemAssigned",
+          "kind": "functionapp,linux",
+          "minimumTlsVersion": "1.2"
+        },
+        "deployment": {
+          "storageConnectionSettingName": "DEPLOYMENT_STORAGE_CONNECTION_STRING",
+          "authenticationType": "StorageAccountConnectionString",
+          "storageType": "blobContainer",
+          "containerName": "worker-functions-deployments"
+        },
+        "loggingServiceName": "SmartDev.Worker.Functions"
       }
     },
-    "keyVaultConfig": {
+    "keyVaultConfiguration": {
       "value": {
-        "softDeleteRetentionInDays": 7
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        },
+        "location": "australiaeast",
+        "secrets": {
+          "azureWebJobsStorage": "AzureWebJobsStorage",
+          "azureCommunicationServiceConnectionString": "AzureCommunicationServiceConnectionString",
+          "cosmosDbConnectionString": "CosmosDbConnectionString",
+          "communicationSenderAddress": "AzureCommunicationServiceSenderAddress",
+          "azureServiceBus": "AzureServiceBus"
+        },
+        "publicNetworkAccess": "Enabled",
+        "accessPolicies": [],
+        "softDeleteRetentionInDays": 7,
+        "enableSoftDelete": true,
+        "enableRbacAuthorization": true,
+        "enabledForTemplateDeployment": true
       }
     },
-    "observabilityConfig": {
+    "observabilityConfiguration": {
       "value": {
-        "retentionInDays": 30,
-        "dailyQuotaGb": 1
+        "enabled": false,
+        "logAnalytics": {
+          "retentionInDays": 30,
+          "skuName": "PerGB2018",
+          "dailyQuotaGb": 0
+        },
+        "applicationInsights": {
+          "ingestionMode": "LogAnalytics",
+          "kind": "web",
+          "applicationType": "web",
+          "requestSource": "rest",
+          "flowType": "Bluefield"
+        }
       }
     },
-    "serviceBusConfig": {
+    "serviceBusConfiguration": {
       "value": {
-        "skuName": "Standard",
-        "skuTier": "Standard"
+        "queue": {
+          "requiresSession": false,
+          "deadLetteringOnMessageExpiration": true,
+          "enablePartitioning": false,
+          "enableBatchedOperations": true,
+          "lockDuration": "PT1M",
+          "defaultMessageTimeToLive": "PT1H",
+          "maxDeliveryCount": 5,
+          "requiresDuplicateDetection": false,
+          "duplicateDetectionHistoryTimeWindow": "PT5M"
+        },
+        "location": "australiaeast",
+        "publicNetworkAccess": "Enabled",
+        "minimumTlsVersion": "1.2",
+        "sku": {
+          "name": "Basic",
+          "tier": "Basic"
+        },
+        "authorizationRule": {
+          "name": "SmartDevFunctionApps",
+          "rights": [
+            "Listen",
+            "Send"
+          ]
+        },
+        "queues": {
+          "contactEmailDeliveryResult": "contact-email-delivery-result",
+          "articleNarrationRequested": "article-narration-requested",
+          "contactMessageCreated": "contact-message-created"
+        }
       }
     },
-    "storageConfig": {
+    "storageConfiguration": {
       "value": {
-        "skuName": "Standard_LRS"
+        "skuName": "Standard_LRS",
+        "containerPublicAccess": "None",
+        "supportsHttpsTrafficOnly": true,
+        "location": "australiaeast",
+        "articleAudioContainerName": "article-audio",
+        "blobDeleteRetentionPolicy": {
+          "days": 7,
+          "enabled": true
+        },
+        "containerDeleteRetentionPolicy": {
+          "days": 7,
+          "enabled": true
+        },
+        "allowBlobPublicAccess": false,
+        "minimumTlsVersion": "TLS1_2",
+        "kind": "StorageV2",
+        "accessTier": "Hot",
+        "deploymentContainerNames": [
+          "api-functions-deployments",
+          "worker-functions-deployments"
+        ]
+      }
+    },
+    "resourceNameConfiguration": {
+      "value": {
+        "apiFunctionApp": "smartdevapp-api-af",
+        "apiServicePlan": "ASP-SmartDevApp-91b9",
+        "appInsights": "smartdevapp-ai",
+        "communicationService": "SmartDevApp",
+        "cosmosAccount": "smartdevapp-cdb",
+        "emailService": "SmartDevApp",
+        "keyVault": "smartdevapp-kv",
+        "logAnalyticsWorkspace": "smartdevapp-law",
+        "serviceBusNamespace": "smartdevappsb",
+        "staticWebApp": "SmartDevApp",
+        "storageAccount": "smartdevappsa",
+        "workerFunctionApp": "smartdevapp-worker-af",
+        "workerServicePlan": "ASP-SmartDevApp-a0fb"
       }
     }
   }

@@ -1,57 +1,88 @@
 # SmartDevApp Azure infrastructure
 
-## Resource ownership
+The Bicep deployment provisions the implemented SmartDevApp workloads as a cost-capped development environment:
 
-| Workload/module | Resource boundary |
-| --- | --- |
-| frontend | [static-web-app.bicep](modules/resources/static-web-app.bicep) |
-| observability | [observability.bicep](modules/resources/observability.bicep) |
-| storage | [storage-account.bicep](modules/resources/storage-account.bicep) |
-| serviceBus | [service-bus.bicep](modules/resources/service-bus.bicep) |
-| cosmos | [cosmos-db.bicep](modules/resources/cosmos-db.bicep) |
-| communication | [communication-services.bicep](modules/resources/communication-services.bicep) |
-| keyVault | [key-vault.bicep](modules/resources/key-vault.bicep) |
-| apiFunction | [function-app.bicep](modules/resources/function-app.bicep) |
-| workerFunction | [function-app.bicep](modules/resources/function-app.bicep) |
-| dns | [dns-zone.bicep](modules/resources/dns-zone.bicep) |
+- SmartDev API on Azure Functions Flex Consumption
+- SmartDev worker on Azure Functions Flex Consumption
+- SmartDev frontend on Azure Static Web Apps
+- Cosmos DB, Service Bus, Storage, Communication Services, Key Vault, DNS, and optional observability required by those workloads
 
-`main.bicep` owns names, relationships, runtime settings and stable deployment outputs. Resource modules live in the flat `modules/resources/` directory and do not call other modules. Environment configuration is grouped by resource in typed `*Config` parameters. Add `modules/configuration/` or `stages/` only when an independently required configuration phase exists.
+`main.bicep` is the infrastructure composition root. It invokes every module and owns the dependencies between them. Resource modules live in the flat `modules/resources/` directory and do not call other modules:
 
-## Environments and configuration
+```text
+infra/
+|-- main.bicep
+|-- main.parameters.dev.json
+`-- modules/
+    `-- resources/
+        `-- *.bicep
+```
 
-`main.parameters.dev.json` is the separate development environment. Regional resources use Canada Central and Static Web Apps uses East US 2. Static Web Apps is Free; applicable registries are Basic, storage is locally redundant, and Container Apps retain bounded scale. Monitoring has 30-day retention and a 1 GiB daily ingestion cap. These settings bound individual services, not the total Azure bill.
+Environment-specific resource settings live in `main.parameters.dev.json`, grouped by resource boundary. This includes names, regions, SKUs, runtime versions, scale limits, storage retention, Cosmos containers, Service Bus queues, and feature toggles. `main.bicep` passes each configuration object to its resource module. The modules retain resource relationships, generated secrets, and fixed application contracts.
 
-The existing production parameter file retains its resource names, regions, sizing, runtime versions and application contracts. Its parameter schema is now grouped by resource; update any external callers that supplied the previous scalar parameters. Existing low-cost production settings are preserved, not newly certified for production resilience.
+Configure the repository-root, Git-ignored `.env` file, then deploy. Command-line scripts read their configuration from this file and do not accept configuration overrides:
 
-Development disables the custom DNS zone and reduces Cosmos database throughput to 400 RU/s. Service Bus remains Standard because the existing queues require duplicate detection. API and worker Functions retain their existing Flex Consumption memory and scaling constraints.
+```powershell
+./scripts/provision-infra.ps1
+```
 
-Create the Git-ignored **repository-root** `.env` file. Do not commit credentials or real tenant/object identifiers:
+Repository file paths, Azure deployment settings, existing Entra application inputs, and optional sender settings are configured in that single file. Azure resource shape stays in `infra/main.parameters.dev.json`.
+
+Use this root `.env` shape:
 
 ```dotenv
+# SmartDevApp configuration.
+# This is the repository's only .env file and it must remain outside source control.
+
+# ------------------------------------------------------------------------------
+# Azure infrastructure deployment
+# ------------------------------------------------------------------------------
+# These values identify the subscription, resource group, templates, and deployment.
 AZURE_SUBSCRIPTION=<subscription-name-or-id>
-AZURE_RESOURCE_GROUP_NAME=rg-smartdevapp-dev
-AZURE_RESOURCE_GROUP_LOCATION=canadacentral
+AZURE_RESOURCE_GROUP_NAME=SmartDevApp
+AZURE_RESOURCE_GROUP_LOCATION=australiaeast
 AZURE_DEPLOYMENT_NAME=smartdevapp-infra
 AZURE_TEMPLATE_FILE=infra/main.bicep
 AZURE_PARAMETERS_FILE=infra/main.parameters.dev.json
+
+# ------------------------------------------------------------------------------
+# Existing Microsoft Entra application registrations
+# ------------------------------------------------------------------------------
+# These values come from the development API and frontend app registrations.
+API_ENTRA_TENANT_ID=<tenant-id>
+API_ENTRA_AUDIENCE=<api-application-id-uri-or-client-id>
+API_ENTRA_OWNER_OBJECT_ID=<owner-user-object-id>
+
+FRONTEND_ENTRA_CLIENT_ID=<frontend-client-id>
+FRONTEND_ENTRA_AUTHORITY=https://login.microsoftonline.com/<tenant-id>
+FRONTEND_ENTRA_API_SCOPE=<api-scope>
+
+# ------------------------------------------------------------------------------
+# Optional Azure Communication Services sender
+# ------------------------------------------------------------------------------
+# Leave blank to use DoNotReply at the generated Azure managed email domain.
+COMMUNICATION_SENDER_ADDRESS=
 ```
 
-Supply these additional local deployment inputs in the same file:
+The Entra values are required because SmartDevApp reuses existing application registrations. `API_ENTRA_AUDIENCE` is the audience your API accepts, either the API Application ID URI or client ID depending on how the API registration is configured. `API_ENTRA_OWNER_OBJECT_ID` is the Azure AD object ID of the user or principal that should receive access to the API registration where the template needs ownership metadata.
 
-| Environment key | Bicep parameter |
+The development parameters deliberately minimise standing cost and align with the current `SmartDevApp` resource group:
+
+| Resource | Development cost control |
 | --- | --- |
-| `API_ENTRA_TENANT_ID` | `apiEntraTenantId` |
-| `API_ENTRA_AUDIENCE` | `apiEntraAudience` |
-| `API_ENTRA_OWNER_OBJECT_ID` | `apiEntraOwnerObjectId` |
-| `FRONTEND_ENTRA_CLIENT_ID` | `frontendEntraClientId` |
-| `FRONTEND_ENTRA_AUTHORITY` | `frontendEntraAuthority` |
-| `FRONTEND_ENTRA_API_SCOPE` | `frontendEntraApiScope` |
+| Regional resources | Australia East, matching the existing resource group and deployed dependencies. |
+| Static Web App | Free tier, using the existing East Asia Static Web App region. |
+| API Function | Flex Consumption, 512 MB memory, one on-demand instance at most, no always-ready instances. |
+| Worker Function | Flex Consumption, 512 MB memory, one on-demand instance at most, no always-ready instances. |
+| Cosmos DB | Serverless account with `articles` and `contact-messages` containers using `/partitionKey`; no provisioned throughput. |
+| Service Bus | Basic tier. Duplicate detection is disabled because Basic does not support broker duplicate detection. |
+| Storage | Standard locally redundant storage, private containers, and seven-day blob/container soft delete. |
+| Key Vault | Standard tier with seven-day soft-delete retention. |
+| Observability | Disabled in development so Log Analytics and Application Insights are not provisioned by this template. |
+| Speech | Azure Speech is not provisioned. The worker receives `AzureSpeech__Enabled=false` and uses the local speech adapter. |
+| Communication Services | Existing Communication Services and Email Communication resources are referenced by name; usage can still incur metered charges. |
 
-Passwords and application credentials are required inputs, never generated examples. Database administrator passwords require at least 12 characters.
-
-COMMUNICATION_SENDER_ADDRESS remains optional in the root .env; omit it to use the generated Azure managed sender address.
-
-Existing Entra registrations and permissions remain application-owned inputs where required. The BSW-specific three-application Graph connector and rotation scripts are not introduced into applications that do not implement that connector.
+This parameter set prioritises development cost over production capacity and resilience. Add a separate production parameter file before deploying a production environment.
 
 ## Provision, preview and delete
 
@@ -70,13 +101,13 @@ Use PowerShell 7 and Azure CLI with Bicep installed. Provisioning selects the co
 
 All three entry scripts have empty parameter contracts. They load the root `.env` themselves and use `ScriptHelpers.psm1` for configuration and `ProvisioningHelpers.psm1` for Azure operations. Temporary deployment parameter files are removed even if Azure fails. Preview requires an existing resource group and never creates it.
 
-When migrating from the previous scripts, move the **configuration entries** from `infra/.env` into the existing root `.env` without overwriting local application settings. The scripts do not move or print existing secrets. Remove obsolete `AZURE_SKIP_WHAT_IF` and `AZURE_WHAT_IF_ONLY` entries; use the separate preview command. Subscription, environment-file, password, force and no-wait command-line overrides are removed.
+`infra/.env` is obsolete. If it exists locally, move any useful entries into the repository-root `.env` without overwriting local application settings, then remove `infra/.env`. The scripts do not read it. Remove obsolete `AZURE_SKIP_WHAT_IF` and `AZURE_WHAT_IF_ONLY` entries; use the separate preview command.
 
 Deletion removes the resource group and its databases. Key Vault soft-deleted names can remain reserved; recover the intended vault or wait for its retention period before reusing its name. A failed deployment can have created some resources: inspect the deployment and preview before retrying. Provisioning does not roll back successful resources automatically.
 
 ## Application delivery
 
-Infrastructure provisioning and application release are separate. Container Apps start with the bootstrap image; a successful Bicep deployment alone does not mean the application is running. Reprovisioning a template configured with the bootstrap image can reset the deployed revision: review the preview and redeploy the intended application image afterward.
+Infrastructure provisioning and application release are separate. A successful Bicep deployment creates the Function Apps and Static Web App, but application code still needs to be deployed afterward.
 
 The `githubSecrets` output contract retains these non-secret names:
 
@@ -101,7 +132,6 @@ Existing application-delivery workflows continue to consume those outputs:
 
 Set the workflow's existing authentication secrets separately; Bicep does not generate or print deployment credentials. The current workflow authentication mechanism is preserved.
 
-
 ## Local validation
 
 ```powershell
@@ -111,6 +141,6 @@ git diff --check
 
 PowerShell scripts can be parsed without executing them using `System.Management.Automation.Language.Parser.ParseFile`. Authenticated Azure validation and what-if use `preview-infra.ps1`; successful compilation does not prove subscription quotas, provider availability or application integrations.
 
-## Validation on 2026-09-12
+## Validation on 2026-09-17
 
-Bicep compilation, development/production parameter-shape checks, PowerShell parsing and git diff checks passed. Isolated script checks covered missing configuration, native failures, temporary-file cleanup, mutation-free preview and typed deletion confirmation. Azure provisioning and application integrations have not been executed.
+Bicep compilation, the development parameter file, PowerShell parsing, and git diff checks passed locally. Azure provisioning and application integrations have not been executed.

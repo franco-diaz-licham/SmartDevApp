@@ -3,19 +3,11 @@
 @description('Azure region for Cosmos DB.')
 param location string
 
+@description('Cosmos DB account, database, and container settings.')
+param configuration object
+
 @description('Cosmos DB account name.')
 param accountName string
-
-@description('Cosmos DB SQL database name.')
-param databaseName string
-
-@description('Cosmos DB database shared throughput.')
-@minValue(400)
-param throughput int
-
-@description('Default TTL in seconds for the contact-messages container.')
-@minValue(60)
-param contactMessageTtlSeconds int
 
 @description('Tags applied to Cosmos DB resources.')
 param tags object
@@ -26,69 +18,52 @@ resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' = {
   name: accountName
   location: location
   tags: tags
-  kind: 'GlobalDocumentDB'
+  kind: configuration.kind
   properties: {
-    consistencyPolicy: {
-      defaultConsistencyLevel: 'Session'
-    }
-    databaseAccountOfferType: 'Standard'
-    enableAutomaticFailover: false
-    enableFreeTier: false
-    locations: [
-      {
-        failoverPriority: 0
-        isZoneRedundant: false
-        locationName: location
-      }
-    ]
-    publicNetworkAccess: 'Enabled'
+    consistencyPolicy: configuration.consistencyPolicy
+    databaseAccountOfferType: configuration.databaseAccountOfferType
+    enableAutomaticFailover: configuration.enableAutomaticFailover
+    enableFreeTier: configuration.enableFreeTier
+    capabilities: configuration.serverless ? configuration.serverlessCapabilities : []
+    locations: configuration.locations
+    publicNetworkAccess: configuration.publicNetworkAccess
   }
 }
 
 resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2024-05-15' = {
-  name: databaseName
+  name: configuration.databaseName
   parent: cosmosAccount
   properties: {
-    options: {
-      throughput: throughput
+    options: configuration.serverless ? {} : {
+      throughput: configuration.throughput
     }
     resource: {
-      id: databaseName
+      id: configuration.databaseName
     }
   }
 }
 
 resource contactMessagesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-05-15' = {
-  name: 'contact-messages'
+  name: configuration.containers.contactMessages.name
   parent: database
   properties: {
     options: {}
     resource: {
-      defaultTtl: contactMessageTtlSeconds
-      id: 'contact-messages'
-      partitionKey: {
-        kind: 'Hash'
-        paths: [
-          '/partitionKey'
-        ]
-      }
+      defaultTtl: configuration.containers.contactMessages.defaultTtl
+      id: configuration.containers.contactMessages.name
+      partitionKey: configuration.containers.contactMessages.partitionKey
     }
   }
 }
 
 resource articlesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-05-15' = {
-  name: 'articles'
+  name: configuration.containers.articles.name
   parent: database
   properties: {
     options: {}
     resource: {
-      id: 'articles'
-      partitionKey: {
-        kind: 'Hash'
-        paths: [
-          '/partitionKey'
-        ]
-      }
+      id: configuration.containers.articles.name
+      partitionKey: configuration.containers.articles.partitionKey
     }
   }
 }

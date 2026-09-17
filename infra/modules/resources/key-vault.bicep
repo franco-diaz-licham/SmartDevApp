@@ -1,10 +1,5 @@
-@description('Environment-specific resource sizing, retention and SKU configuration.')
-param config object
-
-// ------------------------------------- Parameters -------------------------------------
-
-@description('Azure region for Key Vault.')
-param location string
+@description('Key Vault and secret settings.')
+param configuration object
 
 @description('Key Vault name.')
 param keyVaultName string
@@ -35,25 +30,25 @@ param tags object
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: keyVaultName
-  location: location
+  location: configuration.location
   tags: tags
   properties: {
-    accessPolicies: []
-    enableRbacAuthorization: true
-    enableSoftDelete: true
-    enabledForTemplateDeployment: true
-    publicNetworkAccess: 'Enabled'
+    accessPolicies: configuration.accessPolicies
+    enableRbacAuthorization: configuration.enableRbacAuthorization
+    enableSoftDelete: configuration.enableSoftDelete
+    enabledForTemplateDeployment: configuration.enabledForTemplateDeployment
+    publicNetworkAccess: configuration.publicNetworkAccess
     sku: {
-      family: 'A'
-      name: 'standard'
+      family: configuration.sku.family
+      name: configuration.sku.name
     }
-    softDeleteRetentionInDays: config.softDeleteRetentionInDays
+    softDeleteRetentionInDays: configuration.softDeleteRetentionInDays
     tenantId: tenant().tenantId
   }
 }
 
 resource azureWebJobsStorageSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  name: 'AzureWebJobsStorage'
+  name: configuration.secrets.azureWebJobsStorage
   parent: keyVault
   properties: {
     value: azureWebJobsStorageConnectionString
@@ -61,7 +56,7 @@ resource azureWebJobsStorageSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01
 }
 
 resource azureServiceBusSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  name: 'AzureServiceBus'
+  name: configuration.secrets.azureServiceBus
   parent: keyVault
   properties: {
     value: azureServiceBusConnectionString
@@ -69,7 +64,7 @@ resource azureServiceBusSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = 
 }
 
 resource cosmosDbConnectionSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  name: 'CosmosDbConnectionString'
+  name: configuration.secrets.cosmosDbConnectionString
   parent: keyVault
   properties: {
     value: cosmosDbConnectionString
@@ -77,7 +72,7 @@ resource cosmosDbConnectionSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01'
 }
 
 resource azureCommunicationServiceConnectionSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  name: 'AzureCommunicationServiceConnectionString'
+  name: configuration.secrets.azureCommunicationServiceConnectionString
   parent: keyVault
   properties: {
     value: azureCommunicationServiceConnectionString
@@ -85,7 +80,7 @@ resource azureCommunicationServiceConnectionSecret 'Microsoft.KeyVault/vaults/se
 }
 
 resource communicationSenderAddressSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  name: 'AzureCommunicationServiceSenderAddress'
+  name: configuration.secrets.communicationSenderAddress
   parent: keyVault
   properties: {
     value: communicationSenderAddress

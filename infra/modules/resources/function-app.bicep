@@ -1,7 +1,7 @@
 // ------------------------------------- Parameters -------------------------------------
 
-@description('Azure region for the Function App and plan.')
-param location string
+@description('Function App hosting, runtime, deployment, and scaling settings.')
+param configuration object
 
 @description('Function App name.')
 param appName string
@@ -11,9 +11,6 @@ param planName string
 
 @description('Storage account blob endpoint used by Flex Consumption deployment storage.')
 param storageAccountBlobEndpoint string
-
-@description('Deployment blob container name.')
-param deploymentContainerName string
 
 @description('Storage account connection string used by the Functions host and Flex deployment storage.')
 @secure()
@@ -25,24 +22,6 @@ param azureServiceBusConnectionString string
 
 @description('Application Insights connection string.')
 param appInsightsConnectionString string
-
-@description('Azure Functions runtime version.')
-param functionRuntimeVersion string
-
-@description('Maximum Flex Consumption instances.')
-@minValue(1)
-param maximumInstanceCount int
-
-@description('Flex Consumption memory size in MB for each instance.')
-@allowed([
-  2048
-  4096
-])
-param instanceMemoryMB int
-
-@description('HTTP per-instance concurrency. Set 0 for non-HTTP Function Apps.')
-@minValue(0)
-param httpPerInstanceConcurrency int
 
 @description('Additional app settings.')
 param appSettings array
@@ -75,23 +54,23 @@ var baseAppSettings = [
   }
   {
     name: 'FUNCTIONS_EXTENSION_VERSION'
-    value: '~4'
+    value: configuration.runtime.extensionVersion
   }
   {
     name: 'FUNCTIONS_WORKER_RUNTIME'
-    value: 'dotnet-isolated'
+    value: configuration.runtime.name
   }
   {
     name: 'DOTNET_ENVIRONMENT'
-    value: 'Production'
+    value: configuration.runtime.environmentName
   }
   {
     name: 'ASPNETCORE_ENVIRONMENT'
-    value: 'Production'
+    value: configuration.runtime.environmentName
   }
   {
     name: 'AZURE_FUNCTIONS_ENVIRONMENT'
-    value: 'Production'
+    value: configuration.runtime.environmentName
   }
 ]
 
@@ -104,14 +83,14 @@ var secureAppSettingsArray = [
 
 var scaleAndConcurrency = union(
   {
-    instanceMemoryMB: instanceMemoryMB
-    maximumInstanceCount: maximumInstanceCount
+    instanceMemoryMB: configuration.scale.instanceMemoryMB
+    maximumInstanceCount: configuration.scale.maximumInstanceCount
   },
-  httpPerInstanceConcurrency > 0
+  configuration.scale.httpPerInstanceConcurrency > 0
     ? {
         triggers: {
           http: {
-            perInstanceConcurrency: httpPerInstanceConcurrency
+            perInstanceConcurrency: configuration.scale.httpPerInstanceConcurrency
           }
         }
       }
@@ -122,50 +101,50 @@ var scaleAndConcurrency = union(
 
 resource plan 'Microsoft.Web/serverfarms@2024-04-01' = {
   name: planName
-  location: location
+  location: configuration.location
   tags: tags
-  kind: 'functionapp'
+  kind: configuration.plan.kind
   sku: {
-    name: 'FC1'
-    tier: 'FlexConsumption'
+    name: configuration.plan.skuName
+    tier: configuration.plan.skuTier
   }
   properties: {
-    reserved: true
+    reserved: configuration.plan.reserved
   }
 }
 
 resource functionApp 'Microsoft.Web/sites@2024-11-01' = {
   name: appName
-  location: location
+  location: configuration.location
   tags: tags
-  kind: 'functionapp,linux'
+  kind: configuration.site.kind
   identity: {
-    type: 'SystemAssigned'
+    type: configuration.site.identityType
   }
   properties: {
     functionAppConfig: {
       deployment: {
         storage: {
           authentication: {
-            storageAccountConnectionStringName: 'DEPLOYMENT_STORAGE_CONNECTION_STRING'
-            type: 'StorageAccountConnectionString'
+            storageAccountConnectionStringName: configuration.deployment.storageConnectionSettingName
+            type: configuration.deployment.authenticationType
           }
-          type: 'blobContainer'
-          value: '${storageAccountBlobEndpoint}${deploymentContainerName}'
+          type: configuration.deployment.storageType
+          value: '${storageAccountBlobEndpoint}${configuration.deployment.containerName}'
         }
       }
       runtime: {
-        name: 'dotnet-isolated'
-        version: functionRuntimeVersion
+        name: configuration.runtime.name
+        version: configuration.runtime.version
       }
       scaleAndConcurrency: scaleAndConcurrency
     }
-    httpsOnly: true
+    httpsOnly: configuration.site.httpsOnly
     serverFarmId: plan.id
     siteConfig: {
       appSettings: concat(baseAppSettings, secureAppSettingsArray, appSettings)
-      ftpsState: 'Disabled'
-      minTlsVersion: '1.2'
+      ftpsState: configuration.site.ftpsState
+      minTlsVersion: configuration.site.minimumTlsVersion
     }
   }
 }

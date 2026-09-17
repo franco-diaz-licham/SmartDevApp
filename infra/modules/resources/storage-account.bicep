@@ -1,16 +1,8 @@
-@description('Environment-specific resource sizing, retention and SKU configuration.')
-param config object
-
-// ------------------------------------- Parameters -------------------------------------
-
-@description('Azure region for Storage resources.')
-param location string
+@description('Storage account, service, retention, and container settings.')
+param configuration object
 
 @description('Storage account name.')
 param storageAccountName string
-
-@description('Blob containers used by Azure Functions Flex Consumption deployments.')
-param deploymentContainerNames array
 
 @description('Tags applied to Storage resources.')
 param tags object
@@ -19,17 +11,17 @@ param tags object
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: storageAccountName
-  location: location
+  location: configuration.location
   tags: tags
-  kind: 'StorageV2'
+  kind: configuration.kind
   sku: {
-    name: config.skuName
+    name: configuration.skuName
   }
   properties: {
-    accessTier: 'Hot'
-    allowBlobPublicAccess: false
-    minimumTlsVersion: 'TLS1_2'
-    supportsHttpsTrafficOnly: true
+    accessTier: configuration.accessTier
+    allowBlobPublicAccess: configuration.allowBlobPublicAccess
+    minimumTlsVersion: configuration.minimumTlsVersion
+    supportsHttpsTrafficOnly: configuration.supportsHttpsTrafficOnly
   }
 }
 
@@ -37,10 +29,8 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01'
   name: 'default'
   parent: storageAccount
   properties: {
-    deleteRetentionPolicy: {
-      enabled: true
-      days: 7
-    }
+    deleteRetentionPolicy: configuration.blobDeleteRetentionPolicy
+    containerDeleteRetentionPolicy: configuration.containerDeleteRetentionPolicy
   }
 }
 
@@ -55,19 +45,28 @@ resource tableService 'Microsoft.Storage/storageAccounts/tableServices@2023-05-0
 }
 
 resource deploymentContainers 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = [
-  for containerName in deploymentContainerNames: {
+  for containerName in configuration.deploymentContainerNames: {
     name: containerName
     parent: blobService
     properties: {
-      publicAccess: 'None'
+      publicAccess: configuration.containerPublicAccess
     }
   }
 ]
+
+resource articleAudioContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  name: configuration.articleAudioContainerName
+  parent: blobService
+  properties: {
+    publicAccess: configuration.containerPublicAccess
+  }
+}
 
 // ------------------------------------- Outputs -------------------------------------
 
 output blobEndpoint string = storageAccount.properties.primaryEndpoints.blob
 @secure()
 output connectionString string = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
-output deploymentContainerNames array = deploymentContainerNames
+output deploymentContainerNames array = configuration.deploymentContainerNames
+output articleAudioContainerName string = articleAudioContainer.name
 output storageAccountName string = storageAccount.name
