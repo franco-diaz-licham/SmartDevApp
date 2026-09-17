@@ -78,9 +78,7 @@
         "containers": {
           "contactMessages": {
             "partitionKey": {
-              "paths": [
-                "/partitionKey"
-              ],
+              "paths": ["/partitionKey"],
               "kind": "Hash"
             },
             "defaultTtl": 86400,
@@ -89,9 +87,7 @@
           "articles": {
             "name": "articles",
             "partitionKey": {
-              "paths": [
-                "/partitionKey"
-              ],
+              "paths": ["/partitionKey"],
               "kind": "Hash"
             }
           }
@@ -104,7 +100,7 @@
           "environmentName": "Production",
           "name": "dotnet-isolated",
           "extensionVersion": "~4",
-          "version": "10"
+          "version": ".NET 10 Isolated"
         },
         "location": "australiaeast",
         "plan": {
@@ -231,10 +227,7 @@
         },
         "authorizationRule": {
           "name": "SmartDevFunctionApps",
-          "rights": [
-            "Listen",
-            "Send"
-          ]
+          "rights": ["Listen", "Send"]
         },
         "queues": {
           "contactEmailDeliveryResult": "contact-email-delivery-result",
@@ -262,10 +255,7 @@
         "minimumTlsVersion": "TLS1_2",
         "kind": "StorageV2",
         "accessTier": "Hot",
-        "deploymentContainerNames": [
-          "api-functions-deployments",
-          "worker-functions-deployments"
-        ]
+        "deploymentContainerNames": ["api-functions-deployments", "worker-functions-deployments"]
       }
     },
     "resourceNameConfiguration": {

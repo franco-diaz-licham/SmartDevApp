@@ -248,6 +248,9 @@ module apiFunction './modules/resources/function-app.bicep' = {
     ]
     azureServiceBusConnectionString: serviceBus.outputs.connectionString
     configuration: apiFunctionConfiguration
+    corsAllowedOrigins: [
+      frontend.outputs.origin
+    ]
     keyVaultReferenceIdentityResourceId: keyVaultReferenceIdentity.outputs.resourceId
     planName: names.apiServicePlan
     secureAppSettings: {

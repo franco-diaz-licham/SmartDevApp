@@ -30,6 +30,9 @@ param appSettings array
 @secure()
 param secureAppSettings object = {}
 
+@description('Origins allowed by the Azure Functions platform CORS layer.')
+param corsAllowedOrigins array = []
+
 @description('Optional user-assigned identity attached to the Function App.')
 param userAssignedIdentityResourceId string = ''
 
@@ -137,6 +140,10 @@ var functionAppProperties = union(
     serverFarmId: plan.id
     siteConfig: {
       appSettings: concat(baseAppSettings, secureAppSettingsArray, appSettings)
+      cors: {
+        allowedOrigins: corsAllowedOrigins
+        supportCredentials: false
+      }
       ftpsState: configuration.site.ftpsState
       minTlsVersion: configuration.site.minimumTlsVersion
     }
