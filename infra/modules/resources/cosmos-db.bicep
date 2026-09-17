@@ -86,7 +86,7 @@ resource articlesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/c
       partitionKey: {
         kind: 'Hash'
         paths: [
-          '/visibility'
+          '/partitionKey'
         ]
       }
     }

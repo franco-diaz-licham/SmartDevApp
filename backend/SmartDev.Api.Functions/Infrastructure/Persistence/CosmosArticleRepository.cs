@@ -8,21 +8,13 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
 {
     public async Task<Article?> GetByIdAsync(ArticleId id, CancellationToken cancellationToken)
     {
-        var publicDocument = await documentStore.GetAsync<ArticleDocument>(
+        var document = await documentStore.GetAsync<ArticleDocument>(
             ArticleDocument.ContainerName,
             id.Value.ToString("D"),
-            ArticleDocument.PublicPartitionKey,
+            ArticleDocument.PartitionKey,
             cancellationToken);
 
-        if (publicDocument is not null) return publicDocument.ToDomain();
-
-        var privateDocument = await documentStore.GetAsync<ArticleDocument>(
-            ArticleDocument.ContainerName,
-            id.Value.ToString("D"),
-            ArticleDocument.PrivatePartitionKey,
-            cancellationToken);
-
-        return privateDocument?.ToDomain();
+        return document?.ToDomain();
     }
 
     public async Task<DocumentPage<Article>> GetPublishedPublicArticlesAsync(BaseQuery query, CancellationToken cancellationToken)
@@ -32,7 +24,7 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
             CosmosArticleQueries.PublishedPublic(query),
             query.PageSize,
             query.ContinuationToken,
-            ArticleDocument.PublicPartitionKey,
+            ArticleDocument.PartitionKey,
             cancellationToken);
 
         return new DocumentPage<Article>(documents.Items.Select(document => document.ToDomain()).ToArray(), documents.ContinuationToken);
@@ -43,7 +35,7 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
         var documents = await documentStore.QueryAsync<ArticleDocument>(
             ArticleDocument.ContainerName,
             CosmosArticleQueries.PublishedPublic(),
-            ArticleDocument.PublicPartitionKey,
+            ArticleDocument.PartitionKey,
             cancellationToken);
 
         return documents.Select(document => document.ToDomain()).ToArray();
@@ -58,7 +50,7 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
             CosmosArticleQueries.PublishedPublicSearch(query),
             query.PageSize,
             query.ContinuationToken,
-            ArticleDocument.PublicPartitionKey,
+            ArticleDocument.PartitionKey,
             cancellationToken);
 
         return new DocumentPage<Article>(documents.Items.Select(document => document.ToDomain()).ToArray(), documents.ContinuationToken);
@@ -71,7 +63,7 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
             CosmosArticleQueries.PublishedPublicCategoryNames(),
             query.PageSize,
             query.ContinuationToken,
-            ArticleDocument.PublicPartitionKey,
+            ArticleDocument.PartitionKey,
             cancellationToken);
     }
 
@@ -82,6 +74,7 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
             CosmosArticleQueries.OwnerCategoryNames(),
             query.PageSize,
             query.ContinuationToken,
+            partitionKey: ArticleDocument.PartitionKey,
             cancellationToken: cancellationToken);
     }
 
@@ -92,7 +85,7 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
             CosmosArticleQueries.PublishedPublicTagNames(),
             query.PageSize,
             query.ContinuationToken,
-            ArticleDocument.PublicPartitionKey,
+            ArticleDocument.PartitionKey,
             cancellationToken);
     }
 
@@ -103,6 +96,7 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
             CosmosArticleQueries.AllForOwner(query),
             query.PageSize,
             query.ContinuationToken,
+            partitionKey: ArticleDocument.PartitionKey,
             cancellationToken: cancellationToken);
 
         return new DocumentPage<Article>(documents.Items.Select(document => document.ToDomain()).ToArray(), documents.ContinuationToken);
@@ -117,7 +111,7 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
         var created = await documentStore.TryCreateAsync(
             ArticleDocument.ContainerName,
             ArticleDocument.FromDomain(article),
-            article.Visibility.ToString(),
+            ArticleDocument.PartitionKey,
             cancellationToken);
 
         if (!created) throw new InvalidOperationException($"Article {article.Id.Value:D} already exists.");
@@ -129,21 +123,10 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
             throw new InvalidOperationException($"Article slug '{article.Slug.Value}' already exists.");
         }
 
-        var partitionKey = article.Visibility.ToString();
-        var previousPartitionKey = partitionKey == ArticleDocument.PublicPartitionKey
-            ? ArticleDocument.PrivatePartitionKey
-            : ArticleDocument.PublicPartitionKey;
-
         await documentStore.UpsertAsync(
             ArticleDocument.ContainerName,
             ArticleDocument.FromDomain(article),
-            partitionKey,
-            cancellationToken);
-
-        await documentStore.DeleteAsync(
-            ArticleDocument.ContainerName,
-            article.Id.Value.ToString("D"),
-            previousPartitionKey,
+            ArticleDocument.PartitionKey,
             cancellationToken);
     }
 
@@ -153,6 +136,7 @@ public sealed class CosmosArticleRepository(IDocumentStore documentStore) : IArt
             ArticleDocument.ContainerName,
             CosmosArticleQueries.SlugIds(slug),
             pageSize: 2,
+            partitionKey: ArticleDocument.PartitionKey,
             cancellationToken: cancellationToken);
 
         return documents.Items.Any(id => excludedArticleId is null || !string.Equals(id, excludedArticleId.Value.Value.ToString("D"), StringComparison.OrdinalIgnoreCase));
