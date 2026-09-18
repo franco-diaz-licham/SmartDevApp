@@ -103,6 +103,9 @@ services:
       DOTNET_ENVIRONMENT: "Development"
       AZURE_FUNCTIONS_ENVIRONMENT: "Development"
       Observability__OtlpEndpoint: "http://otel-collector:4317"
+      EntraId__TenantId: "${API_ENTRA_TENANT_ID}"
+      EntraId__Audience: "${API_ENTRA_AUDIENCE}"
+      EntraId__OwnerObjectId: "${API_ENTRA_OWNER_OBJECT_ID}"
 
   frontend:
     build:
@@ -119,9 +122,9 @@ services:
       VITE_API_BASE_URL: "http://localhost:7084"
       VITE_API_VERSION: "v1"
       VITE_APP_NAME: "SmartDev"
-      VITE_ENTRA_CLIENT_ID: "a08163b9-bc2e-4783-bda2-a04287d216ec"
-      VITE_ENTRA_AUTHORITY: "https://smartdevapp.ciamlogin.com/3a8a1443-0b3e-4de5-9e59-03bf8c3bd514"
-      VITE_ENTRA_API_SCOPE: "api://1953e0fa-dafc-480c-b2bf-faa4fb5aa694/access_as_user"
+      VITE_ENTRA_CLIENT_ID: "${FRONTEND_ENTRA_CLIENT_ID}"
+      VITE_ENTRA_AUTHORITY: "${FRONTEND_ENTRA_AUTHORITY}"
+      VITE_ENTRA_API_SCOPE: "${FRONTEND_ENTRA_API_SCOPE}"
 
   worker-functions:
     build:

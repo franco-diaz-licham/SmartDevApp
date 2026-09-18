@@ -27,6 +27,18 @@
               "RequiresDuplicateDetection": true,
               "RequiresSession": false
             }
+          },
+          {
+            "Name": "article-narration-requested",
+            "Properties": {
+              "DeadLetteringOnMessageExpiration": true,
+              "DefaultMessageTimeToLive": "PT1H",
+              "DuplicateDetectionHistoryTimeWindow": "PT5M",
+              "LockDuration": "PT1M",
+              "MaxDeliveryCount": 5,
+              "RequiresDuplicateDetection": true,
+              "RequiresSession": false
+            }
           }
         ],
         "Topics": []

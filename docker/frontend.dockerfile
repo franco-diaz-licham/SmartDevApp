@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY ./frontend/package*.json ./
 
-RUN npm install --include=optional --no-package-lock
+RUN npm ci --include=optional
 
 COPY ./frontend ./
 

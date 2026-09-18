@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-Stops and rebuilds the EarlyLearner Docker Compose environment.
+Stops and rebuilds the SmartDev Docker Compose environment.
 
 .EXAMPLE
 ./scripts/compose.ps1
@@ -15,13 +15,19 @@ $ErrorActionPreference = "Stop"
 $scriptDirectory = Split-Path -Parent $PSCommandPath
 $repoRoot = Split-Path -Parent $scriptDirectory
 $composeFile = Join-Path $repoRoot "docker/docker-compose.yml"
+$envFile = Join-Path $repoRoot ".env"
 
 if (-not (Test-Path -LiteralPath $composeFile -PathType Leaf)) {
     Write-Host "🐳 ⚠️ Compose file was not found: $composeFile" -ForegroundColor Red
     exit 1
 }
 
-$composeArgs = @("-f", $composeFile, "--profile", "core")
+if (-not (Test-Path -LiteralPath $envFile -PathType Leaf)) {
+    Write-Host "🐳 ⚠️ Environment file was not found: $envFile" -ForegroundColor Red
+    exit 1
+}
+
+$composeArgs = @("--env-file", $envFile, "-f", $composeFile, "--profile", "core")
 
 # Stop all services first so the environment starts from a clean compose state.
 Write-Host "Stopping SmartDev Docker environment..." -ForegroundColor Yellow
