@@ -18,7 +18,9 @@ public sealed class CosmosDocumentStore(CosmosClient client, IOptions<CosmosDbOp
         DocumentContainerTimeToLive timeToLive = DocumentContainerTimeToLive.UseConfiguredDefault,
         CancellationToken cancellationToken = default)
     {
-        var databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_options.DatabaseName, throughput: _options.Throughput, cancellationToken: cancellationToken);
+        var databaseResponse = _options.Throughput > 0
+            ? await client.CreateDatabaseIfNotExistsAsync(_options.DatabaseName, throughput: _options.Throughput, cancellationToken: cancellationToken)
+            : await client.CreateDatabaseIfNotExistsAsync(_options.DatabaseName, cancellationToken: cancellationToken);
         var properties = new ContainerProperties(containerName, partitionKeyPath) {
             DefaultTimeToLive = timeToLive switch {
                 DocumentContainerTimeToLive.UseConfiguredDefault => _options.DefaultTimeToLiveSeconds,

@@ -31,8 +31,8 @@ public sealed class CosmosDbOptions
     public int DefaultTimeToLiveSeconds { get; init; } = 86400;
 
     /// <summary>
-    /// Gets the database throughput used when the Cosmos DB database is created.
+    /// Gets the database throughput used when the Cosmos DB database is created. Use 0 for serverless accounts.
     /// </summary>
-    [Range(400, int.MaxValue)]
+    [Range(0, int.MaxValue)]
     public int Throughput { get; init; } = 1000;
 }

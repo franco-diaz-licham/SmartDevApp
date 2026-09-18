@@ -34,8 +34,9 @@ public sealed class IntegrationEventPublisher(ServiceBusClient serviceBusClient)
         where TIntegrationEventModel : class
     {
         return typeof(TIntegrationEventModel) switch {
-            var type when type == typeof(ContactMessageCreatedIntegrationEvent) => ContactMessagingTopology.ContactMessageCreatedQueue,
-            var type when type == typeof(ContactEmailDeliveryResultModel) => ContactMessagingTopology.ContactEmailDeliveryResultQueue,
+            var type when type == typeof(ArticleNarrationRequestedIntegrationEvent) => WorkerTopology.ArticleNarrationRequestedQueue,
+            var type when type == typeof(ContactMessageCreatedIntegrationEvent) => WorkerTopology.ContactMessageCreatedQueue,
+            var type when type == typeof(ContactEmailDeliveryResultModel) => WorkerTopology.ContactEmailDeliveryResultQueue,
             _ => throw new InvalidOperationException($"No Service Bus endpoint configured for {typeof(TIntegrationEventModel).Name}.")
         };
     }
@@ -44,6 +45,7 @@ public sealed class IntegrationEventPublisher(ServiceBusClient serviceBusClient)
         where TIntegrationEventModel : class
     {
         return integrationEventModel switch {
+            ArticleNarrationRequestedIntegrationEvent message => $"{nameof(ArticleNarrationRequestedIntegrationEvent)}-{message.ArticleId:N}",
             ContactMessageCreatedIntegrationEvent message => $"{nameof(ContactMessageCreatedIntegrationEvent)}-{message.ContactMessageId:N}",
             ContactEmailDeliveryResultModel result => $"{nameof(ContactEmailDeliveryResultModel)}-{result.ContactMessageId:N}-{result.Status}",
             _ => Guid.NewGuid().ToString("N")
@@ -54,6 +56,7 @@ public sealed class IntegrationEventPublisher(ServiceBusClient serviceBusClient)
         where TIntegrationEventModel : class
     {
         return integrationEventModel switch {
+            ArticleNarrationRequestedIntegrationEvent message => message.ArticleId.ToString("N"),
             ContactMessageCreatedIntegrationEvent message => message.ContactMessageId.ToString("N"),
             ContactEmailDeliveryResultModel result => result.ContactMessageId.ToString("N"),
             _ => null

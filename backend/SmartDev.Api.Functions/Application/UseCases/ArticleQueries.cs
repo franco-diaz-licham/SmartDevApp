@@ -1,9 +1,11 @@
 using SmartDev.Api.Functions.Application.Ports;
 using SmartDev.Api.Functions.Domain.Articles;
+using SmartDev.Shared.Articles;
+using SmartDev.Shared.Infrastructure.Storage;
 
 namespace SmartDev.Api.Functions.Application.UsesCases;
 
-public sealed class ArticlesQueryHandler(IArticleRepository articleRepository)
+public sealed class ArticlesQueryHandler(IArticleRepository articleRepository, IAudioStorage articleAudioStorage)
 {
     public async Task<Result<Page<PublicArticleListItem>>> GetPublicArticlesAsync(BaseQuery query, CancellationToken cancellationToken)
     {
@@ -35,6 +37,20 @@ public sealed class ArticlesQueryHandler(IArticleRepository articleRepository)
         }
 
         return Result<PublicArticleDetail>.Success(PublicArticleDetail.FromDomain(article));
+    }
+
+    public async Task<Result<ArticleAudioPlayback>> GetPublicArticleAudioAsync(Guid articleId, CancellationToken cancellationToken)
+    {
+        var article = await articleRepository.GetByIdAsync(ArticleId.From(articleId), cancellationToken);
+        if (article is null || article.Status != ArticleStatus.Published || article.Visibility != ArticleVisibility.Public) {
+            return Result<ArticleAudioPlayback>.Fail("Article was not found.", ResultTypeEnum.NotFound);
+        }
+
+        var contentVersion = ArticleNarrationContent.CreateVersion(article.Title.Value, article.Summary.Value, article.Body.Value);
+        var audio = await articleAudioStorage.OpenReadAsync(article.Id.Value, contentVersion, cancellationToken);
+        if (audio is null) return Result<ArticleAudioPlayback>.Fail("Article audio is not ready yet.", ResultTypeEnum.NotFound);
+
+        return Result<ArticleAudioPlayback>.Success(new ArticleAudioPlayback(audio.Content, audio.ContentType, contentVersion));
     }
 
     public async Task<Result<Page<string>>> GetPublicArticleCategoriesAsync(BaseQuery query, CancellationToken cancellationToken)
@@ -145,6 +161,8 @@ public sealed record PublicArticleDetail(
 }
 
 public sealed record PublicRelatedProjectReference(string ProjectId, string Label);
+
+public sealed record ArticleAudioPlayback(Stream Content, string ContentType, string ContentVersion);
 
 public sealed record PublicArticleCategory(string Slug, string DisplayName)
 {

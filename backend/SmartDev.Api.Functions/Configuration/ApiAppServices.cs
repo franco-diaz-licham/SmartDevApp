@@ -1,4 +1,7 @@
+using SmartDev.Shared.Infrastructure.Text;
+using SmartDev.Shared.Infrastructure.Storage;
 using Azure.Messaging.ServiceBus;
+using Azure.Storage.Blobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +27,7 @@ public static class ApiAppServices
         services
             .AddMiddlewareServices(configuration)
             .AddApplicationServices()
+            .AddArticleAudioServices(configuration)
             .AddCosmosServices(configuration, environment)
             .AddApiMessagingServices(configuration);
 
@@ -62,11 +66,45 @@ public static class ApiAppServices
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
         services.AddScoped<IDomainEventHandler, ContactMessageCreatedHandler>();
+        services.AddScoped<IDomainEventHandler, ArticleNarrationRequestedHandler>();
+        services.AddSingleton<IMarkdownTextConverter, MarkdownTextConverter>();
 
         services.AddScoped<CreateContactEmailHandler>();
         services.AddScoped<UpdateContactEmailStatusHandler>();
         services.AddScoped<ArticlesQueryHandler>();
         services.AddScoped<ArticlesCommandHandler>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddArticleAudioServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddOptions<ArticleAudioStorageOptions>()
+            .Bind(configuration.GetSection(ArticleAudioStorageOptions.SectionName))
+            .ValidateOnStart();
+
+        services.AddSingleton(sp => sp.GetRequiredService<IOptions<ArticleAudioStorageOptions>>().Value);
+
+        services.AddSingleton(sp => {
+            var options = sp.GetRequiredService<IOptions<ArticleAudioStorageOptions>>().Value;
+            var connectionString = string.IsNullOrWhiteSpace(options.ConnectionString)
+                ? configuration["AzureWebJobsStorage"]
+                : options.ConnectionString;
+
+            return new BlobServiceClient(connectionString);
+        });
+
+        services.AddSingleton(sp => {
+            var client = sp.GetRequiredService<BlobServiceClient>();
+            var options = sp.GetRequiredService<IOptions<ArticleAudioStorageOptions>>().Value;
+            var containerName = string.IsNullOrWhiteSpace(options.ContainerName)
+                ? BlobStorage.DefaultContainerName
+                : options.ContainerName;
+
+            return client.GetBlobContainerClient(containerName);
+        });
+        services.AddSingleton<IAudioStorage, BlobStorage>();
 
         return services;
     }
@@ -78,6 +116,7 @@ public static class ApiAppServices
             .Bind(configuration.GetSection(CosmosDbOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
+
 
         services.AddSingleton(sp => {
             var options = sp.GetRequiredService<IOptions<CosmosDbOptions>>().Value;
@@ -121,3 +160,4 @@ public static class ApiAppServices
         return services;
     }
 }
+

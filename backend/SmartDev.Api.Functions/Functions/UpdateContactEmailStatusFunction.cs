@@ -14,7 +14,7 @@ public sealed class UpdateContactEmailStatusFunction(UpdateContactEmailStatusHan
 
     [Function(nameof(UpdateContactEmailStatusFunction))]
     public async Task Run(
-        [ServiceBusTrigger(ContactMessagingTopology.ContactEmailDeliveryResultQueue, Connection = AzureServiceBusOptions.SectionName)]
+        [ServiceBusTrigger(WorkerTopology.ContactEmailDeliveryResultQueue, Connection = AzureServiceBusOptions.SectionName)]
         ServiceBusReceivedMessage message,
         CancellationToken cancellationToken)
     {
@@ -28,7 +28,7 @@ public sealed class UpdateContactEmailStatusFunction(UpdateContactEmailStatusHan
             logger.LogError(
                 exception,
                 "Contact email delivery result processing failed. QueueName: {QueueName}. MessageId: {MessageId}. DeliveryCount: {DeliveryCount}.",
-                ContactMessagingTopology.ContactEmailDeliveryResultQueue,
+                WorkerTopology.ContactEmailDeliveryResultQueue,
                 message.MessageId,
                 message.DeliveryCount);
 

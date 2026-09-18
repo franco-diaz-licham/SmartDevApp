@@ -16,7 +16,7 @@ public sealed class SendContactEmailFunction(
 
     [Function(nameof(SendContactEmailFunction))]
     public async Task Run(
-        [ServiceBusTrigger(ContactMessagingTopology.ContactMessageCreatedQueue, Connection = AzureServiceBusOptions.SectionName)]
+        [ServiceBusTrigger(WorkerTopology.ContactMessageCreatedQueue, Connection = AzureServiceBusOptions.SectionName)]
         ServiceBusReceivedMessage message,
         CancellationToken cancellationToken)
     {
@@ -33,7 +33,7 @@ public sealed class SendContactEmailFunction(
             logger.LogError(
                 exception,
                 "Contact email message processing failed. QueueName: {QueueName}. MessageId: {MessageId}. DeliveryCount: {DeliveryCount}.",
-                ContactMessagingTopology.ContactMessageCreatedQueue,
+                WorkerTopology.ContactMessageCreatedQueue,
                 message.MessageId,
                 message.DeliveryCount);
 
