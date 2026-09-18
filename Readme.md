@@ -245,6 +245,14 @@ dotnet restore backend/SmartDev.slnx
 dotnet build backend/SmartDev.slnx
 ```
 
+Configure host-based local API user secrets from the repository-root `.env`:
+
+```powershell
+./scripts/configure-user-secrets.ps1
+```
+
+This writes only the API Entra identifiers from `.env`. Local Cosmos DB, Service Bus, Storage, Communication email, and Speech come from Docker Compose, `host.json`, `local.settings.json`, or appsettings files.
+
 Run the API Functions app locally:
 
 ```powershell
@@ -265,7 +273,7 @@ When running against the Docker Cosmos DB emulator from the host machine, trust 
 ./scripts/cosmos-cert.ps1
 ```
 
-Local Azure Functions settings belong in each function project's `local.settings.json`. The flat `AzureServiceBus` setting is required by Azure Functions Service Bus triggers, while structured options in `host.json` configure the application services.
+Local Azure Functions defaults live in each function project's `local.settings.json` and `host.json`. User secrets are reserved for `.env`-derived values that should not live in those files.
 
 ## 🖥️ Frontend Setup
 
@@ -291,3 +299,5 @@ http://localhost:7084
 ```
 
 For local frontend-only overrides, use the frontend tooling's ignored local environment file and keep it out of source control. The repository-root `.env` remains the deployment script configuration file.
+
+
