@@ -62,8 +62,7 @@ public static class WorkerAppServices
 
     private static IServiceCollection AddSpeechServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
-        var speechEnabled = configuration.GetValue($"{AzureSpeechOptions.SectionName}:Enabled", !environment.IsDevelopment());
-        if (!speechEnabled) {
+        if (environment.IsDevelopment()) {
             services.AddSingleton<IArticleSpeechService, LocalArticleSpeechService>();
             return services;
         }

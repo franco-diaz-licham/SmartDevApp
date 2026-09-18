@@ -6,8 +6,6 @@ public sealed class AzureSpeechOptions
 {
     public const string SectionName = "AzureSpeech";
 
-    public bool Enabled { get; init; } = true;
-
     [Required]
     public string SubscriptionKey { get; init; } = string.Empty;
 
