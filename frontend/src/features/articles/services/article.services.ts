@@ -22,6 +22,10 @@ export const articleService = {
     return apiClient.getSingle<PublicArticleDetailResponse>(`${ARTICLES_URL}/${encodeURIComponent(articleId)}`);
   },
 
+  getPublicArticleAudio(articleId: string): Promise<Blob> {
+    return apiClient.getBlob(`${ARTICLES_URL}/${encodeURIComponent(articleId)}/audio`);
+  },
+
   getPublicArticleCategories(request: BaseQuery = {}): Promise<PageResult<string>> {
     return apiClient.getPage<string, BaseQuery>(`${ARTICLES_URL}/categories`, request);
   },

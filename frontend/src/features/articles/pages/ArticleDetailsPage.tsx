@@ -8,6 +8,7 @@ import { ArticleMetadataPane } from '../components/ArticleMetadataPane';
 import { ArticleDetailsPageSkeleton } from '../components/ArticleDetailsPageSkeleton';
 import { ArticlesSectionsPane } from '../components/ArticlesSectionsPane';
 import { useArticleEntryForm, type EditableArticleEntryField, type ArticleEntryFormController } from '../hooks/useArticleEntryForm';
+import { useArticleNarration } from '../hooks/useArticleNarration';
 import { useCreateArticleMutation, useUpdateArticleMutation } from '../queries/article.mutations';
 import { useOwnerArticleQuery, usePublicArticleQuery } from '../queries/article.queries';
 import { getArticleSections } from '../utils/articleContent';
@@ -27,6 +28,7 @@ export const ArticleDetailsPage = () => {
   const form = useArticleEntryForm();
   const { draft, draftArticle } = form;
   const { getValidForm, reset, resetFromArticle, updateField } = form;
+  const { getSavedMessage } = useArticleNarration();
 
   const publicArticleQuery = usePublicArticleQuery(articleId, isAuthReady && hasArticleId && isPublicView);
   const ownerArticleQuery = useOwnerArticleQuery(articleId, isAuthReady && hasArticleId && !isPublicView);
@@ -81,7 +83,7 @@ export const ArticleDetailsPage = () => {
         const savedArticle = await createArticleMutation.mutateAsync(entry);
         reset(entry);
         setEditingField(undefined);
-        setSavedMessage('Saved.');
+        setSavedMessage(getSavedMessage(entry));
         void navigate(`/workspace/articles/${encodeURIComponent(savedArticle.articleId)}`, { replace: true });
         return;
       }
@@ -89,7 +91,7 @@ export const ArticleDetailsPage = () => {
       await updateArticleMutation.mutateAsync(entry);
       reset(entry);
       setEditingField(undefined);
-      setSavedMessage('Saved.');
+      setSavedMessage(getSavedMessage(entry));
     } catch {
       // The mutation state drives the visible error message.
     }

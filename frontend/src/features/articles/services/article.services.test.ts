@@ -8,6 +8,7 @@ vi.mock('@/lib/api/apiClient', () => ({
     getPage: vi.fn(),
     getList: vi.fn(),
     getSingle: vi.fn(),
+    getBlob: vi.fn(),
     post: vi.fn(),
     put: vi.fn()
   }
@@ -17,6 +18,7 @@ const apiClientMock = apiClient as unknown as {
   getPage: Mock;
   getList: Mock;
   getSingle: Mock;
+  getBlob: Mock;
   post: Mock;
   put: Mock;
 };
@@ -121,6 +123,19 @@ describe('articleService', () => {
     // Assert
     expect(result).toEqual(articleDetailResponse);
     expect(apiClientMock.getSingle).toHaveBeenCalledWith('/articles/5f4d0b3f-10a9-4c59-9e91-65cb3770887f');
+  });
+
+  test('gets public article audio by id', async () => {
+    // Arrange
+    const audio = new Blob(['audio'], { type: 'audio/mpeg' });
+    apiClientMock.getBlob.mockResolvedValue(audio);
+
+    // Act
+    const result = await articleService.getPublicArticleAudio('5f4d0b3f-10a9-4c59-9e91-65cb3770887f');
+
+    // Assert
+    expect(result).toBe(audio);
+    expect(apiClientMock.getBlob).toHaveBeenCalledWith('/articles/5f4d0b3f-10a9-4c59-9e91-65cb3770887f/audio');
   });
 
   test('gets an owner article by id', async () => {

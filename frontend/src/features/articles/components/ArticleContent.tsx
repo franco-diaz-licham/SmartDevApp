@@ -3,8 +3,10 @@ import { useRef } from 'react';
 import { AppInlineEditSurface } from '@/components/ui/AppInlineEditSurface';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
+import { ArticleAudioPlayer } from './ArticleAudioPlayer';
 import { ArticleContentSkeleton } from './ArticleContentSkeleton';
 import { ArticleMarkdown } from './ArticleMarkdown';
+import { useArticleNarration } from '../hooks/useArticleNarration';
 import type { ArticleEntryFormController } from '../hooks/useArticleEntryForm';
 import type { PublicArticleDetailModel } from '../types/article.types';
 
@@ -19,6 +21,7 @@ const getInputValue = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement
 
 export const ArticleContent = ({ form, isEditable = false, article, isLoading }: ArticleContentProps) => {
   const bodyEditorRef = useRef<HTMLDivElement>(null);
+  const { canShowAudioPlayer } = useArticleNarration();
 
   const titleValue = form?.values.title ?? article?.title;
   const summaryValue = form?.values.summary ?? article?.summary;
@@ -75,6 +78,7 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading }:
               }}
               onInlineEdit={isEditable ? () => form?.editField('summary') : undefined}
             />
+            {canShowAudioPlayer(isEditable, article) && <ArticleAudioPlayer article={article} />}
           </header>
           {isEditable && form?.editingField === 'bodyMarkdown' ? (
             <div ref={bodyEditorRef} onBlur={handleBodyEditorBlur}>
