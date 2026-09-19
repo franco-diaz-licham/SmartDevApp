@@ -100,7 +100,7 @@
           "environmentName": "Production",
           "name": "dotnet-isolated",
           "extensionVersion": "~4",
-          "version": ".NET 10 Isolated"
+          "version": "10.0"
         },
         "location": "australiaeast",
         "plan": {
@@ -127,7 +127,10 @@
           "storageType": "blobContainer",
           "containerName": "api-functions-deployments"
         },
-        "loggingServiceName": "SmartDev.Api.Functions"
+        "loggingServiceName": "SmartDev.Api.Functions",
+        "corsAllowedOrigins": [
+          "https://smartdev.com.au"
+        ]
       }
     },
     "workerFunctionConfiguration": {
@@ -136,7 +139,7 @@
           "environmentName": "Production",
           "name": "dotnet-isolated",
           "extensionVersion": "~4",
-          "version": ".NET 10 Isolated"
+          "version": "10.0"
         },
         "location": "australiaeast",
         "plan": {

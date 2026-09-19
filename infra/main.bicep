@@ -79,6 +79,14 @@ var cosmosDatabaseName = cosmosConfiguration.databaseName
 var cosmosThroughput = cosmosConfiguration.throughput
 var contactMessageTtlSeconds = cosmosConfiguration.contactMessageTtlSeconds
 var observabilityEnabled = observabilityConfiguration.enabled
+var apiCorsAllowedOrigins = apiFunctionConfiguration.corsAllowedOrigins
+
+var apiCorsAppSettings = [
+  for (origin, index) in apiCorsAllowedOrigins: {
+    name: 'Cors__AllowedOrigins__${index}'
+    value: origin
+  }
+]
 
 var sharedTags = union(tags, {
   workload: workloadName
@@ -208,7 +216,7 @@ module apiFunction './modules/resources/function-app.bicep' = {
   params: {
     appInsightsConnectionString: observabilityEnabled ? observability!.outputs.applicationInsightsConnectionString : ''
     appName: names.apiFunctionApp
-    appSettings: [
+    appSettings: concat([
       {
         name: 'CosmosDb__DatabaseName'
         value: cosmosDatabaseName
@@ -220,10 +228,6 @@ module apiFunction './modules/resources/function-app.bicep' = {
       {
         name: 'CosmosDb__Throughput'
         value: string(cosmosThroughput)
-      }
-      {
-        name: 'Cors__AllowedOrigins__0'
-        value: frontend.outputs.origin
       }
       {
         name: 'EntraId__TenantId'
@@ -245,12 +249,10 @@ module apiFunction './modules/resources/function-app.bicep' = {
         name: 'ArticleAudioStorage__ContainerName'
         value: storage.outputs.articleAudioContainerName
       }
-    ]
+    ], apiCorsAppSettings)
     azureServiceBusConnectionString: serviceBus.outputs.connectionString
     configuration: apiFunctionConfiguration
-    corsAllowedOrigins: [
-      frontend.outputs.origin
-    ]
+    corsAllowedOrigins: apiCorsAllowedOrigins
     keyVaultReferenceIdentityResourceId: keyVaultReferenceIdentity.outputs.resourceId
     planName: names.apiServicePlan
     secureAppSettings: {
