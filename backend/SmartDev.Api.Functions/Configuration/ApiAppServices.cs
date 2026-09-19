@@ -8,7 +8,19 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Azure.Cosmos;
 using SmartDev.Api.Functions.Common.Infrastructure.Messaging;
-using SmartDev.Api.Functions.Features.Articles.UseCases;
+using SmartDev.Api.Functions.Features.Articles.UseCases.CreateOwnerArticle;
+using SmartDev.Api.Functions.Features.Articles.UseCases.GenerateOwnerArticleAudio;
+using SmartDev.Api.Functions.Features.Articles.UseCases.GetOwnerArticleById;
+using SmartDev.Api.Functions.Features.Articles.UseCases.GetOwnerArticles;
+using SmartDev.Api.Functions.Features.Articles.UseCases.GetOwnerArticleCategories;
+using SmartDev.Api.Functions.Features.Articles.UseCases.GetPublicArticleAudioById;
+using SmartDev.Api.Functions.Features.Articles.UseCases.GetPublicArticleById;
+using SmartDev.Api.Functions.Features.Articles.UseCases.GetPublicArticleCategories;
+using SmartDev.Api.Functions.Features.Articles.UseCases.GetPublicArticles;
+using SmartDev.Api.Functions.Features.Articles.UseCases.GetPublicArticleSearchIndex;
+using SmartDev.Api.Functions.Features.Articles.UseCases.GetPublicArticleTags;
+using SmartDev.Api.Functions.Features.Articles.UseCases.SearchPublicArticles;
+using SmartDev.Api.Functions.Features.Articles.UseCases.UpdateOwnerArticle;
 using SmartDev.Api.Functions.Features.Articles.Contracts;
 using SmartDev.Api.Functions.Features.Articles.Infrastructure.Persistence;
 using SmartDev.Api.Functions.Features.Contact.UseCases;
@@ -75,8 +87,19 @@ public static class ApiAppServices
 
         services.AddScoped<CreateContactEmailHandler>();
         services.AddScoped<UpdateContactEmailStatusHandler>();
-        services.AddScoped<ArticlesQueryHandler>();
-        services.AddScoped<ArticlesCommandHandler>();
+        services.AddScoped<CreateOwnerArticleHandler>();
+        services.AddScoped<GenerateOwnerArticleAudioHandler>();
+        services.AddScoped<GetOwnerArticleByIdHandler>();
+        services.AddScoped<GetOwnerArticlesHandler>();
+        services.AddScoped<GetOwnerArticleCategoriesHandler>();
+        services.AddScoped<GetPublicArticleAudioByIdHandler>();
+        services.AddScoped<GetPublicArticleByIdHandler>();
+        services.AddScoped<GetPublicArticleCategoriesHandler>();
+        services.AddScoped<GetPublicArticlesHandler>();
+        services.AddScoped<GetPublicArticleSearchIndexHandler>();
+        services.AddScoped<GetPublicArticleTagsHandler>();
+        services.AddScoped<SearchPublicArticlesHandler>();
+        services.AddScoped<UpdateOwnerArticleHandler>();
 
         return services;
     }
