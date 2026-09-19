@@ -9,7 +9,7 @@ import { ArticleDetailsPageSkeleton } from '../components/ArticleDetailsPageSkel
 import { ArticlesSectionsPane } from '../components/ArticlesSectionsPane';
 import { useArticleEntryForm, type EditableArticleEntryField, type ArticleEntryFormController } from '../hooks/useArticleEntryForm';
 import { useArticleNarration } from '../hooks/useArticleNarration';
-import { useCreateArticleMutation, useUpdateArticleMutation } from '../queries/article.mutations';
+import { useCreateArticleMutation, useGenerateArticleAudioMutation, useUpdateArticleMutation } from '../queries/article.mutations';
 import { useOwnerArticleQuery, usePublicArticleQuery } from '../queries/article.queries';
 import { getArticleSections } from '../utils/articleContent';
 
@@ -24,6 +24,7 @@ export const ArticleDetailsPage = () => {
 
   const [editingField, setEditingField] = useState<EditableArticleEntryField | undefined>();
   const [savedMessage, setSavedMessage] = useState('');
+  const [audioGenerationMessage, setAudioGenerationMessage] = useState('');
 
   const form = useArticleEntryForm();
   const { draft, draftArticle } = form;
@@ -36,6 +37,7 @@ export const ArticleDetailsPage = () => {
 
   const createArticleMutation = useCreateArticleMutation();
   const updateArticleMutation = useUpdateArticleMutation(articleId);
+  const generateArticleAudioMutation = useGenerateArticleAudioMutation(articleId);
   const activeMutation = isNewArticle ? createArticleMutation : updateArticleMutation;
 
   const persistedArticle = isNewArticle ? undefined : articleQuery.data;
@@ -57,6 +59,7 @@ export const ArticleDetailsPage = () => {
   const handleEditField = (field: EditableArticleEntryField) => {
     if (isPublicView) return;
     setSavedMessage('');
+    setAudioGenerationMessage('');
     setEditingField(field);
   };
 
@@ -69,6 +72,7 @@ export const ArticleDetailsPage = () => {
     else reset();
     setEditingField(undefined);
     setSavedMessage('');
+    setAudioGenerationMessage('');
   };
 
   const handleSave = async (event: FormEvent<HTMLFormElement>) => {
@@ -83,7 +87,7 @@ export const ArticleDetailsPage = () => {
         const savedArticle = await createArticleMutation.mutateAsync(entry);
         reset(entry);
         setEditingField(undefined);
-        setSavedMessage(getSavedMessage(entry));
+        setSavedMessage(getSavedMessage());
         void navigate(`/workspace/articles/${encodeURIComponent(savedArticle.articleId)}`, { replace: true });
         return;
       }
@@ -91,9 +95,21 @@ export const ArticleDetailsPage = () => {
       await updateArticleMutation.mutateAsync(entry);
       reset(entry);
       setEditingField(undefined);
-      setSavedMessage(getSavedMessage(entry));
+      setSavedMessage(getSavedMessage());
     } catch {
       // The mutation state drives the visible error message.
+    }
+  };
+
+  const handleGenerateAudio = async () => {
+    if (isPublicView || isNewArticle || !hasArticleId || form.isDirty) return;
+    setAudioGenerationMessage('');
+
+    try {
+      const response = await generateArticleAudioMutation.mutateAsync();
+      setAudioGenerationMessage(response.status === 'ready' ? 'Audio is already available for the saved article content.' : 'Audio generation has been queued.');
+    } catch {
+      setAudioGenerationMessage('Audio generation could not be queued.');
     }
   };
 
@@ -115,7 +131,15 @@ export const ArticleDetailsPage = () => {
   const content = (
     <div className="mx-auto h-full max-w-[1560px] overflow-y-auto lg:grid lg:grid-cols-[1fr_18rem] lg:overflow-hidden xl:grid-cols-[17rem_1fr_18rem]">
       <ArticlesSectionsPane sections={sections} />
-      <ArticleContent form={isPublicView ? undefined : formController} isEditable={!isPublicView} isLoading={!isNewArticle && articleQuery.isLoading} article={article} />
+      <ArticleContent
+        form={isPublicView ? undefined : formController}
+        isEditable={!isPublicView}
+        isLoading={!isNewArticle && articleQuery.isLoading}
+        article={article}
+        isGeneratingAudio={generateArticleAudioMutation.isPending}
+        audioGenerationMessage={audioGenerationMessage}
+        onGenerateAudio={handleGenerateAudio}
+      />
       <ArticleMetadataPane form={isPublicView ? undefined : formController} isEditable={!isPublicView} article={article} />
     </div>
   );

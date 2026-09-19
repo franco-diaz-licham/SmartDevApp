@@ -9,7 +9,7 @@ export const ArticleAudioPlayer = ({ article }: ArticleAudioPlayerProps) => {
   const audio = useArticleAudio(article.id);
 
   if (audio.status === 'not-ready') {
-    return <aside className="rounded-md border border-border bg-muted/30 p-4 text-sm text-muted-foreground">Audio narration is being generated and will appear here after the worker finishes.</aside>;
+    return <aside className="rounded-md border border-border bg-muted/30 p-4 text-sm text-muted-foreground">Audio narration is not available yet.</aside>;
   }
 
   if (audio.status === 'error') {

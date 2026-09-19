@@ -101,3 +101,8 @@ export interface UpdateArticleResponseDto {
   articleId: string;
   slug: string;
 }
+
+export interface GenerateArticleAudioResponseDto {
+  status: 'ready' | 'queued';
+  contentVersion: string;
+}

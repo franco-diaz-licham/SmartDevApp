@@ -138,6 +138,22 @@ describe('articleService', () => {
     expect(apiClientMock.getBlob).toHaveBeenCalledWith('/articles/5f4d0b3f-10a9-4c59-9e91-65cb3770887f/audio');
   });
 
+  test('generates owner article audio by id', async () => {
+    // Arrange
+    const response = {
+      status: 'queued',
+      contentVersion: 'content-version-1'
+    };
+    apiClientMock.post.mockResolvedValue(response);
+
+    // Act
+    const result = await articleService.generateOwnerArticleAudio('5f4d0b3f-10a9-4c59-9e91-65cb3770887f');
+
+    // Assert
+    expect(result).toEqual(response);
+    expect(apiClientMock.post).toHaveBeenCalledWith('/owner/articles/5f4d0b3f-10a9-4c59-9e91-65cb3770887f/audio', {});
+  });
+
   test('gets an owner article by id', async () => {
     // Arrange
     apiClientMock.getSingle.mockResolvedValue(articleDetailResponse);

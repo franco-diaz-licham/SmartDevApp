@@ -38,3 +38,21 @@ export const useUpdateArticleMutation = (articleId: string) => {
     }
   });
 };
+
+/**
+ * Queues audio narration generation for an owner article.
+ *
+ * @param articleId - Existing article identifier to generate narration for.
+ * @returns React Query mutation state for the owner-only audio generation action.
+ */
+export const useGenerateArticleAudioMutation = (articleId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => articleService.generateOwnerArticleAudio(articleId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: articleKeys.publicDetail(articleId) });
+      await queryClient.invalidateQueries({ queryKey: articleKeys.ownerDetail(articleId) });
+    }
+  });
+};

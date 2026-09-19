@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { AppInlineEditSurface } from '@/components/ui/AppInlineEditSurface';
 import { AppInputText } from '@/components/ui/AppInputText';
 import { AppInputTextArea } from '@/components/ui/AppInputTextArea';
+import { ArticleAudioGenerationPanel } from './ArticleAudioGenerationPanel';
 import { ArticleAudioPlayer } from './ArticleAudioPlayer';
 import { ArticleContentSkeleton } from './ArticleContentSkeleton';
 import { ArticleMarkdown } from './ArticleMarkdown';
@@ -15,11 +16,14 @@ interface ArticleContentProps {
   isEditable?: boolean;
   article: PublicArticleDetailModel | undefined;
   isLoading: boolean;
+  isGeneratingAudio?: boolean;
+  audioGenerationMessage?: string;
+  onGenerateAudio?: () => void;
 }
 
 const getInputValue = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => event.target.value;
 
-export const ArticleContent = ({ form, isEditable = false, article, isLoading }: ArticleContentProps) => {
+export const ArticleContent = ({ form, isEditable = false, article, isLoading, isGeneratingAudio = false, audioGenerationMessage = '', onGenerateAudio }: ArticleContentProps) => {
   const bodyEditorRef = useRef<HTMLDivElement>(null);
   const { canShowAudioPlayer } = useArticleNarration();
 
@@ -78,6 +82,9 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading }:
               }}
               onInlineEdit={isEditable ? () => form?.editField('summary') : undefined}
             />
+            {isEditable && article && !form?.isDirty && (
+              <ArticleAudioGenerationPanel isGeneratingAudio={isGeneratingAudio} message={audioGenerationMessage} onGenerateAudio={onGenerateAudio} />
+            )}
             {canShowAudioPlayer(isEditable, article) && <ArticleAudioPlayer article={article} />}
           </header>
           {isEditable && form?.editingField === 'bodyMarkdown' ? (

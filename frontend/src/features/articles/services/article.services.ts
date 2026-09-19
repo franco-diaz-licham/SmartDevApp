@@ -1,6 +1,15 @@
 import { apiClient } from '@/lib/api/apiClient';
 import type { BaseQuery, PageResult } from '@/lib/api/api.types';
-import type { CreateArticleRequestDto, CreateArticleResponseDto, PublicArticleDetailResponse, PublicArticleListItemResponse, PublicSearchIndexResponse, UpdateArticleRequestDto, UpdateArticleResponseDto } from '../types/article.api.types';
+import type {
+  CreateArticleRequestDto,
+  CreateArticleResponseDto,
+  GenerateArticleAudioResponseDto,
+  PublicArticleDetailResponse,
+  PublicArticleListItemResponse,
+  PublicSearchIndexResponse,
+  UpdateArticleRequestDto,
+  UpdateArticleResponseDto
+} from '../types/article.api.types';
 
 const ARTICLES_URL = '/articles';
 const OWNER_ARTICLES_URL = '/owner/articles';
@@ -24,6 +33,10 @@ export const articleService = {
 
   getPublicArticleAudio(articleId: string): Promise<Blob> {
     return apiClient.getBlob(`${ARTICLES_URL}/${encodeURIComponent(articleId)}/audio`);
+  },
+
+  generateOwnerArticleAudio(articleId: string): Promise<GenerateArticleAudioResponseDto> {
+    return apiClient.post<GenerateArticleAudioResponseDto>(`${OWNER_ARTICLES_URL}/${encodeURIComponent(articleId)}/audio`, {});
   },
 
   getPublicArticleCategories(request: BaseQuery = {}): Promise<PageResult<string>> {

@@ -5,7 +5,7 @@ const isPublicPublished = (entry: Pick<ArticleEntryModel, 'status' | 'visibility
 
 export const useArticleNarration = () => {
   const canShowAudioPlayer = useCallback((isEditable: boolean, article: PublicArticleDetailModel | undefined) => !isEditable && isPublicPublished(article), []);
-  const getSavedMessage = useCallback((entry: Pick<ArticleEntryModel, 'status' | 'visibility'>) => (isPublicPublished(entry) ? 'Saved. Audio narration has been queued.' : 'Saved.'), []);
+  const getSavedMessage = useCallback(() => 'Saved.', []);
 
   return {
     canShowAudioPlayer,
