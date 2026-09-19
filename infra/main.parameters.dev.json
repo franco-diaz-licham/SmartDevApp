@@ -136,7 +136,7 @@
           "environmentName": "Production",
           "name": "dotnet-isolated",
           "extensionVersion": "~4",
-          "version": "10"
+          "version": ".NET 10 Isolated"
         },
         "location": "australiaeast",
         "plan": {
