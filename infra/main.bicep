@@ -74,11 +74,9 @@ param resourceNameConfiguration object
 // ------------------------------------- Variables -------------------------------------
 
 var dnsZoneName = dnsConfiguration.zoneName
-var speechEnabled = speechConfiguration.enabled
 var cosmosDatabaseName = cosmosConfiguration.databaseName
 var cosmosThroughput = cosmosConfiguration.throughput
 var contactMessageTtlSeconds = cosmosConfiguration.contactMessageTtlSeconds
-var observabilityEnabled = observabilityConfiguration.enabled
 var apiCorsAllowedOrigins = apiFunctionConfiguration.corsAllowedOrigins
 
 var apiCorsAppSettings = [
@@ -124,7 +122,7 @@ module frontend './modules/resources/static-web-app.bicep' = {
   }
 }
 
-module observability './modules/resources/observability.bicep' = if (observabilityEnabled) {
+module observability './modules/resources/observability.bicep' = {
   name: 'observability'
   params: {
     config: observabilityConfiguration
@@ -214,7 +212,7 @@ module keyVault './modules/resources/key-vault.bicep' = {
 module apiFunction './modules/resources/function-app.bicep' = {
   name: 'api-function-app'
   params: {
-    appInsightsConnectionString: observabilityEnabled ? observability!.outputs.applicationInsightsConnectionString : ''
+    appInsightsConnectionString: observability.outputs.applicationInsightsConnectionString
     appName: names.apiFunctionApp
     appSettings: concat([
       {
@@ -268,7 +266,7 @@ module apiFunction './modules/resources/function-app.bicep' = {
 module workerFunction './modules/resources/function-app.bicep' = {
   name: 'worker-function-app'
   params: {
-    appInsightsConnectionString: observabilityEnabled ? observability!.outputs.applicationInsightsConnectionString : ''
+    appInsightsConnectionString: observability.outputs.applicationInsightsConnectionString
     appName: names.workerFunctionApp
     appSettings: [
       {
@@ -280,16 +278,12 @@ module workerFunction './modules/resources/function-app.bicep' = {
         value: workerFunctionConfiguration.loggingServiceName
       }
       {
-        name: 'AzureSpeech__Enabled'
-        value: string(speechEnabled)
-      }
-      {
         name: 'AzureSpeech__Region'
-        value: speechEnabled ? speechConfiguration.location : ''
+        value: speechConfiguration.location
       }
       {
         name: 'AzureSpeech__VoiceName'
-        value: speechEnabled ? speechConfiguration.voiceName : ''
+        value: speechConfiguration.voiceName
       }
       {
         name: 'ArticleAudioStorage__ContainerName'
@@ -323,13 +317,13 @@ module dns './modules/resources/dns-zone.bicep' = if (!empty(dnsZoneName)) {
 
 output apiBaseUrl string = apiFunction.outputs.defaultOrigin
 output apiFunctionAppName string = apiFunction.outputs.functionAppName
-output applicationInsightsName string = observabilityEnabled ? observability!.outputs.applicationInsightsName : ''
+output applicationInsightsName string = observability.outputs.applicationInsightsName
 output communicationServiceName string = communication.outputs.communicationServiceName
 output cosmosDbAccountName string = cosmos.outputs.accountName
 output dnsZoneName string = dnsZoneName
 output keyVaultName string = keyVault.outputs.keyVaultName
 output keyVaultReferenceIdentityName string = keyVaultReferenceIdentity.outputs.identityName
-output logAnalyticsWorkspaceName string = observabilityEnabled ? observability!.outputs.logAnalyticsWorkspaceName : ''
+output logAnalyticsWorkspaceName string = observability.outputs.logAnalyticsWorkspaceName
 output resourceGroupName string = resourceGroup().name
 output serviceBusNamespaceName string = serviceBus.outputs.namespaceName
 output speechServiceName string = speech.outputs.accountName

@@ -42,7 +42,6 @@
     },
     "speechConfiguration": {
       "value": {
-        "enabled": true,
         "kind": "SpeechServices",
         "location": "australiaeast",
         "sku": {
@@ -194,7 +193,6 @@
     },
     "observabilityConfiguration": {
       "value": {
-        "enabled": false,
         "logAnalytics": {
           "retentionInDays": 30,
           "skuName": "PerGB2018",
