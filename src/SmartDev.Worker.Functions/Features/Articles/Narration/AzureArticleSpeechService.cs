@@ -8,26 +8,26 @@ public sealed class AzureArticleSpeechService(IOptions<AzureSpeechOptions> optio
 {
     private const string ContentType = "audio/mpeg";
 
-    /// <summary>
-    /// Allows the Speech SDK to wait longer between synthesized audio frames before treating synthesis as stalled.
-    /// The default SDK threshold is too low for longer article narration on serverless workers.
-    /// </summary>
-    private const string FrameTimeoutIntervalMilliseconds = "60000";
-
-    /// <summary>
-    /// Allows synthesis to run up to twenty times slower than the generated audio duration before timing out.
-    /// This protects longer article narration from transient Speech service slowness while still bounding retries.
-    /// </summary>
-    private const string RtfTimeoutThreshold = "20";
-
     public async Task<ArticleSpeechAudio> SynthesizeAsync(string text, CancellationToken cancellationToken)
+    {
+        var chunks = SpeechTextChunker.Split(text);
+        if (chunks.Count == 0) return new ArticleSpeechAudio(BinaryData.FromBytes([]), ContentType);
+
+        await using var audio = new MemoryStream();
+        foreach (var chunk in chunks) {
+            var chunkAudio = await SynthesizeChunkAsync(chunk, cancellationToken);
+            await audio.WriteAsync(chunkAudio, cancellationToken);
+        }
+
+        return new ArticleSpeechAudio(BinaryData.FromBytes(audio.ToArray()), ContentType);
+    }
+
+    private async Task<byte[]> SynthesizeChunkAsync(string text, CancellationToken cancellationToken)
     {
         var speechOptions = options.Value;
         var config = SpeechConfig.FromSubscription(speechOptions.SubscriptionKey, speechOptions.Region);
         config.SpeechSynthesisVoiceName = speechOptions.VoiceName;
         config.SetSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Audio24Khz48KBitRateMonoMp3);
-        config.SetProperty(PropertyId.SpeechSynthesis_FrameTimeoutInterval, FrameTimeoutIntervalMilliseconds);
-        config.SetProperty(PropertyId.SpeechSynthesis_RtfTimeoutThreshold, RtfTimeoutThreshold);
 
         using var synthesizer = new SpeechSynthesizer(config, audioConfig: null);
         using var result = await synthesizer.SpeakTextAsync(text).WaitAsync(cancellationToken);
@@ -37,6 +37,6 @@ public sealed class AzureArticleSpeechService(IOptions<AzureSpeechOptions> optio
             throw new InvalidOperationException($"Azure Speech synthesis failed. Reason: {result.Reason}. Details: {cancellation.ErrorDetails}");
         }
 
-        return new ArticleSpeechAudio(BinaryData.FromBytes(result.AudioData), ContentType);
+        return result.AudioData;
     }
 }
