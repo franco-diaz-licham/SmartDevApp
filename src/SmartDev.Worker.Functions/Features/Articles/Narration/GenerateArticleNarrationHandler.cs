@@ -15,6 +15,16 @@ public sealed class GenerateArticleNarrationHandler(
 {
     public async Task HandleAsync(ArticleNarrationRequestedIntegrationEvent message, CancellationToken cancellationToken)
     {
+        var existingAudio = await articleAudioStorage.OpenReadAsync(message.ArticleId, message.ContentVersion, cancellationToken);
+        if (existingAudio is not null) {
+            await existingAudio.Content.DisposeAsync();
+            logger.LogInformation(
+                "Article narration request skipped because audio already exists. ArticleId: {ArticleId}. ContentVersion: {ContentVersion}.",
+                message.ArticleId,
+                message.ContentVersion);
+            return;
+        }
+
         var narrationMarkdown = ArticleNarrationContent.CreateNarrationMarkdown(message.Title, message.Summary, message.BodyMarkdown);
         var narrationText = narrationTextConverter.Convert(narrationMarkdown);
 

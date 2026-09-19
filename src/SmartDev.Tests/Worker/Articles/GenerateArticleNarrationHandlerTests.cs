@@ -46,6 +46,35 @@ public sealed class GenerateArticleNarrationHandlerTests
         storage.AudioText.ShouldBe("audio bytes");
     }
 
+    [Test]
+    public async Task HandleAsync_AudioAlreadyExists_DoesNotSynthesizeAgain()
+    {
+        // Arrange
+        var speechService = new RecordingSpeechService();
+        var storage = new RecordingAudioStorage {
+            ExistingAudio = new AudioFile(new MemoryStream(BinaryData.FromString("existing audio").ToArray()), "audio/mpeg")
+        };
+        var handler = new GenerateArticleNarrationHandler(
+            new MarkdownTextConverter(),
+            speechService,
+            storage,
+            NullLogger<GenerateArticleNarrationHandler>.Instance);
+        var message = new ArticleNarrationRequestedIntegrationEvent(
+            Guid.NewGuid(),
+            "version-1",
+            "Partition keys",
+            "Storage and visibility are separate.",
+            "Use `partitionKey` for storage.",
+            DateTimeOffset.UtcNow);
+
+        // Act
+        await handler.HandleAsync(message, CancellationToken.None);
+
+        // Assert
+        speechService.Text.ShouldBeNull();
+        storage.UploadCount.ShouldBe(0);
+    }
+
     private sealed class RecordingSpeechService : IArticleSpeechService
     {
         public string? Text { get; private set; }
@@ -63,16 +92,19 @@ public sealed class GenerateArticleNarrationHandlerTests
         public string? ContentVersion { get; private set; }
         public string? ContentType { get; private set; }
         public string? AudioText { get; private set; }
+        public AudioFile? ExistingAudio { get; init; }
+        public int UploadCount { get; private set; }
 
         public async Task UploadAsync(Guid contentId, string contentVersion, Stream audio, string contentType, CancellationToken cancellationToken)
         {
             using var reader = new StreamReader(audio);
+            UploadCount++;
             ContentId = contentId;
             ContentVersion = contentVersion;
             ContentType = contentType;
             AudioText = await reader.ReadToEndAsync(cancellationToken);
         }
 
-        public Task<AudioFile?> OpenReadAsync(Guid contentId, string contentVersion, CancellationToken cancellationToken) => throw new NotSupportedException();
+        public Task<AudioFile?> OpenReadAsync(Guid contentId, string contentVersion, CancellationToken cancellationToken) => Task.FromResult(ExistingAudio);
     }
 }

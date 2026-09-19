@@ -9,5 +9,12 @@
   },
   "Observability": {
     "OtlpEndpoint": "http://localhost:4317"
+  },
+  "extensions": {
+    "serviceBus": {
+      "maxConcurrentCalls": 1,
+      "prefetchCount": 0,
+      "maxAutoLockRenewalDuration": "00:05:00"
+    }
   }
 }

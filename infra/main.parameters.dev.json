@@ -196,7 +196,7 @@
         "logAnalytics": {
           "retentionInDays": 30,
           "skuName": "PerGB2018",
-          "dailyQuotaGb": 0
+          "dailyQuotaGb": 0.024
         },
         "applicationInsights": {
           "ingestionMode": "LogAnalytics",
