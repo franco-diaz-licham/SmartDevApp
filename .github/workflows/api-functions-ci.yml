@@ -5,8 +5,8 @@ on:
 
 env:
   DOTNET_VERSION: 10.0.x
-  PROJECT_PATH: backend/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj
-  TEST_PROJECT_PATH: backend/SmartDev.Tests/SmartDev.Tests.csproj
+  PROJECT_PATH: src/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj
+  TEST_PROJECT_PATH: src/SmartDev.Tests/SmartDev.Tests.csproj
 
 jobs:
   build:

@@ -2,11 +2,11 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY ./frontend/package*.json ./
+COPY ./src/SmartDev.UI/package*.json ./
 
 RUN npm ci --include=optional
 
-COPY ./frontend ./
+COPY ./src/SmartDev.UI ./
 
 EXPOSE 5173
 

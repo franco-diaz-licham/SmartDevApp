@@ -10,7 +10,7 @@
 
 # Frontend dependencies/build output
 **/node_modules/
-frontend/dist/
+src/SmartDev.UI/dist/
 
 # Local settings and transient files
 **/local.settings.json

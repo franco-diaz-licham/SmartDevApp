@@ -5,7 +5,7 @@ on:
 
 env:
   DOTNET_VERSION: 10.0.x
-  PROJECT_PATH: backend/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj
+  PROJECT_PATH: src/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj
   WORKER_FUNCTION_APP_NAME: ${{ secrets.WORKER_FUNCTION_APP_NAME }}
   WORKER_FUNCTION_RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}

@@ -5,18 +5,18 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy the solution and project files first so Docker can cache restore layers
-COPY backend/SmartDev.slnx ./backend/
-COPY backend/SmartDev.Shared/SmartDev.Shared.csproj ./backend/SmartDev.Shared/
-COPY backend/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj ./backend/SmartDev.Api.Functions/
+COPY src/SmartDev.slnx ./src/
+COPY src/SmartDev.Shared/SmartDev.Shared.csproj ./src/SmartDev.Shared/
+COPY src/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj ./src/SmartDev.Api.Functions/
 
 # Restore dependencies for the API Functions project
-RUN dotnet restore backend/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj
+RUN dotnet restore src/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj
 
-# Copy all backend source code
-COPY backend/ ./backend/
+# Copy all source code
+COPY src/ ./src/
 
 # Publish the API Functions project into the Azure Functions script root
-RUN dotnet publish backend/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj \
+RUN dotnet publish src/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj \
     -c Release \
     -o /home/site/wwwroot \
     --no-restore

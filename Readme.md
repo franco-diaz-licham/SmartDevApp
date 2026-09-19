@@ -90,7 +90,7 @@ SmartDevApp is split across separately deployable frontend, API Functions, and W
 ### Backend
 
 ```text
-backend/
+src/
 ├── SmartDev.Api.Functions/       # HTTP trigger, status-result trigger, API-owned domain/application/infra
 ├── SmartDev.Worker.Functions/    # Service Bus trigger, email use case, worker-owned application/infra
 ├── SmartDev.Shared/              # Shared messaging contracts, queue names, Service Bus publisher
@@ -100,7 +100,7 @@ backend/
 ### API Functions
 
 ```text
-backend/SmartDev.Api.Functions/
+src/SmartDev.Api.Functions/
 ├── Application/      # Contact-message use cases, ports, domain event dispatching
 ├── Configuration/    # Host setup, DI registration, options, CORS and rate-limit middleware
 ├── Domain/           # Contact, content, and portfolio domain models
@@ -113,7 +113,7 @@ backend/SmartDev.Api.Functions/
 ### Worker Functions
 
 ```text
-backend/SmartDev.Worker.Functions/
+src/SmartDev.Worker.Functions/
 ├── Application/      # Send-contact-email use case and email port
 ├── Configuration/    # Host setup, DI registration, logging, observability
 ├── Functions/        # Service Bus trigger presentation layer
@@ -125,7 +125,7 @@ backend/SmartDev.Worker.Functions/
 ### Shared
 
 ```text
-backend/SmartDev.Shared/
+src/SmartDev.Shared/
 ├── Messaging/        # Integration event contracts, queue topology, Service Bus publisher
 └── Options/          # Shared configuration options
 ```
@@ -133,7 +133,7 @@ backend/SmartDev.Shared/
 ### Frontend
 
 ```text
-frontend/
+src/SmartDev.UI/
 ├── pages/            # Portfolio detail pages
 ├── public/           # Static images and portfolio JSON data
 ├── src/              # TypeScript and styling
@@ -241,8 +241,8 @@ Docker writes function logs to:
 Restore and build the full backend solution:
 
 ```powershell
-dotnet restore backend/SmartDev.slnx
-dotnet build backend/SmartDev.slnx
+dotnet restore src/SmartDev.slnx
+dotnet build src/SmartDev.slnx
 ```
 
 Configure host-based local API user secrets from the repository-root `.env`:
@@ -256,13 +256,13 @@ This writes only the API Entra identifiers from `.env`. Local Cosmos DB, Service
 Run the API Functions app locally:
 
 ```powershell
-dotnet run --project backend/SmartDev.Api.Functions
+dotnet run --project src/SmartDev.Api.Functions
 ```
 
 Run the Worker Functions app locally:
 
 ```powershell
-dotnet run --project backend/SmartDev.Worker.Functions
+dotnet run --project src/SmartDev.Worker.Functions
 ```
 
 The API project uses port `7084` from `launchSettings.json`. The worker project uses port `7177` so both function hosts can run at the same time.
@@ -277,10 +277,10 @@ Local Azure Functions defaults live in each function project's `local.settings.j
 
 ## 🖥️ Frontend Setup
 
-From the frontend directory:
+From the UI project directory:
 
 ```powershell
-cd frontend
+cd src/SmartDev.UI
 npm install
 npm run dev
 ```
@@ -299,5 +299,3 @@ http://localhost:7084
 ```
 
 For local frontend-only overrides, use the frontend tooling's ignored local environment file and keep it out of source control. The repository-root `.env` remains the deployment script configuration file.
-
-

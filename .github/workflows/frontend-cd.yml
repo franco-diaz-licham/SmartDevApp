@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  BUILD_DIR: frontend
+  BUILD_DIR: src/SmartDev.UI
   OUTPUT_DIR: dist
   NODE_VERSION: 22.x
   SWA_NAME: ${{ secrets.SWA_NAME }}

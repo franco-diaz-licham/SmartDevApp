@@ -30,7 +30,7 @@ function Invoke-Main {
     Import-DotEnv -Path $envFile
 
     # Variables
-    $apiProject = Resolve-RepoPath -Path "backend/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj" -RepoRoot $repoRoot
+    $apiProject = Resolve-RepoPath -Path "src/SmartDev.Api.Functions/SmartDev.Api.Functions.csproj" -RepoRoot $repoRoot
     $tenantId = [guid](Get-Config -Name "API_ENTRA_TENANT_ID")
     $ownerObjectId = [guid](Get-Config -Name "API_ENTRA_OWNER_OBJECT_ID")
     $apiAudience = Get-Config -Name "API_ENTRA_AUDIENCE"

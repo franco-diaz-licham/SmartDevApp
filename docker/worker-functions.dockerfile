@@ -5,18 +5,18 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy the solution and project files first so Docker can cache restore layers
-COPY backend/SmartDev.slnx ./backend/
-COPY backend/SmartDev.Shared/SmartDev.Shared.csproj ./backend/SmartDev.Shared/
-COPY backend/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj ./backend/SmartDev.Worker.Functions/
+COPY src/SmartDev.slnx ./src/
+COPY src/SmartDev.Shared/SmartDev.Shared.csproj ./src/SmartDev.Shared/
+COPY src/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj ./src/SmartDev.Worker.Functions/
 
 # Restore dependencies for the Worker Functions project
-RUN dotnet restore backend/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj
+RUN dotnet restore src/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj
 
-# Copy all backend source code
-COPY backend/ ./backend/
+# Copy all source code
+COPY src/ ./src/
 
 # Publish the Worker Functions project into the Azure Functions script root
-RUN dotnet publish backend/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj \
+RUN dotnet publish src/SmartDev.Worker.Functions/SmartDev.Worker.Functions.csproj \
     -c Release \
     -o /home/site/wwwroot \
     --no-restore
