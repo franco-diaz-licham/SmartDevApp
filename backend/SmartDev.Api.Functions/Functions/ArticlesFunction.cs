@@ -73,6 +73,16 @@ public sealed class ArticlesFunction(ArticlesQueryHandler articlesQueryHandler, 
         return await result.ToHttpResponseAsync(request, cancellationToken);
     }
 
+    [Function(nameof(GenerateOwnerArticleAudio))]
+    public async Task<HttpResponseData> GenerateOwnerArticleAudio([HttpTrigger(AuthorizationLevel.Anonymous, "post", "options", Route = "owner/articles/{articleId:guid}/audio")] HttpRequestData request, string articleId, CancellationToken cancellationToken)
+    {
+        if (string.Equals(request.Method, "OPTIONS", StringComparison.OrdinalIgnoreCase)) return request.CreateResponse(HttpStatusCode.NoContent);
+        if (!Guid.TryParse(articleId, out var parsedArticleId)) return await Result.Fail("Article id must be a valid GUID.").ToHttpResponseAsync(request, cancellationToken);
+
+        var result = await articlesQueryHandler.GenerateOwnerArticleAudioAsync(parsedArticleId, cancellationToken);
+        return await result.ToHttpResponseAsync(request, cancellationToken);
+    }
+
     [Function(nameof(GetPublicArticleCategories))]
     public async Task<HttpResponseData> GetPublicArticleCategories([HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "articles/categories")] HttpRequestData request, CancellationToken cancellationToken)
     {
@@ -139,7 +149,7 @@ public sealed class ArticlesFunction(ArticlesQueryHandler articlesQueryHandler, 
 
         var response = request.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", result.Value!.ContentType);
-        response.Headers.Add("Cache-Control", "public, max-age=31536000, immutable");
+        response.Headers.Add("Cache-Control", "no-cache");
         response.Headers.Add("ETag", $"\"{result.Value.ContentVersion}\"");
         await result.Value.Content.CopyToAsync(response.Body, cancellationToken);
         await result.Value.Content.DisposeAsync();

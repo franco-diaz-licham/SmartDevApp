@@ -66,7 +66,6 @@ public static class ApiAppServices
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
         services.AddScoped<IDomainEventHandler, ContactMessageCreatedHandler>();
-        services.AddScoped<IDomainEventHandler, ArticleNarrationRequestedHandler>();
         services.AddSingleton<IMarkdownTextConverter, MarkdownTextConverter>();
 
         services.AddScoped<CreateContactEmailHandler>();

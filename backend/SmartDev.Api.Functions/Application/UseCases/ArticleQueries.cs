@@ -2,10 +2,11 @@ using SmartDev.Api.Functions.Application.Ports;
 using SmartDev.Api.Functions.Domain.Articles;
 using SmartDev.Shared.Articles;
 using SmartDev.Shared.Infrastructure.Storage;
+using SmartDev.Shared.Messaging;
 
 namespace SmartDev.Api.Functions.Application.UsesCases;
 
-public sealed class ArticlesQueryHandler(IArticleRepository articleRepository, IAudioStorage articleAudioStorage)
+public sealed class ArticlesQueryHandler(IArticleRepository articleRepository, IAudioStorage articleAudioStorage, IIntegrationEventPublisher integrationEventPublisher)
 {
     public async Task<Result<Page<PublicArticleListItem>>> GetPublicArticlesAsync(BaseQuery query, CancellationToken cancellationToken)
     {
@@ -51,6 +52,33 @@ public sealed class ArticlesQueryHandler(IArticleRepository articleRepository, I
         if (audio is null) return Result<ArticleAudioPlayback>.Fail("Article audio is not ready yet.", ResultTypeEnum.NotFound);
 
         return Result<ArticleAudioPlayback>.Success(new ArticleAudioPlayback(audio.Content, audio.ContentType, contentVersion));
+    }
+
+    public async Task<Result<ArticleAudioGenerationRequest>> GenerateOwnerArticleAudioAsync(Guid articleId, CancellationToken cancellationToken)
+    {
+        var article = await articleRepository.GetByIdAsync(ArticleId.From(articleId), cancellationToken);
+        if (article is null) {
+            return Result<ArticleAudioGenerationRequest>.Fail("Article was not found.", ResultTypeEnum.NotFound);
+        }
+
+        var contentVersion = ArticleNarrationContent.CreateVersion(article.Title.Value, article.Summary.Value, article.Body.Value);
+        var existingAudio = await articleAudioStorage.OpenReadAsync(article.Id.Value, contentVersion, cancellationToken);
+        if (existingAudio is not null) {
+            await existingAudio.Content.DisposeAsync();
+            return Result<ArticleAudioGenerationRequest>.Success(new ArticleAudioGenerationRequest("ready", contentVersion));
+        }
+
+        await integrationEventPublisher.PublishAsync(
+            new ArticleNarrationRequestedIntegrationEvent(
+                article.Id.Value,
+                contentVersion,
+                article.Title.Value,
+                article.Summary.Value,
+                article.Body.Value,
+                DateTimeOffset.UtcNow),
+            cancellationToken);
+
+        return Result<ArticleAudioGenerationRequest>.Success(new ArticleAudioGenerationRequest("queued", contentVersion), ResultTypeEnum.Accepted);
     }
 
     public async Task<Result<Page<string>>> GetPublicArticleCategoriesAsync(BaseQuery query, CancellationToken cancellationToken)
@@ -163,6 +191,8 @@ public sealed record PublicArticleDetail(
 public sealed record PublicRelatedProjectReference(string ProjectId, string Label);
 
 public sealed record ArticleAudioPlayback(Stream Content, string ContentType, string ContentVersion);
+
+public sealed record ArticleAudioGenerationRequest(string Status, string ContentVersion);
 
 public sealed record PublicArticleCategory(string Slug, string DisplayName)
 {
