@@ -2,7 +2,7 @@
 
 # ---------- Build stage ----------
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /src
+WORKDIR /workspace
 
 # Copy the solution and project files first so Docker can cache restore layers
 COPY src/SmartDev.slnx ./src/
