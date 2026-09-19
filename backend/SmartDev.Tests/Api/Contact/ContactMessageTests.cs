@@ -1,4 +1,4 @@
-using SmartDev.Api.Functions.Domain.Contact;
+using SmartDev.Api.Functions.Features.Contact.Domain;
 using static SmartDev.Tests.TestData.AggregateTestData;
 
 namespace SmartDev.Tests.Api.Contact;

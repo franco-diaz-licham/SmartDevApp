@@ -9,11 +9,11 @@ using Microsoft.Extensions.Options;
 using SmartDev.Shared.Articles;
 using SmartDev.Shared.Messaging;
 using SmartDev.Shared.Options;
-using SmartDev.Worker.Functions.Application.Ports;
-using SmartDev.Worker.Functions.Infrastructure.Email;
-using SmartDev.Worker.Functions.Infrastructure.Options;
-using SmartDev.Worker.Functions.Application.UsesCases;
-using SmartDev.Worker.Functions.Infrastructure.Speech;
+using SmartDev.Worker.Functions.Common.Application;
+using SmartDev.Worker.Functions.Common.Infrastructure.Email;
+using SmartDev.Worker.Functions.Features.Contact.SendEmail;
+using SmartDev.Worker.Functions.Features.Articles.Narration;
+using SmartDev.Worker.Functions.Configuration.Options;
 
 namespace SmartDev.Worker.Functions.Configuration;
 
@@ -124,4 +124,3 @@ public static class WorkerAppServices
         return services;
     }
 }
-

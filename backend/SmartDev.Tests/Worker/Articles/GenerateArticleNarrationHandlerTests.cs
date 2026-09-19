@@ -3,8 +3,7 @@ using SmartDev.Shared.Infrastructure.Text;
 using Microsoft.Extensions.Logging.Abstractions;
 using SmartDev.Shared.Articles;
 using SmartDev.Shared.Messaging;
-using SmartDev.Worker.Functions.Application.Ports;
-using SmartDev.Worker.Functions.Application.UsesCases;
+using SmartDev.Worker.Functions.Features.Articles.Narration;
 
 namespace SmartDev.Tests.Worker.Articles;
 
@@ -34,13 +33,13 @@ public sealed class GenerateArticleNarrationHandlerTests
         await handler.HandleAsync(message, CancellationToken.None);
 
         // Assert
-        speechService.Text.ShouldBe("""
+        speechService.Text!.ReplaceLineEndings("\n").ShouldBe("""
             Partition keys
 
             Storage and visibility are separate.
 
             Use partitionKey for storage.
-            """);
+            """.ReplaceLineEndings("\n"));
         storage.ContentId.ShouldBe(message.ArticleId);
         storage.ContentVersion.ShouldBe("version-1");
         storage.ContentType.ShouldBe("audio/mpeg");
@@ -77,4 +76,3 @@ public sealed class GenerateArticleNarrationHandlerTests
         public Task<AudioFile?> OpenReadAsync(Guid contentId, string contentVersion, CancellationToken cancellationToken) => throw new NotSupportedException();
     }
 }
-

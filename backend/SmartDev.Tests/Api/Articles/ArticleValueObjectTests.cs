@@ -1,4 +1,4 @@
-using SmartDev.Api.Functions.Domain.Articles;
+using SmartDev.Api.Functions.Features.Articles.Domain;
 
 namespace SmartDev.Tests.Api.Articles;
 

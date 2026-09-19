@@ -1,6 +1,6 @@
-using SmartDev.Api.Functions.Domain.Contact;
-using SmartDev.Api.Functions.Domain.Articles;
-using DomainArticleType = SmartDev.Api.Functions.Domain.Articles.ArticleType;
+using SmartDev.Api.Functions.Features.Contact.Domain;
+using SmartDev.Api.Functions.Features.Articles.Domain;
+using DomainArticleType = SmartDev.Api.Functions.Features.Articles.Domain.ArticleType;
 
 namespace SmartDev.Tests.TestData;
 

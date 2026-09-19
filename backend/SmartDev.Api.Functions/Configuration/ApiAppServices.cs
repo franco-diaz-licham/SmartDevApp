@@ -7,16 +7,21 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Azure.Cosmos;
-using SmartDev.Api.Functions.Application.Messaging;
-using SmartDev.Api.Functions.Application.Ports;
+using SmartDev.Api.Functions.Common.Infrastructure.Messaging;
+using SmartDev.Api.Functions.Features.Articles.UseCases;
+using SmartDev.Api.Functions.Features.Articles.Contracts;
+using SmartDev.Api.Functions.Features.Articles.Infrastructure.Persistence;
+using SmartDev.Api.Functions.Features.Contact.UseCases;
+using SmartDev.Api.Functions.Features.Contact.Contracts;
+using SmartDev.Api.Functions.Features.Contact.Infrastructure.Persistence;
+using SmartDev.Api.Functions.Common.Application;
 using SmartDev.Api.Functions.Configuration.Options;
 using SmartDev.Shared.Messaging;
-using SmartDev.Api.Functions.Application.Messaging.Handlers;
-using SmartDev.Api.Functions.Infrastructure.Persistence;
+using SmartDev.Api.Functions.Features.Contact.Messaging;
+using SmartDev.Api.Functions.Common.Infrastructure.Persistence;
 using SmartDev.Shared.Options;
-using SmartDev.Api.Functions.Application.UsesCases;
 using SmartDev.Api.Functions.Configuration.Middleware;
-using SmartDev.Api.Functions.Infrastructure.Auth;
+using SmartDev.Api.Functions.Common.Infrastructure.Auth;
 
 namespace SmartDev.Api.Functions.Configuration;
 
@@ -159,4 +164,3 @@ public static class ApiAppServices
         return services;
     }
 }
-

@@ -1,0 +1,177 @@
+using Microsoft.Azure.Cosmos;
+using SmartDev.Api.Functions.Common.Application;
+using SmartDev.Api.Functions.Features.Articles.Domain;
+
+namespace SmartDev.Api.Functions.Features.Articles.Infrastructure.Persistence;
+
+internal static class CosmosArticleQueries
+{
+    private const string DefaultArticlesOrderBy = "c.publishedAt DESC";
+
+    public static QueryDefinition SlugIds(ArticleSlug slug)
+    {
+        return new QueryDefinition("""
+            SELECT VALUE c.id
+            FROM c
+            WHERE c.type = @type
+              AND c.slug = @slug
+            """)
+            .WithParameter("@type", ArticleDocument.DocumentType)
+            .WithParameter("@slug", slug.Value);
+    }
+
+    public static QueryDefinition PublishedPublic(BaseQuery? query = null)
+    {
+        return BuildArticlesQuery(
+            query,
+            [
+                "c.type = @type",
+                "c.status = @status",
+                "c.visibility = @visibility"
+            ],
+            DefaultArticlesOrderBy)
+            .WithParameter("@type", ArticleDocument.DocumentType)
+            .WithParameter("@status", ArticleStatus.Published.ToString())
+            .WithParameter("@visibility", ArticleVisibility.Public.ToString());
+    }
+
+    public static QueryDefinition PublishedPublicSearch(BaseQuery query)
+    {
+        return BuildArticlesQuery(
+            query,
+            [
+                "c.type = @type",
+                "c.status = @status",
+                "c.visibility = @visibility"
+            ],
+            DefaultArticlesOrderBy)
+            .WithParameter("@type", ArticleDocument.DocumentType)
+            .WithParameter("@status", ArticleStatus.Published.ToString())
+            .WithParameter("@visibility", ArticleVisibility.Public.ToString());
+    }
+
+    public static QueryDefinition PublishedPublicCategoryNames()
+    {
+        return new QueryDefinition("""
+            SELECT DISTINCT VALUE c.category.displayName
+            FROM c
+            WHERE c.type = @type
+              AND c.status = @status
+              AND c.visibility = @visibility
+            ORDER BY c.category.displayName
+            """)
+            .WithParameter("@type", ArticleDocument.DocumentType)
+            .WithParameter("@status", ArticleStatus.Published.ToString())
+            .WithParameter("@visibility", ArticleVisibility.Public.ToString());
+    }
+
+    public static QueryDefinition OwnerCategoryNames()
+    {
+        return new QueryDefinition("""
+            SELECT DISTINCT VALUE c.category.displayName
+            FROM c
+            WHERE c.type = @type
+            ORDER BY c.category.displayName
+            """)
+            .WithParameter("@type", ArticleDocument.DocumentType);
+    }
+
+    public static QueryDefinition PublishedPublicTagNames()
+    {
+        return new QueryDefinition("""
+            SELECT DISTINCT VALUE tag.displayName
+            FROM c
+            JOIN tag IN c.tags
+            WHERE c.type = @type
+              AND c.status = @status
+              AND c.visibility = @visibility
+            ORDER BY tag.displayName
+            """)
+            .WithParameter("@type", ArticleDocument.DocumentType)
+            .WithParameter("@status", ArticleStatus.Published.ToString())
+            .WithParameter("@visibility", ArticleVisibility.Public.ToString());
+    }
+
+    public static QueryDefinition AllForOwner(BaseQuery? query = null)
+    {
+        return BuildArticlesQuery(query, ["c.type = @type"], DefaultArticlesOrderBy)
+            .WithParameter("@type", ArticleDocument.DocumentType);
+    }
+
+    private static QueryDefinition BuildArticlesQuery(BaseQuery? query, IReadOnlyCollection<string> baseConditions, string orderBy)
+    {
+        var conditions = baseConditions.ToList();
+        if (!string.IsNullOrWhiteSpace(query?.SearchTerm)) {
+            conditions.Add("""
+                (
+                  CONTAINS(LOWER(c.title), @searchTerm)
+                  OR CONTAINS(LOWER(c.summary), @searchTerm)
+                  OR CONTAINS(LOWER(c.articleType), @searchTerm)
+                  OR CONTAINS(LOWER(c.bodyMarkdown), @searchTerm)
+                  OR CONTAINS(LOWER(c.category.displayName), @searchTerm)
+                  OR EXISTS(
+                    SELECT VALUE tag
+                    FROM tag IN c.tags
+                    WHERE CONTAINS(LOWER(tag.displayName), @searchTerm)
+                       OR CONTAINS(LOWER(tag.slug), @searchTerm)
+                  )
+                )
+                """);
+        }
+
+        var categoryFilter = query?.Filters.FirstOrDefault(filter =>
+            string.Equals(filter.Field, "category", StringComparison.OrdinalIgnoreCase)
+            && filter.Operator == FilterOperator.Equals
+            && !string.IsNullOrWhiteSpace(filter.Value));
+
+        if (categoryFilter is not null) conditions.Add("LOWER(c.category.displayName) = @category");
+
+        var articleTypeFilter = query?.Filters.FirstOrDefault(filter =>
+            string.Equals(filter.Field, "articleType", StringComparison.OrdinalIgnoreCase)
+            && filter.Operator == FilterOperator.Equals
+            && !string.IsNullOrWhiteSpace(filter.Value));
+
+        if (articleTypeFilter is not null) {
+            conditions.Add("""
+                (
+                  c.articleType = @articleType
+                  OR (NOT IS_DEFINED(c.articleType) AND @articleType = @defaultArticleType)
+                )
+                """);
+        }
+
+        var queryDefinition = new QueryDefinition($"""
+            SELECT * FROM c
+            WHERE {string.Join($"{Environment.NewLine} AND ", conditions)}
+            ORDER BY {ResolveArticleOrderBy(query, orderBy)}
+            """);
+
+        if (!string.IsNullOrWhiteSpace(query?.SearchTerm)) queryDefinition = queryDefinition.WithParameter("@searchTerm", query.SearchTerm.Trim().ToLowerInvariant());
+        if (categoryFilter is not null) queryDefinition = queryDefinition.WithParameter("@category", categoryFilter.Value.Trim().ToLowerInvariant());
+        if (articleTypeFilter is not null) {
+            queryDefinition = queryDefinition
+                .WithParameter("@articleType", articleTypeFilter.Value.Trim())
+                .WithParameter("@defaultArticleType", ArticleType.DeepDive.ToString());
+        }
+        return queryDefinition;
+    }
+
+    private static string ResolveArticleOrderBy(BaseQuery? query, string defaultOrderBy)
+    {
+        if (string.IsNullOrWhiteSpace(query?.SortBy)) return defaultOrderBy;
+
+        var field = query.SortBy.Trim().ToLowerInvariant() switch {
+            "publishedat" or "publisheddate" => "c.publishedAt",
+            _ => null
+        };
+
+        if (field is null) return defaultOrderBy;
+
+        var direction = query.SortDirection == SortDirection.Asc ? "ASC" : "DESC";
+        return $"{field} {direction}";
+    }
+}
+
+
+
+

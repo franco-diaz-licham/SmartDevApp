@@ -1,6 +1,6 @@
-using SmartDev.Api.Functions.Domain.Articles;
+using SmartDev.Api.Functions.Features.Articles.Domain;
 using static SmartDev.Tests.TestData.AggregateTestData;
-using DomainArticleType = SmartDev.Api.Functions.Domain.Articles.ArticleType;
+using DomainArticleType = SmartDev.Api.Functions.Features.Articles.Domain.ArticleType;
 
 namespace SmartDev.Tests.Api.Articles;
 

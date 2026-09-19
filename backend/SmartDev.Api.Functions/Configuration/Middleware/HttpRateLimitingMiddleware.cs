@@ -4,7 +4,7 @@ using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
-using SmartDev.Api.Functions.Functions;
+using SmartDev.Api.Functions.Common.Functions;
 
 namespace SmartDev.Api.Functions.Configuration.Middleware;
 

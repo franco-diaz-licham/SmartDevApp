@@ -26,14 +26,14 @@ public sealed class MarkdownTextConverterTests
         var text = converter.Convert(markdown);
 
         // Assert
-        text.ShouldBe("""
+        text.ReplaceLineEndings("\n").ShouldBe("""
             Partition keys
 
             Use partitionKey instead of /visibility.
 
             Articles use articles
             Contact messages use contact-messages
-            """);
+            """.ReplaceLineEndings("\n"));
     }
 
     [Test]
@@ -58,7 +58,7 @@ public sealed class MarkdownTextConverterTests
         var text = converter.Convert(markdown);
 
         // Assert
-        text.ShouldBe("""
+        text.ReplaceLineEndings("\n").ShouldBe("""
             Optimistic concurrency
 
             Optimistic concurrency assumes conflicts are uncommon.
@@ -66,7 +66,7 @@ public sealed class MarkdownTextConverterTests
             Code example omitted.
 
             Continue after the example.
-            """);
+            """.ReplaceLineEndings("\n"));
     }
 
     [Test]
@@ -89,13 +89,13 @@ public sealed class MarkdownTextConverterTests
         var text = converter.Convert(markdown);
 
         // Assert
-        text.ShouldBe("""
+        text.ReplaceLineEndings("\n").ShouldBe("""
             Deployment options
 
             Table omitted.
 
             Prefer SAS URLs & short expiries.
-            """);
+            """.ReplaceLineEndings("\n"));
     }
 
     [Test]
@@ -111,4 +111,3 @@ public sealed class MarkdownTextConverterTests
         text.ShouldBeEmpty();
     }
 }
-

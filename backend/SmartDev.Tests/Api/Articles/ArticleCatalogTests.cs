@@ -1,4 +1,4 @@
-using SmartDev.Api.Functions.Domain.Articles;
+using SmartDev.Api.Functions.Features.Articles.Domain;
 using static SmartDev.Tests.TestData.AggregateTestData;
 
 namespace SmartDev.Tests.Api.Articles;
