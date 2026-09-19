@@ -49,7 +49,7 @@
         },
         "customSubDomainName": "smartdevapp-speech",
         "publicNetworkAccess": "Enabled",
-        "voiceName": "en-AU-NatashaNeural"
+        "voiceName": "en-AU-WilliamNeural"
       }
     },
     "cosmosConfiguration": {
