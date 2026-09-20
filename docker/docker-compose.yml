@@ -33,19 +33,17 @@ services:
       - ./otel-collector-config.yml:/etc/otelcol-contrib/config.yml:ro
 
   cosmos-db:
-    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-latest
     container_name: smartdev-cosmos-db
     hostname: cosmos-db
-    environment:
-      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: "3"
-      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"
+    command: ["--protocol", "https"]
     ports:
       - "8081:8081"
-      - "10250-10255:10250-10255"
+      - "1234:1234"
     volumes:
-      - cosmos-data:/data/db
+      - cosmos-data:/data
     healthcheck:
-      test: ["CMD-SHELL", "curl -k -sS https://localhost:8081/ >/dev/null"]
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/ready >/dev/null"]
       interval: 10s
       timeout: 5s
       retries: 30
@@ -150,5 +148,5 @@ volumes:
   azurite-data:
     driver: local
   cosmos-data:
-    name: smartdev_cosmos-data
+    name: smartdev_cosmos-vnext-data
     driver: local

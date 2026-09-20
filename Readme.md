@@ -220,6 +220,7 @@ Frontend:             http://localhost:5173
 API Functions:        http://localhost:7084
 Worker Functions:     worker container
 Cosmos DB Emulator:   https://localhost:8081
+Cosmos DB Explorer:   http://localhost:1234
 Azurite Blob:         http://localhost:10000
 Azurite Queue:        http://localhost:10001
 Azurite Table:        http://localhost:10002
