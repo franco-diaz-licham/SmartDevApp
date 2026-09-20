@@ -82,9 +82,7 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
               }}
               onInlineEdit={isEditable ? () => form?.editField('summary') : undefined}
             />
-            {isEditable && article && !form?.isDirty && (
-              <ArticleAudioGenerationPanel isGeneratingAudio={isGeneratingAudio} message={audioGenerationMessage} onGenerateAudio={onGenerateAudio} />
-            )}
+            {isEditable && article && !form?.isDirty && <ArticleAudioGenerationPanel isGeneratingAudio={isGeneratingAudio} message={audioGenerationMessage} onGenerateAudio={onGenerateAudio} />}
             {canShowAudioPlayer(isEditable, article) && <ArticleAudioPlayer article={article} />}
           </header>
           {isEditable && form?.editingField === 'bodyMarkdown' ? (
@@ -106,7 +104,7 @@ export const ArticleContent = ({ form, isEditable = false, article, isLoading, i
             </div>
           ) : (
             <AppInlineEditSurface className="mt-3" disabled={!isEditable} label="ARTICLE BODY" required={isEditable} onEdit={handleBodyEdit}>
-              <div className="space-y-6 pb-16">
+              <div className="min-w-0 space-y-6 pb-16">
                 <ArticleMarkdown markdown={bodyMarkdownValue ?? ''} />
               </div>
             </AppInlineEditSurface>

@@ -7,7 +7,7 @@ export const WorkspaceLayout = () => {
     <div className="grid h-screen grid-rows-[auto_minmax(0,1fr)] overflow-hidden">
       <ScrollToTop />
       <WorkspaceTopBar />
-      <div className="min-h-0">
+      <div className="min-h-0 min-w-0">
         <Outlet />
       </div>
     </div>
