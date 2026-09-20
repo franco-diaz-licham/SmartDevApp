@@ -6,7 +6,8 @@ import { useAuth } from '@/features/auth';
 
 const workspaceNavigationItems = [
   { label: 'HOME', href: '/home', visibility: 'public' },
-  { label: 'ARTICLES', href: '/articles', visibility: 'public' }
+  { label: 'ARTICLES', href: '/articles', visibility: 'public' },
+  { label: 'JOURNAL', href: '/journal', visibility: 'owner' }
 ] as const;
 
 const navButtonClassName = 'block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline disabled:opacity-60 lg:py-0';

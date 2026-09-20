@@ -7,7 +7,7 @@ import { ProfessionalWorkPage } from '@/features/portfolio/pages/ProfessionalWor
 import { AppShell } from '@/layouts/AppShell';
 import { WorkspaceLayout } from '@/layouts/WorkspaceLayout';
 import { NotFoundPage } from '@/pages/NotFoundPage';
-import { ArticleDetailsPageRoute, ArticlesPageRoute } from './workspaceRouteComponents';
+import { ArticleDetailsPageRoute, ArticlesPageRoute, JournalEntryPageRoute, JournalPageRoute } from './workspaceRouteComponents';
 
 export const router = createBrowserRouter([
   {
@@ -31,7 +31,12 @@ export const router = createBrowserRouter([
       { path: '/articles/:articleId', element: <ArticleDetailsPageRoute /> },
       {
         element: <RequireAuth fallback={<ArticleDetailsPageSkeleton />} />,
-        children: [{ path: '/articles/new', element: <ArticleDetailsPageRoute /> }]
+        children: [
+          { path: '/articles/new', element: <ArticleDetailsPageRoute /> },
+          { path: '/journal', element: <JournalPageRoute /> },
+          { path: '/journal/new', element: <JournalEntryPageRoute /> },
+          { path: '/journal/:entryId', element: <JournalEntryPageRoute /> }
+        ]
       }
     ]
   },
