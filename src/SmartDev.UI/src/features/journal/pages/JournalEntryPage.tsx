@@ -9,7 +9,7 @@ import { JournalEntryMetadataPane } from '../components/JournalEntryMetadataPane
 import { JournalEntryPageSkeleton } from '../components/JournalEntryPageSkeleton';
 import { useJournalEntryForm, type JournalEntryFormController } from '../hooks/useJournalEntryForm';
 import { useCreateJournalEntryMutation, useUpdateJournalEntryMutation } from '../queries/journal.mutations';
-import { useOwnerJournalEntryFormQuery } from '../queries/journal.queries';
+import { useJournalEntryFormQuery } from '../queries/journal.queries';
 import { defaultJournalEntryFormValues } from '../types/journalEntryForm.schema';
 
 export const JournalEntryPage = () => {
@@ -20,7 +20,7 @@ export const JournalEntryPage = () => {
   const isNewEntry = Boolean(newEntryMatch);
   const [savedMessage, setSavedMessage] = useState('');
 
-  const entryQuery = useOwnerJournalEntryFormQuery(entryId, isAuthReady && !isNewEntry && entryId.trim().length > 0);
+  const entryQuery = useJournalEntryFormQuery(entryId, isAuthReady && !isNewEntry && entryId.trim().length > 0);
   const createEntryMutation = useCreateJournalEntryMutation();
   const updateEntryMutation = useUpdateJournalEntryMutation(entryId);
   const activeMutation = isNewEntry ? createEntryMutation : updateEntryMutation;

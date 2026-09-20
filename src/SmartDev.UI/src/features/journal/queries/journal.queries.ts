@@ -6,20 +6,20 @@ import { journalService } from '../services/journal.services';
 export const journalKeys = {
   all: ['journal'] as const,
   lists: () => [...journalKeys.all, 'list'] as const,
-  ownerList: (query: BaseQuery) => [...journalKeys.lists(), 'owner', query] as const,
+  list: (query: BaseQuery) => [...journalKeys.lists(), 'private', query] as const,
   details: () => [...journalKeys.all, 'detail'] as const,
-  ownerDetail: (entryId: string) => [...journalKeys.details(), 'owner', entryId] as const,
-  ownerEntry: (entryId: string) => [...journalKeys.details(), 'owner-entry', entryId] as const
+  detail: (entryId: string) => [...journalKeys.details(), 'private', entryId] as const,
+  entry: (entryId: string) => [...journalKeys.details(), 'entry', entryId] as const
 };
 
-export const useOwnerJournalEntriesQuery = (query: BaseQuery = {}, enabled = true) => {
+export const useJournalEntriesQuery = (query: BaseQuery = {}, enabled = true) => {
   const initialQuery = {
     pageSize: 30,
     ...query
   };
 
   return useInfiniteQuery({
-    queryKey: journalKeys.ownerList(initialQuery),
+    queryKey: journalKeys.list(initialQuery),
     queryFn: async ({ pageParam }) => {
       const page = await journalService.getEntries({
         ...initialQuery,
@@ -37,16 +37,16 @@ export const useOwnerJournalEntriesQuery = (query: BaseQuery = {}, enabled = tru
   });
 };
 
-export const useOwnerJournalEntryQuery = (entryId: string, enabled = true) =>
+export const useJournalEntryQuery = (entryId: string, enabled = true) =>
   useQuery({
-    queryKey: journalKeys.ownerDetail(entryId),
+    queryKey: journalKeys.detail(entryId),
     queryFn: async () => mapJournalDetailResponseToModel(await journalService.getEntryById(entryId)),
     enabled: enabled && entryId.trim().length > 0
   });
 
-export const useOwnerJournalEntryFormQuery = (entryId: string, enabled = true) =>
+export const useJournalEntryFormQuery = (entryId: string, enabled = true) =>
   useQuery({
-    queryKey: journalKeys.ownerEntry(entryId),
+    queryKey: journalKeys.entry(entryId),
     queryFn: async () => mapJournalDetailResponseToEntryFormModel(await journalService.getEntryById(entryId)),
     enabled: enabled && entryId.trim().length > 0
   });

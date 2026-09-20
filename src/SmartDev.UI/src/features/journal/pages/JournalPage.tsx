@@ -5,7 +5,7 @@ import { useAuth } from '@/features/auth';
 import { JournalMainContent } from '../components/JournalMainContent';
 import { JournalPageSkeleton } from '../components/JournalPageSkeleton';
 import { useJournalQueryParams } from '../hooks/useJournalQueryParams';
-import { useOwnerJournalEntriesQuery } from '../queries/journal.queries';
+import { useJournalEntriesQuery } from '../queries/journal.queries';
 import { useJournalUiStore } from '../stores/journalUi.store';
 import { allJournalCompanies } from '../utils/journalContent';
 
@@ -26,7 +26,7 @@ export const JournalPage = () => {
   const setOccurredTo = useJournalUiStore((state) => state.setOccurredTo);
   const setOccurredDateSortDirection = useJournalUiStore((state) => state.setOccurredDateSortDirection);
   const queryParams = useJournalQueryParams();
-  const entriesQuery = useOwnerJournalEntriesQuery(queryParams, isAuthReady);
+  const entriesQuery = useJournalEntriesQuery(queryParams, isAuthReady);
   const entries = useMemo(() => entriesQuery.data?.pages.flatMap((page) => page.items) ?? [], [entriesQuery.data]);
   const companyOptions = useMemo(() => {
     const loadedCompanies = entries.map((entry) => entry.company?.name).filter((company): company is string => Boolean(company));
