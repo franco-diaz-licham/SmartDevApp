@@ -13,7 +13,7 @@ public sealed class AzureSpeechOptions
     public string Region { get; init; } = string.Empty;
 
     [Required]
-    public string VoiceName { get; init; } = "en-AU-NatashaNeural";
+    public string VoiceName { get; init; } = "en-AU-WilliamMultilingualNeural";
 }
 
 
