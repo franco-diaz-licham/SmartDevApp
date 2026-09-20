@@ -73,7 +73,7 @@ public static class WorkerAppServices
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddSingleton<IArticleSpeechService, AzureArticleSpeechService>();
+        services.AddSingleton<IArticleSpeechService, AzureSpeechService>();
 
         return services;
     }
@@ -106,7 +106,7 @@ public static class WorkerAppServices
             return client.GetBlobContainerClient(containerName);
         });
 
-        services.AddSingleton<IAudioStorage, BlobStorage>();
+        services.AddSingleton<IFileStorage, BlobStorage>();
 
         return services;
     }

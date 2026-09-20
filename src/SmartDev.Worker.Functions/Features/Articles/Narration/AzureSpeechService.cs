@@ -4,7 +4,7 @@ using SmartDev.Worker.Functions.Common.Application;
 
 namespace SmartDev.Worker.Functions.Features.Articles.Narration;
 
-public sealed class AzureArticleSpeechService(IOptions<AzureSpeechOptions> options) : IArticleSpeechService
+public sealed class AzureSpeechService(IOptions<AzureSpeechOptions> options) : IArticleSpeechService
 {
     private const string ContentType = "audio/mpeg";
 

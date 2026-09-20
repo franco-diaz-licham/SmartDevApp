@@ -1,7 +1,6 @@
 using System.Net;
 using System.Text.RegularExpressions;
 using Markdig;
-using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 
@@ -38,7 +37,6 @@ public sealed partial class MarkdownTextConverter : IMarkdownTextConverter
     {
         return block switch {
             CodeBlock codeBlock => codeBlock.Lines.ToString().ReplaceLineEndings(ParagraphSeparator),
-            Table => "Table omitted.",
             HtmlBlock htmlBlock => ExtractEmbeddedHtmlText(htmlBlock.Lines.ToString()),
             ContainerBlock containerBlock => ExtractReadableText(containerBlock),
             LeafBlock { Inline: not null } leafBlock => ExtractInlineText(leafBlock.Inline),

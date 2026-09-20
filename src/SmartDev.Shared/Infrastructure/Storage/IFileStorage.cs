@@ -1,6 +1,6 @@
 namespace SmartDev.Shared.Infrastructure.Storage;
 
-public interface IAudioStorage
+public interface IFileStorage
 {
     Task UploadAsync(
         Guid contentId,

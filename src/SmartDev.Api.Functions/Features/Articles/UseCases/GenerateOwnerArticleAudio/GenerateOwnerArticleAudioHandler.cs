@@ -10,7 +10,7 @@ namespace SmartDev.Api.Functions.Features.Articles.UseCases.GenerateOwnerArticle
 
 public sealed class GenerateOwnerArticleAudioHandler(
     IArticleRepository articleRepository,
-    IAudioStorage articleAudioStorage,
+    IFileStorage articleAudioStorage,
     IIntegrationEventPublisher integrationEventPublisher)
 {
     public async Task<Result<ArticleAudioGenerationRequest>> HandleAsync(Guid articleId, CancellationToken cancellationToken)

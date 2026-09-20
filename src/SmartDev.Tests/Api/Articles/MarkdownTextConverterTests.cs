@@ -95,7 +95,17 @@ public sealed class MarkdownTextConverterTests
         text.ReplaceLineEndings("\n").ShouldBe("""
             Deployment options
 
-            Table omitted.
+            Option
+
+            Result
+
+            API
+
+            Streams audio
+
+            SAS
+
+            Blob serves audio
 
             Prefer SAS URLs & short expiries.
             """.ReplaceLineEndings("\n"));
@@ -173,7 +183,7 @@ public sealed class MarkdownTextConverterTests
     }
 
     [Test]
-    public void Convert_TableWithoutOuterPipes_OmitsTableAsOneBlock()
+    public void Convert_TableWithoutOuterPipes_ReadsHeadersAndCells()
     {
         // Arrange
         const string markdown = "Name | Value\n--- | ---\nOne | Two";
@@ -182,7 +192,7 @@ public sealed class MarkdownTextConverterTests
         var text = new MarkdownTextConverter().Convert(markdown);
 
         // Assert
-        text.ShouldBe("Table omitted.");
+        text.ShouldBe("Name\n\nValue\n\nOne\n\nTwo");
     }
 
     [Test]
@@ -262,6 +272,25 @@ public sealed class MarkdownTextConverterTests
 
         // Assert
         text.ShouldBe("# Example\n\n```\n\ntext\n\n```");
+    }
+
+
+    [Test]
+    public void Convert_TableWithFormattedCells_ReadsHeadersAndValuesInOrder()
+    {
+        // Arrange
+        const string markdown = """
+            | **Name** | Value |
+            | :--- | ---: |
+            | [Limit](/limits) | `count < 2` |
+            | Status | Ready &amp; waiting |
+            """;
+
+        // Act
+        var text = new MarkdownTextConverter().Convert(markdown);
+
+        // Assert
+        text.ShouldBe("Name\n\nValue\n\nLimit\n\ncount < 2\n\nStatus\n\nReady & waiting");
     }
 
 

@@ -46,6 +46,25 @@ public sealed class SpeechSsmlBuilderTests
     }
 
     [Test]
+    public void Build_MarkdownTable_ReadsHeadersAndRowsWithCellPauses()
+    {
+        // Arrange
+        const string markdown = "| Name | Value |\n| --- | --- |\n| Limit | 10 |\n| Count | 2 |";
+        var text = new MarkdownTextConverter().Convert(markdown);
+        var chunk = SpeechTextChunker.Split(text).Single();
+
+        // Act
+        var document = XElement.Parse(SpeechSsmlBuilder.Build(chunk, "en-AU-NatashaNeural"));
+
+        // Assert
+        var voice = document.Element(Synthesis + "voice")!;
+        voice.Nodes().OfType<XText>().Select(node => node.Value)
+            .ShouldBe(["Name", "Value", "Limit", "10", "Count", "2"]);
+        voice.Elements(Synthesis + "break").Count().ShouldBe(6);
+    }
+
+
+    [Test]
     public void Build_TextContainsXmlCharacters_EscapesContentInsteadOfInjectingMarkup()
     {
         // Arrange

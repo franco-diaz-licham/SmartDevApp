@@ -131,7 +131,7 @@ public static class ApiAppServices
 
             return client.GetBlobContainerClient(containerName);
         });
-        services.AddSingleton<IAudioStorage, BlobStorage>();
+        services.AddSingleton<IFileStorage, BlobStorage>();
 
         return services;
     }

@@ -86,7 +86,7 @@ public sealed class GenerateArticleNarrationHandlerTests
         }
     }
 
-    private sealed class RecordingAudioStorage : IAudioStorage
+    private sealed class RecordingAudioStorage : IFileStorage
     {
         public Guid ContentId { get; private set; }
         public string? ContentVersion { get; private set; }

@@ -9,7 +9,7 @@ namespace SmartDev.Worker.Functions.Features.Articles.Narration;
 public sealed class GenerateArticleNarrationHandler(
     IMarkdownTextConverter narrationTextConverter,
     IArticleSpeechService articleSpeechService,
-    IAudioStorage articleAudioStorage,
+    IFileStorage articleAudioStorage,
     ILogger<GenerateArticleNarrationHandler> logger)
 {
     public async Task HandleAsync(ArticleNarrationRequestedIntegrationEvent message, CancellationToken cancellationToken)

@@ -7,7 +7,7 @@ using SmartDev.Shared.Infrastructure.Storage;
 
 namespace SmartDev.Api.Functions.Features.Articles.UseCases.GetPublicArticleAudioById;
 
-public sealed class GetPublicArticleAudioByIdHandler(IArticleRepository articleRepository, IAudioStorage articleAudioStorage)
+public sealed class GetPublicArticleAudioByIdHandler(IArticleRepository articleRepository, IFileStorage articleAudioStorage)
 {
     public async Task<Result<ArticleAudioPlayback>> HandleAsync(Guid articleId, CancellationToken cancellationToken)
     {

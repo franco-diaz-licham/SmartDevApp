@@ -5,7 +5,7 @@ using SmartDev.Shared.Options;
 
 namespace SmartDev.Shared.Infrastructure.Storage;
 
-public sealed class BlobStorage(BlobContainerClient containerClient, ArticleAudioStorageOptions options) : IAudioStorage
+public sealed class BlobStorage(BlobContainerClient containerClient, ArticleAudioStorageOptions options) : IFileStorage
 {
     public const string DefaultContainerName = "article-audio";
     public const string DefaultBlobPrefix = "articles";
