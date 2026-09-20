@@ -7,7 +7,7 @@ internal static class CosmosJournalQueries
 {
     private const string DefaultOrderBy = "c.occurredOn DESC, c.createdAt DESC";
 
-    public static QueryDefinition AllForOwner(BaseQuery query)
+    public static QueryDefinition All(BaseQuery query)
     {
         var conditions = new List<string> { "c.type = @type" };
 

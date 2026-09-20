@@ -1,9 +1,9 @@
 using SmartDev.Api.Functions.Features.Articles.Domain;
 using SmartDev.Api.Functions.Features.Journal.Domain;
 
-namespace SmartDev.Api.Functions.Features.Journal.UseCases.UpdateOwnerJournalEntry;
+namespace SmartDev.Api.Functions.Features.Journal.UseCases.UpdateJournalEntry;
 
-public sealed record UpdateOwnerJournalEntryCommand(
+public sealed record UpdateJournalEntryCommand(
     Guid EntryId,
     string Title,
     string BodyMarkdown,

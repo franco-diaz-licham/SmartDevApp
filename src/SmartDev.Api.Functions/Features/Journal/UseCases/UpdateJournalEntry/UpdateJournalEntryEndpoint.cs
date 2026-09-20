@@ -5,17 +5,17 @@ using SmartDev.Api.Functions.Common.Application;
 using SmartDev.Api.Functions.Common.Functions;
 using SmartDev.Api.Functions.Features.Journal.UseCases.Shared;
 
-namespace SmartDev.Api.Functions.Features.Journal.UseCases.UpdateOwnerJournalEntry;
+namespace SmartDev.Api.Functions.Features.Journal.UseCases.UpdateJournalEntry;
 
-public sealed class UpdateOwnerJournalEntryEndpoint(UpdateOwnerJournalEntryHandler handler)
+public sealed class UpdateJournalEntryEndpoint(UpdateJournalEntryHandler handler)
 {
-    [Function(nameof(UpdateOwnerJournalEntry))]
-    public async Task<HttpResponseData> UpdateOwnerJournalEntry([HttpTrigger(AuthorizationLevel.Anonymous, "put", "options", Route = "owner/journal/{entryId:guid}")] HttpRequestData request, string entryId, CancellationToken cancellationToken)
+    [Function(nameof(UpdateJournalEntry))]
+    public async Task<HttpResponseData> UpdateJournalEntry([HttpTrigger(AuthorizationLevel.Anonymous, "put", "options", Route = "journal/{entryId:guid}")] HttpRequestData request, string entryId, CancellationToken cancellationToken)
     {
         if (string.Equals(request.Method, "OPTIONS", StringComparison.OrdinalIgnoreCase)) return request.CreateResponse(HttpStatusCode.NoContent);
         if (!Guid.TryParse(entryId, out var parsedEntryId)) return await Result.Fail("Journal entry id must be a valid GUID.").ToHttpResponseAsync(request, cancellationToken);
 
-        var body = await request.ReadFromJsonAsync<UpdateOwnerJournalEntryRequest>(cancellationToken);
+        var body = await request.ReadFromJsonAsync<UpdateJournalEntryRequest>(cancellationToken);
         if (body is null) return await Result<JournalSaveResult>.Fail("Request body is required.").ToHttpResponseAsync(request, cancellationToken);
 
         var command = body.ToCommandResult(parsedEntryId);

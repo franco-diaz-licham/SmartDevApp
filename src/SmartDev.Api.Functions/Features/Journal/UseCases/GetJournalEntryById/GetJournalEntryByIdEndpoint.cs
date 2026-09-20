@@ -3,12 +3,12 @@ using Microsoft.Azure.Functions.Worker.Http;
 using SmartDev.Api.Functions.Common.Application;
 using SmartDev.Api.Functions.Common.Functions;
 
-namespace SmartDev.Api.Functions.Features.Journal.UseCases.GetOwnerJournalEntryById;
+namespace SmartDev.Api.Functions.Features.Journal.UseCases.GetJournalEntryById;
 
-public sealed class GetOwnerJournalEntryByIdEndpoint(GetOwnerJournalEntryByIdHandler handler)
+public sealed class GetJournalEntryByIdEndpoint(GetJournalEntryByIdHandler handler)
 {
-    [Function(nameof(GetOwnerJournalEntryById))]
-    public async Task<HttpResponseData> GetOwnerJournalEntryById([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "owner/journal/{entryId:guid}")] HttpRequestData request, string entryId, CancellationToken cancellationToken)
+    [Function(nameof(GetJournalEntryById))]
+    public async Task<HttpResponseData> GetJournalEntryById([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "journal/{entryId:guid}")] HttpRequestData request, string entryId, CancellationToken cancellationToken)
     {
         if (!Guid.TryParse(entryId, out var parsedEntryId)) return await Result.Fail("Journal entry id must be a valid GUID.").ToHttpResponseAsync(request, cancellationToken);
 

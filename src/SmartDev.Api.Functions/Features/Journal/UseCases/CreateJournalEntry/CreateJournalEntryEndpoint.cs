@@ -5,16 +5,16 @@ using SmartDev.Api.Functions.Common.Application;
 using SmartDev.Api.Functions.Common.Functions;
 using SmartDev.Api.Functions.Features.Journal.UseCases.Shared;
 
-namespace SmartDev.Api.Functions.Features.Journal.UseCases.CreateOwnerJournalEntry;
+namespace SmartDev.Api.Functions.Features.Journal.UseCases.CreateJournalEntry;
 
-public sealed class CreateOwnerJournalEntryEndpoint(CreateOwnerJournalEntryHandler handler)
+public sealed class CreateJournalEntryEndpoint(CreateJournalEntryHandler handler)
 {
-    [Function(nameof(CreateOwnerJournalEntry))]
-    public async Task<HttpResponseData> CreateOwnerJournalEntry([HttpTrigger(AuthorizationLevel.Anonymous, "post", "options", Route = "owner/journal")] HttpRequestData request, CancellationToken cancellationToken)
+    [Function(nameof(CreateJournalEntry))]
+    public async Task<HttpResponseData> CreateJournalEntry([HttpTrigger(AuthorizationLevel.Anonymous, "post", "options", Route = "journal")] HttpRequestData request, CancellationToken cancellationToken)
     {
         if (string.Equals(request.Method, "OPTIONS", StringComparison.OrdinalIgnoreCase)) return request.CreateResponse(HttpStatusCode.NoContent);
 
-        var body = await request.ReadFromJsonAsync<CreateOwnerJournalEntryRequest>(cancellationToken);
+        var body = await request.ReadFromJsonAsync<CreateJournalEntryRequest>(cancellationToken);
         if (body is null) return await Result<JournalSaveResult>.Fail("Request body is required.").ToHttpResponseAsync(request, cancellationToken);
 
         var command = body.ToCommandResult();

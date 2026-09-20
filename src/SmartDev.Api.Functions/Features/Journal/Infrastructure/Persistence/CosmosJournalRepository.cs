@@ -21,7 +21,7 @@ public sealed class CosmosJournalRepository(IDocumentStore documentStore) : IJou
     {
         var documents = await documentStore.QueryPageAsync<JournalEntryDocument>(
             JournalEntryDocument.ContainerName,
-            CosmosJournalQueries.AllForOwner(query),
+            CosmosJournalQueries.All(query),
             query.PageSize,
             query.ContinuationToken,
             JournalEntryDocument.PartitionKey,

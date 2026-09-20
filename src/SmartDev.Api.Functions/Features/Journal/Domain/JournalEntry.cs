@@ -4,7 +4,7 @@ using SmartDev.Api.Functions.Features.Articles.Domain;
 namespace SmartDev.Api.Functions.Features.Journal.Domain;
 
 /// <summary>
-/// Private owner-authored development journal entry.
+/// Private development journal entry.
 /// </summary>
 public sealed class JournalEntry : Entity<JournalEntryId>
 {

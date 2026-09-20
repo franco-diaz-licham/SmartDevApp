@@ -3,9 +3,9 @@ using SmartDev.Api.Functions.Features.Journal.Contracts;
 using SmartDev.Api.Functions.Features.Journal.Domain;
 using SmartDev.Api.Functions.Features.Journal.UseCases.Shared;
 
-namespace SmartDev.Api.Functions.Features.Journal.UseCases.GetOwnerJournalEntryById;
+namespace SmartDev.Api.Functions.Features.Journal.UseCases.GetJournalEntryById;
 
-public sealed class GetOwnerJournalEntryByIdHandler(IJournalRepository journalRepository)
+public sealed class GetJournalEntryByIdHandler(IJournalRepository journalRepository)
 {
     public async Task<Result<JournalDetail>> HandleAsync(Guid entryId, CancellationToken cancellationToken)
     {

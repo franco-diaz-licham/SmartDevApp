@@ -2,9 +2,9 @@ using SmartDev.Api.Functions.Common.Application;
 using SmartDev.Api.Functions.Features.Journal.Domain;
 using SmartDev.Api.Functions.Features.Journal.UseCases.Shared;
 
-namespace SmartDev.Api.Functions.Features.Journal.UseCases.UpdateOwnerJournalEntry;
+namespace SmartDev.Api.Functions.Features.Journal.UseCases.UpdateJournalEntry;
 
-public sealed record UpdateOwnerJournalEntryRequest(
+public sealed record UpdateJournalEntryRequest(
     string Title,
     string BodyMarkdown,
     string? EntryType,
@@ -23,9 +23,9 @@ public sealed record UpdateOwnerJournalEntryRequest(
     IReadOnlyCollection<string>? NextActions,
     string? OccurredOn)
 {
-    public Result<UpdateOwnerJournalEntryCommand> ToCommandResult(Guid entryId)
+    public Result<UpdateJournalEntryCommand> ToCommandResult(Guid entryId)
     {
-        return JournalEditMapping.BindCommand(() => new UpdateOwnerJournalEntryCommand(
+        return JournalEditMapping.BindCommand(() => new UpdateJournalEntryCommand(
             entryId,
             Title,
             BodyMarkdown,

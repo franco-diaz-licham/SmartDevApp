@@ -4,11 +4,11 @@ using SmartDev.Api.Functions.Features.Journal.Contracts;
 using SmartDev.Api.Functions.Features.Journal.Domain;
 using SmartDev.Api.Functions.Features.Journal.UseCases.Shared;
 
-namespace SmartDev.Api.Functions.Features.Journal.UseCases.CreateOwnerJournalEntry;
+namespace SmartDev.Api.Functions.Features.Journal.UseCases.CreateJournalEntry;
 
-public sealed class CreateOwnerJournalEntryHandler(IJournalRepository journalRepository)
+public sealed class CreateJournalEntryHandler(IJournalRepository journalRepository)
 {
-    public async Task<Result<JournalSaveResult>> HandleAsync(CreateOwnerJournalEntryCommand command, CancellationToken cancellationToken)
+    public async Task<Result<JournalSaveResult>> HandleAsync(CreateJournalEntryCommand command, CancellationToken cancellationToken)
     {
         try {
             var entry = JournalEntry.Create(

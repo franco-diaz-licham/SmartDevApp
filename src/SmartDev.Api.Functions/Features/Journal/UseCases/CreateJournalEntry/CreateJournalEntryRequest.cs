@@ -2,9 +2,9 @@ using SmartDev.Api.Functions.Common.Application;
 using SmartDev.Api.Functions.Features.Journal.Domain;
 using SmartDev.Api.Functions.Features.Journal.UseCases.Shared;
 
-namespace SmartDev.Api.Functions.Features.Journal.UseCases.CreateOwnerJournalEntry;
+namespace SmartDev.Api.Functions.Features.Journal.UseCases.CreateJournalEntry;
 
-public sealed record CreateOwnerJournalEntryRequest(
+public sealed record CreateJournalEntryRequest(
     string Title,
     string BodyMarkdown,
     string? EntryType,
@@ -23,9 +23,9 @@ public sealed record CreateOwnerJournalEntryRequest(
     IReadOnlyCollection<string>? NextActions,
     string? OccurredOn)
 {
-    public Result<CreateOwnerJournalEntryCommand> ToCommandResult()
+    public Result<CreateJournalEntryCommand> ToCommandResult()
     {
-        return JournalEditMapping.BindCommand(() => new CreateOwnerJournalEntryCommand(
+        return JournalEditMapping.BindCommand(() => new CreateJournalEntryCommand(
             Title,
             BodyMarkdown,
             JournalEditMapping.BindEntryType(EntryType),

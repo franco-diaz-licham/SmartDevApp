@@ -16,7 +16,7 @@ public enum JournalEntryType
 }
 
 /// <summary>
-/// Tracks the owner's personal workflow state for a journal entry.
+/// Tracks the personal workflow state for a journal entry.
 /// </summary>
 public enum JournalEntryStatus
 {

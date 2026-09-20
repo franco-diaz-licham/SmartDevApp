@@ -4,7 +4,7 @@ using SmartDev.Api.Functions.Features.Journal.Domain;
 namespace SmartDev.Api.Functions.Features.Journal.Contracts;
 
 /// <summary>
-/// Persists private owner journal entries.
+/// Persists private journal entries.
 /// </summary>
 public interface IJournalRepository
 {

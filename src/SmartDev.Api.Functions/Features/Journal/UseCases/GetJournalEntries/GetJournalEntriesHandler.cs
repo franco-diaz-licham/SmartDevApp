@@ -2,9 +2,9 @@ using SmartDev.Api.Functions.Common.Application;
 using SmartDev.Api.Functions.Features.Journal.Contracts;
 using SmartDev.Api.Functions.Features.Journal.UseCases.Shared;
 
-namespace SmartDev.Api.Functions.Features.Journal.UseCases.GetOwnerJournalEntries;
+namespace SmartDev.Api.Functions.Features.Journal.UseCases.GetJournalEntries;
 
-public sealed class GetOwnerJournalEntriesHandler(IJournalRepository journalRepository)
+public sealed class GetJournalEntriesHandler(IJournalRepository journalRepository)
 {
     public async Task<Result<Page<JournalListItem>>> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {

@@ -1,9 +1,9 @@
 using SmartDev.Api.Functions.Features.Articles.Domain;
 using SmartDev.Api.Functions.Features.Journal.Domain;
 
-namespace SmartDev.Api.Functions.Features.Journal.UseCases.CreateOwnerJournalEntry;
+namespace SmartDev.Api.Functions.Features.Journal.UseCases.CreateJournalEntry;
 
-public sealed record CreateOwnerJournalEntryCommand(
+public sealed record CreateJournalEntryCommand(
     string Title,
     string BodyMarkdown,
     JournalEntryType EntryType,
