@@ -26,6 +26,12 @@ using SmartDev.Api.Functions.Features.Articles.Infrastructure.Persistence;
 using SmartDev.Api.Functions.Features.Contact.UseCases;
 using SmartDev.Api.Functions.Features.Contact.Contracts;
 using SmartDev.Api.Functions.Features.Contact.Infrastructure.Persistence;
+using SmartDev.Api.Functions.Features.Journal.Contracts;
+using SmartDev.Api.Functions.Features.Journal.Infrastructure.Persistence;
+using SmartDev.Api.Functions.Features.Journal.UseCases.CreateOwnerJournalEntry;
+using SmartDev.Api.Functions.Features.Journal.UseCases.GetOwnerJournalEntries;
+using SmartDev.Api.Functions.Features.Journal.UseCases.GetOwnerJournalEntryById;
+using SmartDev.Api.Functions.Features.Journal.UseCases.UpdateOwnerJournalEntry;
 using SmartDev.Api.Functions.Common.Application;
 using SmartDev.Api.Functions.Configuration.Options;
 using SmartDev.Shared.Messaging;
@@ -88,10 +94,13 @@ public static class ApiAppServices
         services.AddScoped<CreateContactEmailHandler>();
         services.AddScoped<UpdateContactEmailStatusHandler>();
         services.AddScoped<CreateOwnerArticleHandler>();
+        services.AddScoped<CreateOwnerJournalEntryHandler>();
         services.AddScoped<GenerateOwnerArticleAudioHandler>();
         services.AddScoped<GetOwnerArticleByIdHandler>();
         services.AddScoped<GetOwnerArticlesHandler>();
         services.AddScoped<GetOwnerArticleCategoriesHandler>();
+        services.AddScoped<GetOwnerJournalEntriesHandler>();
+        services.AddScoped<GetOwnerJournalEntryByIdHandler>();
         services.AddScoped<GetPublicArticleAudioByIdHandler>();
         services.AddScoped<GetPublicArticleByIdHandler>();
         services.AddScoped<GetPublicArticleCategoriesHandler>();
@@ -100,6 +109,7 @@ public static class ApiAppServices
         services.AddScoped<GetPublicArticleTagsHandler>();
         services.AddScoped<SearchPublicArticlesHandler>();
         services.AddScoped<UpdateOwnerArticleHandler>();
+        services.AddScoped<UpdateOwnerJournalEntryHandler>();
 
         return services;
     }
@@ -171,6 +181,7 @@ public static class ApiAppServices
         services.AddHostedService<DocumentContainerInitializer>();
         services.AddScoped<IContactMessageStore, CosmosContactMessageStore>();
         services.AddScoped<IArticleRepository, CosmosArticleRepository>();
+        services.AddScoped<IJournalRepository, CosmosJournalRepository>();
 
         return services;
     }

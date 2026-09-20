@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SmartDev.Api.Functions.Common.Application;
 using SmartDev.Api.Functions.Features.Articles.Infrastructure.Persistence;
 using SmartDev.Api.Functions.Features.Contact.Infrastructure.Persistence;
+using SmartDev.Api.Functions.Features.Journal.Infrastructure.Persistence;
 
 namespace SmartDev.Api.Functions.Common.Infrastructure.Persistence;
 
@@ -20,6 +21,12 @@ public sealed class DocumentContainerInitializer(IDocumentStore documentStore, I
         await documentStore.EnsureContainerAsync(
             ArticleDocument.ContainerName,
             ArticleDocument.PartitionKeyPath,
+            timeToLive: DocumentContainerTimeToLive.Disabled,
+            cancellationToken: stoppingToken);
+
+        await documentStore.EnsureContainerAsync(
+            JournalEntryDocument.ContainerName,
+            JournalEntryDocument.PartitionKeyPath,
             timeToLive: DocumentContainerTimeToLive.Disabled,
             cancellationToken: stoppingToken);
 
