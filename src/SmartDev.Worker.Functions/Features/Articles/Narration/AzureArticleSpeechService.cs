@@ -22,7 +22,7 @@ public sealed class AzureArticleSpeechService(IOptions<AzureSpeechOptions> optio
         return new ArticleSpeechAudio(BinaryData.FromBytes(audio.ToArray()), ContentType);
     }
 
-    private async Task<byte[]> SynthesizeChunkAsync(string text, CancellationToken cancellationToken)
+    private async Task<byte[]> SynthesizeChunkAsync(SpeechTextChunk chunk, CancellationToken cancellationToken)
     {
         var speechOptions = options.Value;
         var config = SpeechConfig.FromSubscription(speechOptions.SubscriptionKey, speechOptions.Region);
@@ -30,7 +30,7 @@ public sealed class AzureArticleSpeechService(IOptions<AzureSpeechOptions> optio
         config.SetSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Audio24Khz48KBitRateMonoMp3);
 
         using var synthesizer = new SpeechSynthesizer(config, audioConfig: null);
-        using var result = await synthesizer.SpeakTextAsync(text).WaitAsync(cancellationToken);
+        using var result = await synthesizer.SpeakSsmlAsync(SpeechSsmlBuilder.Build(chunk, speechOptions.VoiceName)).WaitAsync(cancellationToken);
 
         if (result.Reason != ResultReason.SynthesizingAudioCompleted) {
             var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
