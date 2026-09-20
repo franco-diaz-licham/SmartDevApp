@@ -3,7 +3,6 @@ using SmartDev.Shared.Articles;
 using SmartDev.Shared.Infrastructure.Storage;
 using SmartDev.Shared.Infrastructure.Text;
 using SmartDev.Shared.Messaging;
-using SmartDev.Worker.Functions.Common.Application;
 
 namespace SmartDev.Worker.Functions.Features.Articles.Narration;
 
