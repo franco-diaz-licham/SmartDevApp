@@ -20,46 +20,32 @@ const statusOptions = [{ label: allJournalStatuses, value: allJournalStatuses },
 
 interface JournalMainContentProps {
   entries: JournalListItemModel[];
-  companyOptions: { label: string; value: string }[];
   searchTerm: string;
-  selectedCompany: string;
   selectedEntryType: JournalEntryTypeModel | typeof allJournalTypes;
   selectedStatus: JournalEntryStatusModel | typeof allJournalStatuses;
-  occurredFrom: string;
-  occurredTo: string;
   occurredDateSortDirection: JournalSortDirection;
   isEntriesLoading: boolean;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onSearchTermChange: (searchTerm: string) => void;
-  onCompanyChange: (company: string) => void;
   onEntryTypeChange: (entryType: JournalEntryTypeModel | typeof allJournalTypes) => void;
   onStatusChange: (status: JournalEntryStatusModel | typeof allJournalStatuses) => void;
-  onOccurredFromChange: (occurredFrom: string) => void;
-  onOccurredToChange: (occurredTo: string) => void;
   onOccurredDateSortDirectionChange: (sortDirection: JournalSortDirection) => void;
   onLoadMore: () => void;
 }
 
 export const JournalMainContent = ({
   entries,
-  companyOptions,
   searchTerm,
-  selectedCompany,
   selectedEntryType,
   selectedStatus,
-  occurredFrom,
-  occurredTo,
   occurredDateSortDirection,
   isEntriesLoading,
   hasNextPage,
   isFetchingNextPage,
   onSearchTermChange,
-  onCompanyChange,
   onEntryTypeChange,
   onStatusChange,
-  onOccurredFromChange,
-  onOccurredToChange,
   onOccurredDateSortDirectionChange,
   onLoadMore
 }: JournalMainContentProps) => {
@@ -79,7 +65,6 @@ export const JournalMainContent = ({
             className="w-full lg:flex-1"
             onChange={(event: ChangeEvent<HTMLInputElement>) => onSearchTermChange(event.target.value)}
           />
-          <AppSelect id="journal-company-filter" label="Company" name="journalCompany" value={selectedCompany} options={companyOptions} className="w-full lg:w-48" onChange={(event: ChangeEvent<HTMLSelectElement>) => onCompanyChange(event.target.value)} />
           <AppSelect
             id="journal-type-filter"
             label="Type"
@@ -98,8 +83,6 @@ export const JournalMainContent = ({
             className="w-full lg:w-44"
             onChange={(event: ChangeEvent<HTMLSelectElement>) => onStatusChange(event.target.value as JournalEntryStatusModel | typeof allJournalStatuses)}
           />
-          <AppInputText id="journal-from-filter" label="From" name="journalFrom" type="date" value={occurredFrom} className="w-full lg:w-40" onChange={(event: ChangeEvent<HTMLInputElement>) => onOccurredFromChange(event.target.value)} />
-          <AppInputText id="journal-to-filter" label="To" name="journalTo" type="date" value={occurredTo} className="w-full lg:w-40" onChange={(event: ChangeEvent<HTMLInputElement>) => onOccurredToChange(event.target.value)} />
           <AppSelect
             id="journal-date-sort"
             label="Sort"

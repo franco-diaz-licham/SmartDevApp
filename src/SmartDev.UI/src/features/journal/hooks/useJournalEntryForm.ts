@@ -5,12 +5,17 @@ import type { Path, PathValue } from 'react-hook-form';
 import type { JournalEntryFormModel } from '../types/journal.types';
 import { defaultJournalEntryFormValues, journalEntryFormSchema, type JournalEntryFormErrors } from '../types/journalEntryForm.schema';
 
+export type EditableJournalEntryField = 'title' | 'summary' | 'bodyMarkdown' | 'tags' | 'companyName' | 'companyRoleTitle' | 'collaborators';
+
 export interface JournalEntryFormController {
   values: JournalEntryFormModel;
   errors: JournalEntryFormErrors;
+  editingField?: EditableJournalEntryField;
   isDirty: boolean;
   isSaving: boolean;
   savedMessage?: string;
+  blurField: () => void;
+  editField: (field: EditableJournalEntryField) => void;
   updateField: <TField extends keyof JournalEntryFormModel>(field: TField, value: JournalEntryFormModel[TField]) => void;
 }
 

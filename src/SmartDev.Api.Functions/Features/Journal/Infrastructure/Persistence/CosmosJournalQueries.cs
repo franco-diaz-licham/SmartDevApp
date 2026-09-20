@@ -46,9 +46,6 @@ internal static class CosmosJournalQueries
             conditions.Add("EXISTS(SELECT VALUE tag FROM tag IN c.tags WHERE LOWER(tag.displayName) = @tag OR LOWER(tag.slug) = @tag)");
         }
 
-        var companyFilter = FindEqualsFilter(query, "company");
-        if (companyFilter is not null) conditions.Add("LOWER(c.company.name) = @company");
-
         var workplaceContextFilter = FindEqualsFilter(query, "workplaceContext");
         if (workplaceContextFilter is not null) conditions.Add("LOWER(c.workplaceContext) = @workplaceContext");
 
@@ -57,12 +54,6 @@ internal static class CosmosJournalQueries
 
         var confidenceFilter = FindEqualsFilter(query, "confidence");
         if (confidenceFilter is not null) conditions.Add("c.confidence = @confidence");
-
-        var occurredFromFilter = FindDateFilter(query, "occurredOn", FilterOperator.GreaterThanOrEqual) ?? FindDateFilter(query, "occurredFrom", FilterOperator.GreaterThanOrEqual);
-        if (occurredFromFilter is not null) conditions.Add("c.occurredOn >= @occurredFrom");
-
-        var occurredToFilter = FindDateFilter(query, "occurredOn", FilterOperator.LessThanOrEqual) ?? FindDateFilter(query, "occurredTo", FilterOperator.LessThanOrEqual);
-        if (occurredToFilter is not null) conditions.Add("c.occurredOn <= @occurredTo");
 
         var queryDefinition = new QueryDefinition($"""
             SELECT * FROM c
@@ -75,12 +66,9 @@ internal static class CosmosJournalQueries
         if (entryTypeFilter is not null) queryDefinition = queryDefinition.WithParameter("@entryType", entryTypeFilter.Value.Trim());
         if (statusFilter is not null) queryDefinition = queryDefinition.WithParameter("@status", statusFilter.Value.Trim());
         if (tagFilter is not null) queryDefinition = queryDefinition.WithParameter("@tag", tagFilter.Value.Trim().ToLowerInvariant());
-        if (companyFilter is not null) queryDefinition = queryDefinition.WithParameter("@company", companyFilter.Value.Trim().ToLowerInvariant());
         if (workplaceContextFilter is not null) queryDefinition = queryDefinition.WithParameter("@workplaceContext", workplaceContextFilter.Value.Trim().ToLowerInvariant());
         if (outcomeFilter is not null) queryDefinition = queryDefinition.WithParameter("@outcome", outcomeFilter.Value.Trim().ToLowerInvariant());
         if (confidenceFilter is not null) queryDefinition = queryDefinition.WithParameter("@confidence", confidenceFilter.Value.Trim());
-        if (occurredFromFilter is not null) queryDefinition = queryDefinition.WithParameter("@occurredFrom", occurredFromFilter.Value.Trim());
-        if (occurredToFilter is not null) queryDefinition = queryDefinition.WithParameter("@occurredTo", occurredToFilter.Value.Trim());
 
         return queryDefinition;
     }
@@ -90,14 +78,6 @@ internal static class CosmosJournalQueries
         return query.Filters.FirstOrDefault(filter =>
             string.Equals(filter.Field, field, StringComparison.OrdinalIgnoreCase)
             && filter.Operator == FilterOperator.Equals
-            && !string.IsNullOrWhiteSpace(filter.Value));
-    }
-
-    private static QueryFilter? FindDateFilter(BaseQuery query, string field, FilterOperator filterOperator)
-    {
-        return query.Filters.FirstOrDefault(filter =>
-            string.Equals(filter.Field, field, StringComparison.OrdinalIgnoreCase)
-            && filter.Operator == filterOperator
             && !string.IsNullOrWhiteSpace(filter.Value));
     }
 

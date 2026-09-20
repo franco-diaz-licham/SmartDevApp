@@ -1,6 +1,5 @@
 import type { JournalConfidenceModel, JournalEntryStatusModel, JournalEntryTypeModel } from '../types/journal.types';
 
-export const allJournalCompanies = 'All companies';
 export const allJournalTypes = 'All types';
 export const allJournalStatuses = 'All statuses';
 

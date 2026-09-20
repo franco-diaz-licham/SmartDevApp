@@ -2,15 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import type { BaseQuery, QueryFilter } from '@/lib/api/api.types';
 import type { JournalUiState } from '../stores/journalUi.store';
 import { useJournalUiStore } from '../stores/journalUi.store';
-import { allJournalCompanies, allJournalStatuses, allJournalTypes } from '../utils/journalContent';
+import { allJournalStatuses, allJournalTypes } from '../utils/journalContent';
 
-type JournalQuerySource = Pick<JournalUiState, 'occurredDateSortDirection' | 'occurredFrom' | 'occurredTo' | 'searchTerm' | 'selectedCompany' | 'selectedEntryType' | 'selectedStatus'>;
+type JournalQuerySource = Pick<JournalUiState, 'occurredDateSortDirection' | 'searchTerm' | 'selectedEntryType' | 'selectedStatus'>;
 
-type JournalFilterField = 'company' | 'entryType' | 'occurredOn' | 'status';
+type JournalFilterField = 'entryType' | 'status';
 
 type JournalFilter = QueryFilter & {
   field: JournalFilterField;
-  operator: Extract<QueryFilter['operator'], 'equals' | 'greaterThanOrEqual' | 'lessThanOrEqual'>;
+  operator: Extract<QueryFilter['operator'], 'equals'>;
   value: string;
 };
 
@@ -27,12 +27,8 @@ const useDebouncedValue = <TValue>(value: TValue, delayMs: number) => {
   return debouncedValue;
 };
 
-export const selectJournalQueryParams = ({ occurredDateSortDirection, occurredFrom, occurredTo, searchTerm, selectedCompany, selectedEntryType, selectedStatus }: JournalQuerySource): BaseQuery => {
+export const selectJournalQueryParams = ({ occurredDateSortDirection, searchTerm, selectedEntryType, selectedStatus }: JournalQuerySource): BaseQuery => {
   const filters: JournalFilter[] = [];
-
-  if (selectedCompany !== allJournalCompanies) {
-    filters.push({ field: 'company', operator: 'equals', value: selectedCompany });
-  }
 
   if (selectedEntryType !== allJournalTypes) {
     filters.push({ field: 'entryType', operator: 'equals', value: selectedEntryType });
@@ -40,14 +36,6 @@ export const selectJournalQueryParams = ({ occurredDateSortDirection, occurredFr
 
   if (selectedStatus !== allJournalStatuses) {
     filters.push({ field: 'status', operator: 'equals', value: selectedStatus });
-  }
-
-  if (occurredFrom.trim()) {
-    filters.push({ field: 'occurredOn', operator: 'greaterThanOrEqual', value: occurredFrom.trim() });
-  }
-
-  if (occurredTo.trim()) {
-    filters.push({ field: 'occurredOn', operator: 'lessThanOrEqual', value: occurredTo.trim() });
   }
 
   return {
@@ -62,16 +50,13 @@ export const selectJournalQueryParams = ({ occurredDateSortDirection, occurredFr
 
 export const useJournalQueryParams = () => {
   const searchTerm = useJournalUiStore((state) => state.searchTerm);
-  const selectedCompany = useJournalUiStore((state) => state.selectedCompany);
   const selectedEntryType = useJournalUiStore((state) => state.selectedEntryType);
   const selectedStatus = useJournalUiStore((state) => state.selectedStatus);
-  const occurredFrom = useJournalUiStore((state) => state.occurredFrom);
-  const occurredTo = useJournalUiStore((state) => state.occurredTo);
   const occurredDateSortDirection = useJournalUiStore((state) => state.occurredDateSortDirection);
   const debouncedSearchTerm = useDebouncedValue(searchTerm, searchDebounceMs);
 
   return useMemo(
-    () => selectJournalQueryParams({ occurredDateSortDirection, occurredFrom, occurredTo, searchTerm: debouncedSearchTerm, selectedCompany, selectedEntryType, selectedStatus }),
-    [debouncedSearchTerm, occurredDateSortDirection, occurredFrom, occurredTo, selectedCompany, selectedEntryType, selectedStatus]
+    () => selectJournalQueryParams({ occurredDateSortDirection, searchTerm: debouncedSearchTerm, selectedEntryType, selectedStatus }),
+    [debouncedSearchTerm, occurredDateSortDirection, selectedEntryType, selectedStatus]
   );
 };

@@ -7,7 +7,7 @@ import { useAuth } from '@/features/auth';
 import { JournalEntryContent } from '../components/JournalEntryContent';
 import { JournalEntryMetadataPane } from '../components/JournalEntryMetadataPane';
 import { JournalEntryPageSkeleton } from '../components/JournalEntryPageSkeleton';
-import { useJournalEntryForm, type JournalEntryFormController } from '../hooks/useJournalEntryForm';
+import { useJournalEntryForm, type EditableJournalEntryField, type JournalEntryFormController } from '../hooks/useJournalEntryForm';
 import { useCreateJournalEntryMutation, useUpdateJournalEntryMutation } from '../queries/journal.mutations';
 import { useJournalEntryFormQuery } from '../queries/journal.queries';
 import { defaultJournalEntryFormValues } from '../types/journalEntryForm.schema';
@@ -18,6 +18,7 @@ export const JournalEntryPage = () => {
   const { entryId = '' } = useParams();
   const { isAuthReady } = useAuth();
   const isNewEntry = Boolean(newEntryMatch);
+  const [editingField, setEditingField] = useState<EditableJournalEntryField | undefined>();
   const [savedMessage, setSavedMessage] = useState('');
 
   const entryQuery = useJournalEntryFormQuery(entryId, isAuthReady && !isNewEntry && entryId.trim().length > 0);
@@ -45,6 +46,7 @@ export const JournalEntryPage = () => {
       if (isNewEntry) {
         const savedEntry = await createEntryMutation.mutateAsync(entry);
         reset(entry);
+        setEditingField(undefined);
         setSavedMessage('Journal entry saved.');
         void navigate(`/journal/${encodeURIComponent(savedEntry.entryId)}`, { replace: true });
         return;
@@ -52,6 +54,7 @@ export const JournalEntryPage = () => {
 
       await updateEntryMutation.mutateAsync(entry);
       reset(entry);
+      setEditingField(undefined);
       setSavedMessage('Journal entry saved.');
     } catch {
       // Mutation state renders the visible error message.
@@ -63,8 +66,18 @@ export const JournalEntryPage = () => {
     void saveEntry();
   };
 
+  const handleEditField = (field: EditableJournalEntryField) => {
+    setSavedMessage('');
+    setEditingField(field);
+  };
+
+  const handleFieldBlur = () => {
+    setEditingField(undefined);
+  };
+
   const handleCancel = () => {
     reset(isNewEntry ? defaultJournalEntryFormValues : entryQuery.data);
+    setEditingField(undefined);
     setSavedMessage('');
   };
 
@@ -74,16 +87,19 @@ export const JournalEntryPage = () => {
   const formController: JournalEntryFormController = {
     values: draft,
     errors: form.errors,
+    editingField,
     isDirty: form.isDirty,
     isSaving: activeMutation.isPending || form.isSubmitting,
     savedMessage,
+    blurField: handleFieldBlur,
+    editField: handleEditField,
     updateField: form.updateField
   };
 
   return (
     <WorkspacePageWrapper>
-      <form className="h-full overflow-y-auto" onSubmit={handleSave}>
-        <div className="mx-auto grid max-w-[1500px] gap-6 p-5 sm:p-8 lg:grid-cols-[1fr_22rem] lg:p-10">
+      <form className="h-full min-h-0" onSubmit={handleSave}>
+        <div className="mx-auto h-full max-w-[1500px] overflow-y-auto lg:grid lg:grid-cols-[1fr_18rem] lg:overflow-hidden">
           <JournalEntryContent form={formController} />
           <JournalEntryMetadataPane form={formController} mutationError={mutationError} onCancel={handleCancel} />
         </div>
