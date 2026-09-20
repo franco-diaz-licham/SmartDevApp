@@ -5,7 +5,6 @@ const todayIsoDate = () => new Date().toISOString().slice(0, 10);
 
 export const journalEntryFormLimits = {
   title: 160,
-  summary: 500,
   tags: 500,
   bodyMarkdown: 200_000,
   companyName: 160,
@@ -29,7 +28,6 @@ export const journalEntryFormSchema = z.object({
   entryType: z.enum(journalEntryTypeOptions),
   status: z.enum(journalStatusOptions),
   tags: z.string().trim().max(journalEntryFormLimits.tags, `Tags must be ${journalEntryFormLimits.tags} characters or less.`),
-  summary: z.string().trim().max(journalEntryFormLimits.summary, `Summary must be ${journalEntryFormLimits.summary} characters or less.`),
   companyName: z.string().trim().max(journalEntryFormLimits.companyName, `Company must be ${journalEntryFormLimits.companyName} characters or less.`),
   companyRoleTitle: z.string().trim().max(journalEntryFormLimits.companyRoleTitle, `Role title must be ${journalEntryFormLimits.companyRoleTitle} characters or less.`),
   workplaceContext: z.string().trim().max(journalEntryFormLimits.workplaceContext, `Workplace context must be ${journalEntryFormLimits.workplaceContext} characters or less.`),
@@ -49,7 +47,6 @@ export const defaultJournalEntryFormValues: JournalEntryFormModel = {
   entryType: 'Note',
   status: 'Active',
   tags: '',
-  summary: '',
   companyName: '',
   companyRoleTitle: '',
   workplaceContext: '',

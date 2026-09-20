@@ -13,7 +13,6 @@ export interface JournalTagResponse {
 export interface JournalListItemResponse {
   id: string;
   title: string;
-  summary: string | null;
   entryType: JournalEntryTypeModel;
   status: JournalEntryStatusModel;
   tags: JournalTagResponse[];
@@ -63,7 +62,6 @@ export interface JournalEntryRequestDto {
   entryType: JournalEntryTypeModel;
   status: JournalEntryStatusModel;
   tags: JournalTagRequestDto[];
-  summary: string | null;
   company: JournalCompanyRequestDto | null;
   workplaceContext: string | null;
   outcome: string | null;

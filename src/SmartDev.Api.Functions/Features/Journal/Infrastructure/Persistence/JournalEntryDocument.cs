@@ -19,8 +19,6 @@ public sealed class JournalEntryDocument
 
     public string Title { get; init; } = string.Empty;
 
-    public string? Summary { get; init; }
-
     public string BodyMarkdown { get; init; } = string.Empty;
 
     public string EntryType { get; init; } = JournalEntryType.Note.ToString();
@@ -65,7 +63,6 @@ public sealed class JournalEntryDocument
         return new JournalEntryDocument {
             Id = entry.Id.Value.ToString("D"),
             Title = entry.Title.Value,
-            Summary = entry.Summary?.Value,
             BodyMarkdown = entry.Body.Value,
             EntryType = entry.EntryType.ToString(),
             Status = entry.Status.ToString(),
@@ -96,7 +93,6 @@ public sealed class JournalEntryDocument
             ResolveEnum(EntryType, JournalEntryType.Note),
             ResolveEnum(Status, JournalEntryStatus.Active),
             Tags.Select(tag => ArticleTagSnapshot.Create(ArticleTagSlug.Create(tag.Slug), tag.DisplayName)),
-            JournalSummary.CreateOptional(Summary),
             CompanyReference.CreateOptional(Company?.Name, Company?.RoleTitle),
             WorkplaceContext,
             WorkOutcome.CreateOptional(Outcome),

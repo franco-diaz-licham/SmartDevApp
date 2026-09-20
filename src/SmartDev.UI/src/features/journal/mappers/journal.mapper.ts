@@ -55,7 +55,6 @@ export const mapJournalDetailResponseToEntryFormModel = (entry: JournalDetailRes
   entryType: entry.entryType,
   status: entry.status,
   tags: entry.tags.map((tag) => tag.displayName).join(', '),
-  summary: entry.summary ?? '',
   companyName: entry.company?.name ?? '',
   companyRoleTitle: entry.company?.roleTitle ?? '',
   workplaceContext: entry.workplaceContext ?? '',
@@ -75,7 +74,6 @@ export const mapJournalEntryFormModelToRequestDto = (entry: JournalEntryFormMode
   entryType: entry.entryType,
   status: entry.status,
   tags: mapTagsToRequest(entry.tags),
-  summary: trimOrNull(entry.summary),
   company: trimOrNull(entry.companyName)
     ? {
         name: entry.companyName.trim(),

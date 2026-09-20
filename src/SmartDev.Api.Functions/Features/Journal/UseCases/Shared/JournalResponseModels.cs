@@ -11,7 +11,6 @@ public sealed record JournalRelatedArticleResponse(string ArticleId, string Titl
 public sealed record JournalListItem(
     string Id,
     string Title,
-    string? Summary,
     string EntryType,
     string Status,
     IReadOnlyCollection<JournalTagResponse> Tags,
@@ -29,7 +28,6 @@ public sealed record JournalListItem(
         return new JournalListItem(
             entry.Id.Value.ToString("D"),
             entry.Title.Value,
-            entry.Summary?.Value,
             entry.EntryType.ToString(),
             entry.Status.ToString(),
             entry.Tags.Select(tag => new JournalTagResponse(tag.Slug.Value, tag.DisplayName)).ToArray(),
@@ -47,7 +45,6 @@ public sealed record JournalListItem(
 public sealed record JournalDetail(
     string Id,
     string Title,
-    string? Summary,
     string BodyMarkdown,
     string EntryType,
     string Status,
@@ -72,7 +69,6 @@ public sealed record JournalDetail(
         return new JournalDetail(
             entry.Id.Value.ToString("D"),
             entry.Title.Value,
-            entry.Summary?.Value,
             entry.Body.Value,
             entry.EntryType.ToString(),
             entry.Status.ToString(),

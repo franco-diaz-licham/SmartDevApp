@@ -17,7 +17,6 @@ export interface JournalTagModel {
 export interface JournalListItemModel {
   id: string;
   title: string;
-  summary: string | null;
   entryType: JournalEntryTypeModel;
   status: JournalEntryStatusModel;
   tags: JournalTagModel[];
@@ -52,7 +51,6 @@ export interface JournalEntryFormModel {
   entryType: JournalEntryTypeModel;
   status: JournalEntryStatusModel;
   tags: string;
-  summary: string;
   companyName: string;
   companyRoleTitle: string;
   workplaceContext: string;

@@ -43,21 +43,6 @@ export const JournalEntryContent = ({ form }: JournalEntryContentProps) => {
           onChange={(event: ChangeEvent<HTMLInputElement>) => form.updateField('title', getInputValue(event))}
           onInlineEdit={() => form.editField('title')}
         />
-        <AppInputTextArea
-          autoFocus={form.editingField === 'summary'}
-          inline
-          inlineSize="summary"
-          label="SUMMARY"
-          inlineStatus={form.editingField === 'summary' ? 'edit' : 'read'}
-          className="mt-5 p-2 pr-8 text-lg leading-8 text-muted-foreground"
-          error={form.errors.summary}
-          name="summary"
-          readValue={form.values.summary}
-          value={form.values.summary}
-          onBlur={form.blurField}
-          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => form.updateField('summary', getInputValue(event))}
-          onInlineEdit={() => form.editField('summary')}
-        />
         {form.editingField === 'bodyMarkdown' ? (
           <div ref={bodyEditorRef} onBlur={handleBodyEditorBlur}>
             <AppInputTextArea

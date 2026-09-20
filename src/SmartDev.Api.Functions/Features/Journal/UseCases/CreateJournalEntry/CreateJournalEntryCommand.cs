@@ -9,7 +9,6 @@ public sealed record CreateJournalEntryCommand(
     JournalEntryType EntryType,
     JournalEntryStatus Status,
     IReadOnlyCollection<ArticleTagSnapshot> Tags,
-    string? Summary,
     CompanyReference? Company,
     string? WorkplaceContext,
     string? Outcome,

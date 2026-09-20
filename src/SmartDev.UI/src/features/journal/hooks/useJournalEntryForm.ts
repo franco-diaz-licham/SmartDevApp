@@ -5,7 +5,7 @@ import type { Path, PathValue } from 'react-hook-form';
 import type { JournalEntryFormModel } from '../types/journal.types';
 import { defaultJournalEntryFormValues, journalEntryFormSchema, type JournalEntryFormErrors } from '../types/journalEntryForm.schema';
 
-export type EditableJournalEntryField = 'title' | 'summary' | 'bodyMarkdown' | 'tags' | 'companyName' | 'companyRoleTitle' | 'collaborators';
+export type EditableJournalEntryField = 'title' | 'bodyMarkdown' | 'tags' | 'companyName' | 'companyRoleTitle' | 'collaborators';
 
 export interface JournalEntryFormController {
   values: JournalEntryFormModel;

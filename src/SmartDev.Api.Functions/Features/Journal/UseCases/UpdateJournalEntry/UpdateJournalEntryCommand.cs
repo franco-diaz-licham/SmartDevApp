@@ -10,7 +10,6 @@ public sealed record UpdateJournalEntryCommand(
     JournalEntryType EntryType,
     JournalEntryStatus Status,
     IReadOnlyCollection<ArticleTagSnapshot> Tags,
-    string? Summary,
     CompanyReference? Company,
     string? WorkplaceContext,
     string? Outcome,

@@ -20,7 +20,6 @@ public sealed class UpdateJournalEntryHandler(IJournalRepository journalReposito
                 command.EntryType,
                 command.Status,
                 command.Tags,
-                JournalSummary.CreateOptional(command.Summary),
                 command.Company,
                 command.WorkplaceContext,
                 WorkOutcome.CreateOptional(command.Outcome),

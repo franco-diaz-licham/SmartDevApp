@@ -16,7 +16,6 @@ internal static class CosmosJournalQueries
                 (
                   CONTAINS(LOWER(c.title), @searchTerm)
                   OR CONTAINS(LOWER(c.bodyMarkdown), @searchTerm)
-                  OR CONTAINS(LOWER(c.summary), @searchTerm)
                   OR CONTAINS(LOWER(c.entryType), @searchTerm)
                   OR CONTAINS(LOWER(c.status), @searchTerm)
                   OR CONTAINS(LOWER(c.company.name), @searchTerm)

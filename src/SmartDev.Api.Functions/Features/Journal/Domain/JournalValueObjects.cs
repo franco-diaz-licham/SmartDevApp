@@ -18,24 +18,6 @@ public sealed record JournalTitle
 }
 
 /// <summary>
-/// Optional short summary for list previews and future review pages.
-/// </summary>
-public sealed record JournalSummary
-{
-    private const int MaxLength = 500;
-
-    private JournalSummary(string value) => Value = value;
-
-    public string Value { get; }
-
-    public static JournalSummary? CreateOptional(string? value)
-    {
-        var summary = Guard.Optional(value, "summary", MaxLength);
-        return summary is null ? null : new JournalSummary(summary);
-    }
-}
-
-/// <summary>
 /// Optional company context used to group entries over a long career.
 /// </summary>
 public sealed record CompanyReference

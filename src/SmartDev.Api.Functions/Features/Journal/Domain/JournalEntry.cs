@@ -22,7 +22,6 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         JournalEntryType entryType,
         JournalEntryStatus status,
         IEnumerable<ArticleTagSnapshot> tags,
-        JournalSummary? summary,
         CompanyReference? company,
         string? workplaceContext,
         WorkOutcome? outcome,
@@ -42,7 +41,6 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         Body = body;
         EntryType = entryType;
         Status = status;
-        Summary = summary;
         Company = company;
         WorkplaceContext = Guard.Optional(workplaceContext, "workplaceContext", 160);
         Outcome = outcome;
@@ -59,8 +57,6 @@ public sealed class JournalEntry : Entity<JournalEntryId>
     }
 
     public JournalTitle Title { get; private set; }
-
-    public JournalSummary? Summary { get; private set; }
 
     public MarkdownContent Body { get; private set; }
 
@@ -97,7 +93,6 @@ public sealed class JournalEntry : Entity<JournalEntryId>
     public string SearchableText => string.Join(
         " ",
         Title.Value,
-        Summary?.Value,
         Body.Value,
         EntryType.ToString(),
         Status.ToString(),
@@ -121,7 +116,6 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         JournalEntryType entryType,
         JournalEntryStatus status,
         IEnumerable<ArticleTagSnapshot> tags,
-        JournalSummary? summary,
         CompanyReference? company,
         string? workplaceContext,
         WorkOutcome? outcome,
@@ -142,7 +136,6 @@ public sealed class JournalEntry : Entity<JournalEntryId>
             entryType,
             status,
             tags,
-            summary,
             company,
             workplaceContext,
             outcome,
@@ -166,7 +159,6 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         JournalEntryType entryType,
         JournalEntryStatus status,
         IEnumerable<ArticleTagSnapshot> tags,
-        JournalSummary? summary,
         CompanyReference? company,
         string? workplaceContext,
         WorkOutcome? outcome,
@@ -182,7 +174,7 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         DateTimeOffset? updatedAt,
         DateTimeOffset? archivedAt)
     {
-        return new JournalEntry(id, title, body, entryType, status, tags, summary, company, workplaceContext, outcome, impact, collaborators, confidence, relatedArticles, decisions, blockers, nextActions, occurredOn, createdAt, updatedAt, archivedAt);
+        return new JournalEntry(id, title, body, entryType, status, tags, company, workplaceContext, outcome, impact, collaborators, confidence, relatedArticles, decisions, blockers, nextActions, occurredOn, createdAt, updatedAt, archivedAt);
     }
 
     public void Update(
@@ -191,7 +183,6 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         JournalEntryType entryType,
         JournalEntryStatus status,
         IEnumerable<ArticleTagSnapshot> tags,
-        JournalSummary? summary,
         CompanyReference? company,
         string? workplaceContext,
         WorkOutcome? outcome,
@@ -209,7 +200,6 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         Body = body;
         EntryType = entryType;
         Status = status;
-        Summary = summary;
         Company = company;
         WorkplaceContext = Guard.Optional(workplaceContext, "workplaceContext", 160);
         Outcome = outcome;
