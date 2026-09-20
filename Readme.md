@@ -278,6 +278,8 @@ Local Azure Functions defaults live in each function project's `local.settings.j
 
 ## 🖥️ Frontend Setup
 
+Articles are available at `/articles`, with detail pages at `/articles/:articleId` and owner-only creation at `/articles/new`. The reusable UI shell keeps its Workspace component names.
+
 From the UI project directory:
 
 ```powershell

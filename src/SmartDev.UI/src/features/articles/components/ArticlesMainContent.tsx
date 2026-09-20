@@ -79,7 +79,7 @@ export const ArticlesMainContent = ({
             onChange={(event: ChangeEvent<HTMLSelectElement>) => onPublishedDateSortDirectionChange(event.target.value as ArticlePublishedDateSortDirection)}
           />
           <AuthenticatedOnly>
-            <AppButton className="mb-0 mt-0 w-full text-sm sm:w-42" type="button" onClick={() => navigate('/workspace/articles/new')}>
+            <AppButton className="mb-0 mt-0 w-full text-sm sm:w-42" type="button" onClick={() => navigate('/articles/new')}>
               New article
             </AppButton>
           </AuthenticatedOnly>
@@ -89,7 +89,7 @@ export const ArticlesMainContent = ({
           {isArticlesLoading && <ArticlesListSkeleton />}
 
           {articles.map((article) => (
-            <Link key={article.id} className="rounded-md border border-border p-4 no-underline transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" to={`/workspace/articles/${encodeURIComponent(article.id)}`}>
+            <Link key={article.id} className="rounded-md border border-border p-4 no-underline transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30" to={`/articles/${encodeURIComponent(article.id)}`}>
               <span className="text-xs font-extrabold uppercase text-primary">{getArticleTypeLabel(article.articleType)}</span>
               <span className="ml-2 text-xs font-extrabold uppercase text-muted-foreground">{article.category.displayName}</span>
               <span className="mt-2 block text-lg font-extrabold">{article.title}</span>

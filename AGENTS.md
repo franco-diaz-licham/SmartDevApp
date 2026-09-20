@@ -2,7 +2,7 @@
 
 ## Product and engineering direction
 
-- Build SmartDev as a public portfolio and owner workspace application with a small, maintainable Azure footprint.
+- Build SmartDev as a public portfolio and article management application with a small, maintainable Azure footprint.
 - Prefer simple, explicit, feature-owned implementations. Deliver the smallest complete vertical slice that satisfies the current user outcome.
 - Follow established repository patterns before introducing a new dependency, abstraction, host, datastore, or deployment boundary. Add them only for a demonstrated need.
 - Keep shared infrastructure genuinely shared. Feature-specific code stays in its feature; reusable storage, text conversion, messaging contracts, options, and host primitives live in shared/common areas.
@@ -17,7 +17,7 @@
 | `src/SmartDev.Worker.Functions` | .NET isolated Azure Functions worker for Service Bus-triggered background work such as contact email and article narration. |
 | `src/SmartDev.Shared` | Cross-process contracts, messaging topology, shared options, blob audio storage, markdown/text conversion, and small shared infrastructure helpers. |
 | `src/SmartDev.Tests` | Backend unit tests. Use Arrange-Act-Assert comments in tests. |
-| `src/SmartDev.UI` | React, TypeScript, Vite frontend for public and workspace experiences. |
+| `src/SmartDev.UI` | React, TypeScript, Vite frontend for public and owner article experiences. |
 | `docker` | Local Compose stack, Dockerfiles, emulators, Service Bus config, OTEL collector configuration, and local container documentation. |
 | `infra` | Azure Bicep composition, resource modules, development parameters, resource inventory, and infrastructure documentation. |
 | `scripts` | PowerShell entry scripts and reusable modules for local setup, user secrets, Compose, and Azure infrastructure operations. |

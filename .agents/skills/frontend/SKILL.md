@@ -1,13 +1,13 @@
 ---
 name: frontend
-description: Implement, debug, or review SmartDev React/Vite frontend code, including public article pages, workspace owner flows, auth integration, API clients, TanStack Query usage, styling, and frontend tests.
+description: Implement, debug, or review SmartDev React/Vite frontend code, including public article pages, article owner flows, auth integration, API clients, TanStack Query usage, styling, and frontend tests.
 ---
 
 # SmartDev frontend
 
 ## Establish the UI flow
 
-1. Identify whether the change affects public view, workspace owner view, authentication, article editing, article audio, contact, API access, routing, styling, or deployment configuration.
+1. Identify whether the change affects public view, article owner view, authentication, article editing, article audio, contact, API access, routing, styling, or deployment configuration.
 2. Inspect the owning feature under `src/SmartDev.UI/src/features`, adjacent components/hooks/services/queries/types, shared API/client code, route setup, and existing tests.
 3. Apply the shared API and messaging contract in [AGENTS.md](../../../AGENTS.md) when frontend behavior depends on backend contracts.
 4. Keep implementation feature-owned. Shared UI primitives belong under `src/SmartDev.UI/src/components` or `src/SmartDev.UI/src/lib` only when reused.
@@ -30,7 +30,7 @@ description: Implement, debug, or review SmartDev React/Vite frontend code, incl
 
 - Keep API calls in feature services and TanStack Query hooks. Components should consume hooks/services rather than building URLs directly.
 - Keep request/response DTOs aligned with backend contracts. Do not create feature-specific page envelopes for shared page results.
-- Preserve the public/workspace split. Public users can view and download existing public article content. Owner-only actions such as create, update, and generate audio remain behind workspace/auth flows.
+- Preserve the public/owner split. Public users can view and download existing public article content. Owner-only actions such as create, update, and generate audio remain behind authenticated owner flows.
 - Keep auth concerns in auth hooks/providers and API client interceptors. Do not pass tokens through component trees.
 - Prefer small hooks/components when conditions, messages, or side effects start to repeat across a page.
 - Keep generated object URLs and browser resources cleaned up when audio/blob behavior changes.

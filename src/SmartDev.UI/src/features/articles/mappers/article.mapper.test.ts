@@ -71,7 +71,7 @@ describe('article mapper', () => {
       category: 'Backend',
           tags: ['.NET'],
           bodyText: 'Cosmos DB articles.',
-          url: '/workspace/articles/1f4d0b3f-10a9-4c59-9e91-65cb3770887f',
+          url: '/articles/1f4d0b3f-10a9-4c59-9e91-65cb3770887f',
           updatedAt: '2026-08-06T09:30:00Z',
           publishedAt: null
         }

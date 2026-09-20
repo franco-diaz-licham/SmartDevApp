@@ -15,7 +15,7 @@ import { getArticleSections } from '../utils/articleContent';
 
 export const ArticleDetailsPage = () => {
   const navigate = useNavigate();
-  const newArticleMatch = useMatch('/workspace/articles/new');
+  const newArticleMatch = useMatch('/articles/new');
   const { articleId = '' } = useParams();
   const { isAuthReady, isPublicView } = useAuth();
 
@@ -88,7 +88,7 @@ export const ArticleDetailsPage = () => {
         reset(entry);
         setEditingField(undefined);
         setSavedMessage(getSavedMessage());
-        void navigate(`/workspace/articles/${encodeURIComponent(savedArticle.articleId)}`, { replace: true });
+        void navigate(`/articles/${encodeURIComponent(savedArticle.articleId)}`, { replace: true });
         return;
       }
 

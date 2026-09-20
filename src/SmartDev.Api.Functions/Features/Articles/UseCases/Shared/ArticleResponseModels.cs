@@ -110,7 +110,7 @@ public sealed record PublicArticleSearchDocument(
             article.Category.DisplayName,
             article.Tags.Select(tag => tag.DisplayName).ToArray(),
             article.Body.Value,
-            $"/workspace/articles/{article.Id.Value:D}",
+            $"/articles/{article.Id.Value:D}",
             article.UpdatedAt,
             article.PublishedAt);
     }

@@ -27,12 +27,11 @@ export const router = createBrowserRouter([
   {
     element: <WorkspaceLayout />,
     children: [
-      { path: '/workspace', element: <ArticlesPageRoute /> },
-      { path: '/articles', element: <Navigate to="/workspace" replace /> },
-      { path: '/workspace/articles/:articleId', element: <ArticleDetailsPageRoute /> },
+      { path: '/articles', element: <ArticlesPageRoute /> },
+      { path: '/articles/:articleId', element: <ArticleDetailsPageRoute /> },
       {
         element: <RequireAuth fallback={<ArticleDetailsPageSkeleton />} />,
-        children: [{ path: '/workspace/articles/new', element: <ArticleDetailsPageRoute /> }]
+        children: [{ path: '/articles/new', element: <ArticleDetailsPageRoute /> }]
       }
     ]
   },

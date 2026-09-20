@@ -6,7 +6,7 @@ import { useAuth } from '@/features/auth';
 
 const workspaceNavigationItems = [
   { label: 'HOME', href: '/home', visibility: 'public' },
-  { label: 'WORKSPACE', href: '/workspace', visibility: 'public' }
+  { label: 'ARTICLES', href: '/articles', visibility: 'public' }
 ] as const;
 
 const navButtonClassName = 'block bg-transparent p-0 py-2 text-left font-bold text-current hover:underline disabled:opacity-60 lg:py-0';
@@ -69,7 +69,7 @@ export const WorkspaceTopBar = () => {
             </li>
           ) : (
             <li>
-              <a className="block py-2 no-underline hover:underline lg:py-0" href="/login?returnTo=%2Fworkspace" onClick={closeMenu}>
+              <a className="block py-2 no-underline hover:underline lg:py-0" href="/login?returnTo=%2Farticles" onClick={closeMenu}>
                 LOGIN
               </a>
             </li>

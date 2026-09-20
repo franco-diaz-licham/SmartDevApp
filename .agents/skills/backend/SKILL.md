@@ -32,7 +32,7 @@ Do not put reusable infrastructure under one feature because it was first needed
 - Preserve use-case intent in type names: `GenerateOwnerArticleAudioEndpoint`, `GenerateOwnerArticleAudioHandler`, and `ArticleAudioGenerationRequest` rather than generic endpoint/handler/response names.
 - Keep endpoints and triggers limited to binding, validation, handler invocation, response mapping, and useful non-sensitive logging.
 - Enforce owner-only access in owner routes and middleware/use-case boundaries. Missing owner context must not mean unrestricted access.
-- Keep public article behavior separate from owner workspace behavior. Public users download existing audio; they do not generate it.
+- Keep public article behavior separate from owner article management behavior. Public users download existing audio; they do not generate it.
 - Use feature repository contracts, pass cancellation tokens through async boundaries, and return `Result<T>` for expected application outcomes.
 - Let unexpected exceptions reach the Functions host. Catch only to add useful non-sensitive context or to translate provider-specific expected failures.
 - Keep malformed JSON, missing bodies, unparseable IDs, auth failures, CORS, and rate limiting behavior consistent across API endpoints.

@@ -11,7 +11,7 @@ description: Create, revise, or review SmartDev product plans, architecture note
 2. Read directly relevant plans and inspect implemented code/configuration before stating behavior exists. Aspirational plans are not implementation evidence.
 3. Apply the relevant engineering skill when the plan makes concrete frontend, backend, Docker, infrastructure, scripting, or delivery decisions.
 4. Describe what the user accomplishes before endpoints, queues, Function Apps, blob keys, or deployment mechanics.
-5. Keep SmartDev's public portfolio experience and owner workspace experience distinct.
+5. Keep SmartDev's public portfolio experience and owner article management experience distinct.
 
 ## Separate truth by document purpose
 
