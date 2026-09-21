@@ -44,42 +44,6 @@ public sealed record CompanyReference
 }
 
 /// <summary>
-/// Optional outcome text for what changed.
-/// </summary>
-public sealed record WorkOutcome
-{
-    private const int MaxLength = 160;
-
-    private WorkOutcome(string value) => Value = value;
-
-    public string Value { get; }
-
-    public static WorkOutcome? CreateOptional(string? value)
-    {
-        var outcome = Guard.Optional(value, "outcome", MaxLength);
-        return outcome is null ? null : new WorkOutcome(outcome);
-    }
-}
-
-/// <summary>
-/// Optional impact text for why the work mattered.
-/// </summary>
-public sealed record WorkImpact
-{
-    private const int MaxLength = 500;
-
-    private WorkImpact(string value) => Value = value;
-
-    public string Value { get; }
-
-    public static WorkImpact? CreateOptional(string? value)
-    {
-        var impact = Guard.Optional(value, "impact", MaxLength);
-        return impact is null ? null : new WorkImpact(impact);
-    }
-}
-
-/// <summary>
 /// Optional person involved in the work.
 /// </summary>
 public sealed record CollaboratorReference
@@ -111,46 +75,4 @@ public sealed record ArticleReference
     public string Title { get; }
 
     public static ArticleReference Create(Guid articleId, string title) => new(ArticleId.From(articleId), Guard.Required(title, "articleTitle", MaxTitleLength));
-}
-
-/// <summary>
-/// Optional decision note extracted from a journal entry.
-/// </summary>
-public sealed record DecisionNote
-{
-    private const int MaxLength = 500;
-
-    private DecisionNote(string value) => Value = value;
-
-    public string Value { get; }
-
-    public static DecisionNote Create(string value) => new(Guard.Required(value, "decision", MaxLength));
-}
-
-/// <summary>
-/// Optional blocker note extracted from a journal entry.
-/// </summary>
-public sealed record BlockerNote
-{
-    private const int MaxLength = 500;
-
-    private BlockerNote(string value) => Value = value;
-
-    public string Value { get; }
-
-    public static BlockerNote Create(string value) => new(Guard.Required(value, "blocker", MaxLength));
-}
-
-/// <summary>
-/// Optional next action extracted from a journal entry.
-/// </summary>
-public sealed record NextAction
-{
-    private const int MaxLength = 500;
-
-    private NextAction(string value) => Value = value;
-
-    public string Value { get; }
-
-    public static NextAction Create(string value) => new(Guard.Required(value, "nextAction", MaxLength));
 }

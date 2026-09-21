@@ -21,15 +21,9 @@ public sealed class UpdateJournalEntryHandler(IJournalRepository journalReposito
                 command.Status,
                 command.Tags,
                 command.Company,
-                command.WorkplaceContext,
-                WorkOutcome.CreateOptional(command.Outcome),
-                WorkImpact.CreateOptional(command.Impact),
                 command.Collaborators.Select(CollaboratorReference.Create),
                 command.Confidence,
                 command.RelatedArticles,
-                command.Decisions.Select(DecisionNote.Create),
-                command.Blockers.Select(BlockerNote.Create),
-                command.NextActions.Select(NextAction.Create),
                 command.OccurredOn,
                 DateTimeOffset.UtcNow);
 

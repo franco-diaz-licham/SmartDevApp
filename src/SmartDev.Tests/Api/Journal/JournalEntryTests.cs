@@ -22,15 +22,9 @@ public sealed class JournalEntryTests
             JournalEntryStatus.Active,
             tags: [],
             company: null,
-            workplaceContext: null,
-            outcome: null,
-            impact: null,
             collaborators: [],
             JournalConfidence.Confirmed,
             relatedArticles: [],
-            decisions: [],
-            blockers: [],
-            nextActions: [],
             occurredOn,
             now);
 
@@ -45,7 +39,7 @@ public sealed class JournalEntryTests
         entry.UpdatedAt.ShouldBeNull();
         entry.Tags.ShouldBeEmpty();
         entry.Company.ShouldBeNull();
-        entry.WorkplaceContext.ShouldBeNull();
+        entry.RelatedArticles.ShouldBeEmpty();
     }
 
     [Test]
@@ -63,16 +57,10 @@ public sealed class JournalEntryTests
             JournalEntryType.Note,
             JournalEntryStatus.Active,
             [tag, duplicateTag],
-            company: null,
-            workplaceContext: null,
-            outcome: null,
-            impact: null,
+            null,
             [CollaboratorReference.Create("Sam"), CollaboratorReference.Create("sam")],
             JournalConfidence.Confirmed,
-            relatedArticles: [],
-            decisions: [],
-            blockers: [],
-            nextActions: [],
+            [],
             new DateOnly(2026, 9, 20));
 
         // Assert
@@ -92,15 +80,9 @@ public sealed class JournalEntryTests
             JournalEntryStatus.Active,
             tags: [],
             company: null,
-            workplaceContext: null,
-            outcome: null,
-            impact: null,
             collaborators: [],
             JournalConfidence.Tentative,
             relatedArticles: [],
-            decisions: [],
-            blockers: [],
-            nextActions: [],
             new DateOnly(2026, 9, 19));
         var updatedAt = new DateTimeOffset(2026, 9, 20, 10, 0, 0, TimeSpan.Zero);
 
@@ -112,15 +94,9 @@ public sealed class JournalEntryTests
             JournalEntryStatus.Archived,
             [ArticleTagSnapshot.Create(ArticleTagSlug.Create("architecture"), "Architecture")],
             CompanyReference.CreateOptional("Example Co", "Senior Engineer"),
-            "Payments",
-            WorkOutcome.CreateOptional("Decided retry policy"),
-            WorkImpact.CreateOptional("Reduced operational ambiguity."),
             [CollaboratorReference.Create("Alex")],
             JournalConfidence.Confirmed,
             relatedArticles: [],
-            [DecisionNote.Create("Keep retries bounded.")],
-            blockers: [],
-            [NextAction.Create("Document retry policy.")],
             new DateOnly(2026, 9, 20),
             updatedAt);
 
@@ -131,8 +107,5 @@ public sealed class JournalEntryTests
         entry.ArchivedAt.ShouldBe(updatedAt);
         entry.UpdatedAt.ShouldBe(updatedAt);
         entry.Company?.Name.ShouldBe("Example Co");
-        entry.WorkplaceContext.ShouldBe("Payments");
-        entry.Decisions.Single().Value.ShouldBe("Keep retries bounded.");
-        entry.NextActions.Single().Value.ShouldBe("Document retry policy.");
     }
 }

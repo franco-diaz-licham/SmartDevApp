@@ -20,16 +20,10 @@ internal static class CosmosJournalQueries
                   OR CONTAINS(LOWER(c.status), @searchTerm)
                   OR CONTAINS(LOWER(c.company.name), @searchTerm)
                   OR CONTAINS(LOWER(c.company.roleTitle), @searchTerm)
-                  OR CONTAINS(LOWER(c.workplaceContext), @searchTerm)
-                  OR CONTAINS(LOWER(c.outcome), @searchTerm)
-                  OR CONTAINS(LOWER(c.impact), @searchTerm)
                   OR CONTAINS(LOWER(c.confidence), @searchTerm)
                   OR EXISTS(SELECT VALUE tag FROM tag IN c.tags WHERE CONTAINS(LOWER(tag.displayName), @searchTerm) OR CONTAINS(LOWER(tag.slug), @searchTerm))
                   OR EXISTS(SELECT VALUE collaborator FROM collaborator IN c.collaborators WHERE CONTAINS(LOWER(collaborator.name), @searchTerm))
                   OR EXISTS(SELECT VALUE article FROM article IN c.relatedArticles WHERE CONTAINS(LOWER(article.title), @searchTerm))
-                  OR EXISTS(SELECT VALUE decision FROM decision IN c.decisions WHERE CONTAINS(LOWER(decision), @searchTerm))
-                  OR EXISTS(SELECT VALUE blocker FROM blocker IN c.blockers WHERE CONTAINS(LOWER(blocker), @searchTerm))
-                  OR EXISTS(SELECT VALUE nextAction FROM nextAction IN c.nextActions WHERE CONTAINS(LOWER(nextAction), @searchTerm))
                 )
                 """);
         }
@@ -45,12 +39,6 @@ internal static class CosmosJournalQueries
             conditions.Add("EXISTS(SELECT VALUE tag FROM tag IN c.tags WHERE LOWER(tag.displayName) = @tag OR LOWER(tag.slug) = @tag)");
         }
 
-        var workplaceContextFilter = FindEqualsFilter(query, "workplaceContext");
-        if (workplaceContextFilter is not null) conditions.Add("LOWER(c.workplaceContext) = @workplaceContext");
-
-        var outcomeFilter = FindEqualsFilter(query, "outcome");
-        if (outcomeFilter is not null) conditions.Add("LOWER(c.outcome) = @outcome");
-
         var confidenceFilter = FindEqualsFilter(query, "confidence");
         if (confidenceFilter is not null) conditions.Add("c.confidence = @confidence");
 
@@ -65,8 +53,6 @@ internal static class CosmosJournalQueries
         if (entryTypeFilter is not null) queryDefinition = queryDefinition.WithParameter("@entryType", entryTypeFilter.Value.Trim());
         if (statusFilter is not null) queryDefinition = queryDefinition.WithParameter("@status", statusFilter.Value.Trim());
         if (tagFilter is not null) queryDefinition = queryDefinition.WithParameter("@tag", tagFilter.Value.Trim().ToLowerInvariant());
-        if (workplaceContextFilter is not null) queryDefinition = queryDefinition.WithParameter("@workplaceContext", workplaceContextFilter.Value.Trim().ToLowerInvariant());
-        if (outcomeFilter is not null) queryDefinition = queryDefinition.WithParameter("@outcome", outcomeFilter.Value.Trim().ToLowerInvariant());
         if (confidenceFilter is not null) queryDefinition = queryDefinition.WithParameter("@confidence", confidenceFilter.Value.Trim());
 
         return queryDefinition;

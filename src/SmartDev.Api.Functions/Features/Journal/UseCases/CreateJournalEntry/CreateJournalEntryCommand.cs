@@ -10,13 +10,7 @@ public sealed record CreateJournalEntryCommand(
     JournalEntryStatus Status,
     IReadOnlyCollection<ArticleTagSnapshot> Tags,
     CompanyReference? Company,
-    string? WorkplaceContext,
-    string? Outcome,
-    string? Impact,
     IReadOnlyCollection<string> Collaborators,
     JournalConfidence Confidence,
     IReadOnlyCollection<ArticleReference> RelatedArticles,
-    IReadOnlyCollection<string> Decisions,
-    IReadOnlyCollection<string> Blockers,
-    IReadOnlyCollection<string> NextActions,
     DateOnly OccurredOn);

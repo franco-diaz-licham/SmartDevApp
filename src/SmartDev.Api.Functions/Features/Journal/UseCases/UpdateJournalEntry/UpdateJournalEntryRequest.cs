@@ -11,15 +11,9 @@ public sealed record UpdateJournalEntryRequest(
     string? Status,
     IReadOnlyCollection<JournalTagRequest>? Tags,
     JournalCompanyRequest? Company,
-    string? WorkplaceContext,
-    string? Outcome,
-    string? Impact,
     IReadOnlyCollection<string>? Collaborators,
     string? Confidence,
     IReadOnlyCollection<JournalRelatedArticleRequest>? RelatedArticles,
-    IReadOnlyCollection<string>? Decisions,
-    IReadOnlyCollection<string>? Blockers,
-    IReadOnlyCollection<string>? NextActions,
     string? OccurredOn)
 {
     public Result<UpdateJournalEntryCommand> ToCommandResult(Guid entryId)
@@ -32,15 +26,9 @@ public sealed record UpdateJournalEntryRequest(
             JournalEditMapping.BindStatus(Status),
             JournalEditMapping.BindOptionalCollection(Tags, tag => tag.ToInput()),
             CompanyReference.CreateOptional(Company?.Name, Company?.RoleTitle),
-            WorkplaceContext,
-            Outcome,
-            Impact,
             Collaborators ?? [],
             JournalEditMapping.BindConfidence(Confidence),
             JournalEditMapping.BindOptionalCollection(RelatedArticles, article => article.ToInput()),
-            Decisions ?? [],
-            Blockers ?? [],
-            NextActions ?? [],
             JournalEditMapping.BindOccurredOn(OccurredOn)));
     }
 }
