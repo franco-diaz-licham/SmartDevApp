@@ -23,15 +23,15 @@ export interface JournalListItemResponse {
   updatedAt: string | null;
 }
 
-export interface JournalRelatedArticleResponse {
-  articleId: string;
+export interface JournalRelatedJournalEntryResponse {
+  entryId: string;
   title: string;
 }
 
 export interface JournalDetailResponse extends JournalListItemResponse {
   bodyMarkdown: string;
   collaborators: string[];
-  relatedArticles: JournalRelatedArticleResponse[];
+  relatedJournalEntries: JournalRelatedJournalEntryResponse[];
   archivedAt: string | null;
 }
 
@@ -45,8 +45,8 @@ export interface JournalTagRequestDto {
   displayName: string;
 }
 
-export interface JournalRelatedArticleRequestDto {
-  articleId: string;
+export interface JournalRelatedJournalEntryRequestDto {
+  entryId: string;
   title: string;
 }
 
@@ -59,7 +59,7 @@ export interface JournalEntryRequestDto {
   company: JournalCompanyRequestDto | null;
   collaborators: string[];
   confidence: JournalConfidenceModel;
-  relatedArticles: JournalRelatedArticleRequestDto[];
+  relatedJournalEntries: JournalRelatedJournalEntryRequestDto[];
   occurredOn: string;
 }
 

@@ -30,12 +30,12 @@ export interface JournalListItemModel {
 export interface JournalDetailModel extends JournalListItemModel {
   bodyMarkdown: string;
   collaborators: string[];
-  relatedArticles: JournalRelatedArticleModel[];
+  relatedJournalEntries: JournalRelatedJournalEntryModel[];
   archivedAt: Date | null;
 }
 
-export interface JournalRelatedArticleModel {
-  articleId: string;
+export interface JournalRelatedJournalEntryModel {
+  entryId: string;
   title: string;
 }
 
@@ -49,7 +49,7 @@ export interface JournalEntryFormModel {
   companyRoleTitle: string;
   collaborators: string;
   confidence: JournalConfidenceModel;
-  relatedArticles: JournalRelatedArticleModel[];
+  relatedJournalEntries: JournalRelatedJournalEntryModel[];
   occurredOn: string;
 }
 

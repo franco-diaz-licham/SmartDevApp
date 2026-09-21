@@ -41,7 +41,7 @@ export const journalEntryFormSchema = z.object({
   companyRoleTitle: z.string().trim().max(journalEntryFormLimits.companyRoleTitle, `Role title must be ${journalEntryFormLimits.companyRoleTitle} characters or less.`),
   collaborators: z.string().trim().max(journalEntryFormLimits.collaborators, `Collaborators must be ${journalEntryFormLimits.collaborators} characters or less.`),
   confidence: z.enum(journalConfidenceOptions),
-  relatedArticles: z.array(z.object({ articleId: z.string().trim().min(1), title: z.string().trim().min(1) })),
+  relatedJournalEntries: z.array(z.object({ entryId: z.string().trim().min(1), title: z.string().trim().min(1) })),
   occurredOn: z.string().trim().min(1, 'Date is required.')
 }) satisfies z.ZodType<JournalEntryFormModel>;
 
@@ -55,7 +55,7 @@ export const defaultJournalEntryFormValues: JournalEntryFormModel = {
   companyRoleTitle: '',
   collaborators: '',
   confidence: 'Confirmed',
-  relatedArticles: [],
+  relatedJournalEntries: [],
   occurredOn: todayIsoDate()
 };
 

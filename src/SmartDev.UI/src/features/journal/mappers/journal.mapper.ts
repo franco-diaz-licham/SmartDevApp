@@ -42,7 +42,7 @@ export const mapJournalDetailResponseToModel = (entry: JournalDetailResponse): J
   ...mapJournalListItemResponseToModel(entry),
   bodyMarkdown: entry.bodyMarkdown,
   collaborators: entry.collaborators,
-  relatedArticles: entry.relatedArticles,
+  relatedJournalEntries: entry.relatedJournalEntries,
   archivedAt: toNullableDate(entry.archivedAt)
 });
 
@@ -56,7 +56,7 @@ export const mapJournalDetailResponseToEntryFormModel = (entry: JournalDetailRes
   companyRoleTitle: entry.company?.roleTitle ?? '',
   collaborators: entry.collaborators.join(', '),
   confidence: entry.confidence,
-  relatedArticles: entry.relatedArticles,
+  relatedJournalEntries: entry.relatedJournalEntries,
   occurredOn: entry.occurredOn
 });
 
@@ -74,7 +74,7 @@ export const mapJournalEntryFormModelToRequestDto = (entry: JournalEntryFormMode
     : null,
   collaborators: splitTextList(entry.collaborators),
   confidence: entry.confidence,
-  relatedArticles: entry.relatedArticles,
+  relatedJournalEntries: entry.relatedJournalEntries,
   occurredOn: entry.occurredOn
 });
 
