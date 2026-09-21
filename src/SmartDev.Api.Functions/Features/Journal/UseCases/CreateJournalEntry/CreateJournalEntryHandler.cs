@@ -21,7 +21,7 @@ public sealed class CreateJournalEntryHandler(IJournalRepository journalReposito
                 command.Company,
                 command.Collaborators.Select(CollaboratorReference.Create),
                 command.Confidence,
-                command.RelatedArticles,
+                command.RelatedJournalEntries,
                 command.OccurredOn);
 
             await journalRepository.AddAsync(entry, cancellationToken);

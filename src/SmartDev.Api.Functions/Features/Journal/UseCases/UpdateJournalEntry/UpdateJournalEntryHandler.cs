@@ -23,7 +23,7 @@ public sealed class UpdateJournalEntryHandler(IJournalRepository journalReposito
                 command.Company,
                 command.Collaborators.Select(CollaboratorReference.Create),
                 command.Confidence,
-                command.RelatedArticles,
+                command.RelatedJournalEntries,
                 command.OccurredOn,
                 DateTimeOffset.UtcNow);
 

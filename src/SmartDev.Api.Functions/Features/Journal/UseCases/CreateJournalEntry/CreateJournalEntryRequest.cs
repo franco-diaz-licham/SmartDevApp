@@ -13,7 +13,7 @@ public sealed record CreateJournalEntryRequest(
     JournalCompanyRequest? Company,
     IReadOnlyCollection<string>? Collaborators,
     string? Confidence,
-    IReadOnlyCollection<JournalRelatedArticleRequest>? RelatedArticles,
+    IReadOnlyCollection<JournalRelatedJournalEntryRequest>? RelatedJournalEntries,
     string? OccurredOn)
 {
     public Result<CreateJournalEntryCommand> ToCommandResult()
@@ -27,7 +27,7 @@ public sealed record CreateJournalEntryRequest(
             CompanyReference.CreateOptional(Company?.Name, Company?.RoleTitle),
             Collaborators ?? [],
             JournalEditMapping.BindConfidence(Confidence),
-            JournalEditMapping.BindOptionalCollection(RelatedArticles, article => article.ToInput()),
+            JournalEditMapping.BindOptionalCollection(RelatedJournalEntries, article => article.ToInput()),
             JournalEditMapping.BindOccurredOn(OccurredOn)));
     }
 }

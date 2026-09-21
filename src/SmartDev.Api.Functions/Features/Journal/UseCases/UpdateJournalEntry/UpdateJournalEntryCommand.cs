@@ -13,5 +13,5 @@ public sealed record UpdateJournalEntryCommand(
     CompanyReference? Company,
     IReadOnlyCollection<string> Collaborators,
     JournalConfidence Confidence,
-    IReadOnlyCollection<ArticleReference> RelatedArticles,
+    IReadOnlyCollection<JournalEntryReference> RelatedJournalEntries,
     DateOnly OccurredOn);

@@ -11,9 +11,9 @@ public sealed record JournalTagRequest(string Slug, string DisplayName)
     public ArticleTagSnapshot ToInput() => ArticleTagSnapshot.Create(ArticleTagSlug.Create(Slug), DisplayName);
 }
 
-public sealed record JournalRelatedArticleRequest(Guid ArticleId, string Title)
+public sealed record JournalRelatedJournalEntryRequest(Guid EntryId, string Title)
 {
-    public ArticleReference ToInput() => ArticleReference.Create(ArticleId, Title);
+    public JournalEntryReference ToInput() => JournalEntryReference.Create(EntryId, Title);
 }
 
 internal static class JournalEditMapping

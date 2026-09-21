@@ -12,5 +12,5 @@ public sealed record CreateJournalEntryCommand(
     CompanyReference? Company,
     IReadOnlyCollection<string> Collaborators,
     JournalConfidence Confidence,
-    IReadOnlyCollection<ArticleReference> RelatedArticles,
+    IReadOnlyCollection<JournalEntryReference> RelatedJournalEntries,
     DateOnly OccurredOn);

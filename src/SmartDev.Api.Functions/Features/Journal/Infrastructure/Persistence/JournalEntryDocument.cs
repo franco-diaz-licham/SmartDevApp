@@ -33,7 +33,7 @@ public sealed class JournalEntryDocument
 
     public string Confidence { get; init; } = JournalConfidence.Confirmed.ToString();
 
-    public IReadOnlyCollection<RelatedArticleDocument> RelatedArticles { get; init; } = [];
+    public IReadOnlyCollection<RelatedJournalEntryDocument> RelatedJournalEntries { get; init; } = [];
 
     public string OccurredOn { get; init; } = string.Empty;
 
@@ -58,7 +58,7 @@ public sealed class JournalEntryDocument
             Company = entry.Company is null ? null : new CompanyDocument(entry.Company.Name, entry.Company.RoleTitle),
             Collaborators = entry.Collaborators.Select(collaborator => new CollaboratorDocument(collaborator.Name)).ToArray(),
             Confidence = entry.Confidence.ToString(),
-            RelatedArticles = entry.RelatedArticles.Select(article => new RelatedArticleDocument(article.ArticleId.Value.ToString("D"), article.Title)).ToArray(),
+            RelatedJournalEntries = entry.RelatedJournalEntries.Select(article => new RelatedJournalEntryDocument(article.EntryId.Value.ToString("D"), article.Title)).ToArray(),
             OccurredOn = entry.OccurredOn.ToString("yyyy-MM-dd"),
             CreatedAt = entry.CreatedAt,
             UpdatedAt = entry.UpdatedAt,
@@ -78,7 +78,7 @@ public sealed class JournalEntryDocument
             CompanyReference.CreateOptional(Company?.Name, Company?.RoleTitle),
             Collaborators.Select(collaborator => CollaboratorReference.Create(collaborator.Name)),
             ResolveEnum(Confidence, JournalConfidence.Confirmed),
-            RelatedArticles.Select(article => ArticleReference.Create(Guid.Parse(article.ArticleId), article.Title)),
+            RelatedJournalEntries.Select(article => JournalEntryReference.Create(Guid.Parse(article.EntryId), article.Title)),
             DateOnly.Parse(OccurredOn),
             CreatedAt,
             UpdatedAt,
@@ -98,4 +98,4 @@ public sealed record CompanyDocument(string Name, string? RoleTitle);
 
 public sealed record CollaboratorDocument(string Name);
 
-public sealed record RelatedArticleDocument(string ArticleId, string Title);
+public sealed record RelatedJournalEntryDocument(string EntryId, string Title);

@@ -6,7 +6,7 @@ public sealed record JournalCompanyResponse(string Name, string? RoleTitle);
 
 public sealed record JournalTagResponse(string Slug, string DisplayName);
 
-public sealed record JournalRelatedArticleResponse(string ArticleId, string Title);
+public sealed record JournalRelatedJournalEntryResponse(string EntryId, string Title);
 
 public sealed record JournalListItem(
     string Id,
@@ -46,7 +46,7 @@ public sealed record JournalDetail(
     JournalCompanyResponse? Company,
     IReadOnlyCollection<string> Collaborators,
     string Confidence,
-    IReadOnlyCollection<JournalRelatedArticleResponse> RelatedArticles,
+    IReadOnlyCollection<JournalRelatedJournalEntryResponse> RelatedJournalEntries,
     string OccurredOn,
     DateTimeOffset CreatedAt,
     DateTimeOffset? UpdatedAt,
@@ -64,7 +64,7 @@ public sealed record JournalDetail(
             entry.Company is null ? null : new JournalCompanyResponse(entry.Company.Name, entry.Company.RoleTitle),
             entry.Collaborators.Select(collaborator => collaborator.Name).ToArray(),
             entry.Confidence.ToString(),
-            entry.RelatedArticles.Select(article => new JournalRelatedArticleResponse(article.ArticleId.Value.ToString("D"), article.Title)).ToArray(),
+            entry.RelatedJournalEntries.Select(article => new JournalRelatedJournalEntryResponse(article.EntryId.Value.ToString("D"), article.Title)).ToArray(),
             entry.OccurredOn.ToString("yyyy-MM-dd"),
             entry.CreatedAt,
             entry.UpdatedAt,

@@ -23,7 +23,7 @@ internal static class CosmosJournalQueries
                   OR CONTAINS(LOWER(c.confidence), @searchTerm)
                   OR EXISTS(SELECT VALUE tag FROM tag IN c.tags WHERE CONTAINS(LOWER(tag.displayName), @searchTerm) OR CONTAINS(LOWER(tag.slug), @searchTerm))
                   OR EXISTS(SELECT VALUE collaborator FROM collaborator IN c.collaborators WHERE CONTAINS(LOWER(collaborator.name), @searchTerm))
-                  OR EXISTS(SELECT VALUE article FROM article IN c.relatedArticles WHERE CONTAINS(LOWER(article.title), @searchTerm))
+                  OR EXISTS(SELECT VALUE article FROM article IN c.relatedJournalEntries WHERE CONTAINS(LOWER(article.title), @searchTerm))
                 )
                 """);
         }

@@ -24,7 +24,7 @@ public sealed class JournalEntryTests
             company: null,
             collaborators: [],
             JournalConfidence.Confirmed,
-            relatedArticles: [],
+            relatedJournalEntries: [],
             occurredOn,
             now);
 
@@ -39,7 +39,7 @@ public sealed class JournalEntryTests
         entry.UpdatedAt.ShouldBeNull();
         entry.Tags.ShouldBeEmpty();
         entry.Company.ShouldBeNull();
-        entry.RelatedArticles.ShouldBeEmpty();
+        entry.RelatedJournalEntries.ShouldBeEmpty();
     }
 
     [Test]
@@ -82,7 +82,7 @@ public sealed class JournalEntryTests
             company: null,
             collaborators: [],
             JournalConfidence.Tentative,
-            relatedArticles: [],
+            relatedJournalEntries: [],
             new DateOnly(2026, 9, 19));
         var updatedAt = new DateTimeOffset(2026, 9, 20, 10, 0, 0, TimeSpan.Zero);
 
@@ -96,7 +96,7 @@ public sealed class JournalEntryTests
             CompanyReference.CreateOptional("Example Co", "Senior Engineer"),
             [CollaboratorReference.Create("Alex")],
             JournalConfidence.Confirmed,
-            relatedArticles: [],
+            relatedJournalEntries: [],
             new DateOnly(2026, 9, 20),
             updatedAt);
 

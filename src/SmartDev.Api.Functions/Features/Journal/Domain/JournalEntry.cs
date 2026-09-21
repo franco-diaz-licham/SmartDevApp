@@ -10,7 +10,7 @@ public sealed class JournalEntry : Entity<JournalEntryId>
 {
     private readonly List<ArticleTagSnapshot> _tags = [];
     private readonly List<CollaboratorReference> _collaborators = [];
-    private readonly List<ArticleReference> _relatedArticles = [];
+    private readonly List<JournalEntryReference> _relatedJournalEntries = [];
 
     private JournalEntry(
         JournalEntryId id,
@@ -22,7 +22,7 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         CompanyReference? company,
         IEnumerable<CollaboratorReference> collaborators,
         JournalConfidence confidence,
-        IEnumerable<ArticleReference> relatedArticles,
+        IEnumerable<JournalEntryReference> relatedJournalEntries,
         DateOnly occurredOn,
         DateTimeOffset createdAt,
         DateTimeOffset? updatedAt,
@@ -38,7 +38,7 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         ArchivedAt = archivedAt;
         _tags.AddRange(NormalizeTags(tags));
         _collaborators.AddRange(collaborators.DistinctBy(collaborator => collaborator.Name, StringComparer.OrdinalIgnoreCase));
-        _relatedArticles.AddRange(relatedArticles.DistinctBy(article => article.ArticleId));
+        _relatedJournalEntries.AddRange(relatedJournalEntries.DistinctBy(article => article.EntryId));
     }
 
     public JournalTitle Title { get; private set; }
@@ -57,7 +57,7 @@ public sealed class JournalEntry : Entity<JournalEntryId>
 
     public JournalConfidence Confidence { get; private set; }
 
-    public IReadOnlyCollection<ArticleReference> RelatedArticles => _relatedArticles;
+    public IReadOnlyCollection<JournalEntryReference> RelatedJournalEntries => _relatedJournalEntries;
 
     public DateOnly OccurredOn { get; private set; }
 
@@ -74,7 +74,7 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         Company?.RoleTitle,
         string.Join(" ", Collaborators.Select(collaborator => collaborator.Name)),
         Confidence.ToString(),
-        string.Join(" ", RelatedArticles.Select(article => article.Title)));
+        string.Join(" ", RelatedJournalEntries.Select(article => article.Title)));
 
     public static JournalEntry Create(
         JournalEntryId id,
@@ -86,7 +86,7 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         CompanyReference? company,
         IEnumerable<CollaboratorReference> collaborators,
         JournalConfidence confidence,
-        IEnumerable<ArticleReference> relatedArticles,
+        IEnumerable<JournalEntryReference> relatedJournalEntries,
         DateOnly occurredOn,
         DateTimeOffset? now = null)
     {
@@ -100,7 +100,7 @@ public sealed class JournalEntry : Entity<JournalEntryId>
             company,
             collaborators,
             confidence,
-            relatedArticles,
+            relatedJournalEntries,
             occurredOn,
             now ?? DateTimeOffset.UtcNow,
             updatedAt: null,
@@ -117,13 +117,13 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         CompanyReference? company,
         IEnumerable<CollaboratorReference> collaborators,
         JournalConfidence confidence,
-        IEnumerable<ArticleReference> relatedArticles,
+        IEnumerable<JournalEntryReference> relatedJournalEntries,
         DateOnly occurredOn,
         DateTimeOffset createdAt,
         DateTimeOffset? updatedAt,
         DateTimeOffset? archivedAt)
     {
-        return new JournalEntry(id, title, body, entryType, status, tags, company, collaborators, confidence, relatedArticles, occurredOn, createdAt, updatedAt, archivedAt);
+        return new JournalEntry(id, title, body, entryType, status, tags, company, collaborators, confidence, relatedJournalEntries, occurredOn, createdAt, updatedAt, archivedAt);
     }
 
     public void Update(
@@ -135,7 +135,7 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         CompanyReference? company,
         IEnumerable<CollaboratorReference> collaborators,
         JournalConfidence confidence,
-        IEnumerable<ArticleReference> relatedArticles,
+        IEnumerable<JournalEntryReference> relatedJournalEntries,
         DateOnly occurredOn,
         DateTimeOffset now)
     {
@@ -149,7 +149,7 @@ public sealed class JournalEntry : Entity<JournalEntryId>
         ArchivedAt = status == JournalEntryStatus.Archived ? ArchivedAt ?? now : null;
         Replace(_tags, NormalizeTags(tags));
         Replace(_collaborators, collaborators.DistinctBy(collaborator => collaborator.Name, StringComparer.OrdinalIgnoreCase));
-        Replace(_relatedArticles, relatedArticles.DistinctBy(article => article.ArticleId));
+        Replace(_relatedJournalEntries, relatedJournalEntries.DistinctBy(article => article.EntryId));
         Touch(now);
     }
 

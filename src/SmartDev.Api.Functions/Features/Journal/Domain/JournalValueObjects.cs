@@ -1,5 +1,4 @@
 using SmartDev.Api.Functions.Common.Domain;
-using SmartDev.Api.Functions.Features.Articles.Domain;
 
 namespace SmartDev.Api.Functions.Features.Journal.Domain;
 
@@ -58,21 +57,21 @@ public sealed record CollaboratorReference
 }
 
 /// <summary>
-/// Optional article link copied by stable article id.
+/// Optional journal entry link copied by stable journal entry id.
 /// </summary>
-public sealed record ArticleReference
+public sealed record JournalEntryReference
 {
     private const int MaxTitleLength = 160;
 
-    private ArticleReference(ArticleId articleId, string title)
+    private JournalEntryReference(JournalEntryId entryId, string title)
     {
-        ArticleId = articleId;
+        EntryId = entryId;
         Title = title;
     }
 
-    public ArticleId ArticleId { get; }
+    public JournalEntryId EntryId { get; }
 
     public string Title { get; }
 
-    public static ArticleReference Create(Guid articleId, string title) => new(ArticleId.From(articleId), Guard.Required(title, "articleTitle", MaxTitleLength));
+    public static JournalEntryReference Create(Guid entryId, string title) => new(JournalEntryId.From(entryId), Guard.Required(title, "journalEntryTitle", MaxTitleLength));
 }
