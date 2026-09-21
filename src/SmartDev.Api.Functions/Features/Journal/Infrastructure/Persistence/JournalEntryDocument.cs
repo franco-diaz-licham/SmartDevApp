@@ -1,3 +1,4 @@
+using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using SmartDev.Api.Functions.Features.Articles.Domain;
 using SmartDev.Api.Functions.Features.Articles.Infrastructure.Persistence;
@@ -11,6 +12,14 @@ public sealed class JournalEntryDocument
     public const string DocumentType = "journalEntry";
     public const string PartitionKeyPath = "/partitionKey";
     public const string PartitionKey = "journal";
+
+    /// <summary>
+    /// Composite indexes backing the sorts in <see cref="CosmosJournalQueries" />; each also serves the fully reversed order.
+    /// </summary>
+    public static readonly IReadOnlyCollection<IReadOnlyList<CompositePath>> CompositeIndexes = [
+        [new CompositePath { Path = "/occurredOn", Order = CompositePathSortOrder.Descending }, new CompositePath { Path = "/createdAt", Order = CompositePathSortOrder.Descending }],
+        [new CompositePath { Path = "/updatedAt", Order = CompositePathSortOrder.Descending }, new CompositePath { Path = "/createdAt", Order = CompositePathSortOrder.Descending }]
+    ];
 
     [JsonProperty("id")]
     public string Id { get; init; } = string.Empty;

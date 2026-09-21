@@ -13,11 +13,13 @@ public interface IDocumentStore
     /// <param name="containerName">The name of the document container.</param>
     /// <param name="partitionKeyPath">The partition key path used by the container.</param>
     /// <param name="timeToLive">The container time-to-live policy.</param>
+    /// <param name="compositeIndexes">Composite indexes required by multi-field ORDER BY queries; applied to existing containers when missing.</param>
     /// <param name="cancellationToken">The token used to cancel the operation.</param>
     Task EnsureContainerAsync(
         string containerName,
         string partitionKeyPath,
         DocumentContainerTimeToLive timeToLive = DocumentContainerTimeToLive.UseConfiguredDefault,
+        IReadOnlyCollection<IReadOnlyList<CompositePath>>? compositeIndexes = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>

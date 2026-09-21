@@ -79,6 +79,9 @@ internal static class CosmosJournalQueries
 
         if (field is null) return DefaultOrderBy;
         var direction = query.SortDirection == SortDirection.Asc ? "ASC" : "DESC";
-        return $"{field} {direction}, c.createdAt DESC";
+        if (field == "c.createdAt") return $"{field} {direction}";
+
+        // Multi-field ORDER BY needs a matching composite index (JournalEntryDocument.CompositeIndexes); the tie-breaker follows the primary direction so one index serves both.
+        return $"{field} {direction}, c.createdAt {direction}";
     }
 }

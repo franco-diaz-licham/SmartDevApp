@@ -28,6 +28,7 @@ public sealed class DocumentContainerInitializer(IDocumentStore documentStore, I
             JournalEntryDocument.ContainerName,
             JournalEntryDocument.PartitionKeyPath,
             timeToLive: DocumentContainerTimeToLive.Disabled,
+            compositeIndexes: JournalEntryDocument.CompositeIndexes,
             cancellationToken: stoppingToken);
 
         logger.LogInformation("Cosmos DB document containers are ready");

@@ -16,8 +16,10 @@ public sealed class CosmosDocumentStore(CosmosClient client, IOptions<CosmosDbOp
         string containerName,
         string partitionKeyPath,
         DocumentContainerTimeToLive timeToLive = DocumentContainerTimeToLive.UseConfiguredDefault,
+        IReadOnlyCollection<IReadOnlyList<CompositePath>>? compositeIndexes = null,
         CancellationToken cancellationToken = default)
     {
+        compositeIndexes ??= [];
         var databaseResponse = _options.Throughput > 0
             ? await client.CreateDatabaseIfNotExistsAsync(_options.DatabaseName, throughput: _options.Throughput, cancellationToken: cancellationToken)
             : await client.CreateDatabaseIfNotExistsAsync(_options.DatabaseName, cancellationToken: cancellationToken);
@@ -28,8 +30,30 @@ public sealed class CosmosDocumentStore(CosmosClient client, IOptions<CosmosDbOp
                 _ => throw new ArgumentOutOfRangeException(nameof(timeToLive), timeToLive, "Unsupported document container time-to-live policy.")
             }
         };
+        AddMissingCompositeIndexes(properties.IndexingPolicy, compositeIndexes);
 
-        await databaseResponse.Database.CreateContainerIfNotExistsAsync(properties, cancellationToken: cancellationToken);
+        var containerResponse = await databaseResponse.Database.CreateContainerIfNotExistsAsync(properties, cancellationToken: cancellationToken);
+
+        // CreateContainerIfNotExists does not update existing containers, so add indexes introduced after the container was created.
+        var existing = containerResponse.Resource;
+        if (AddMissingCompositeIndexes(existing.IndexingPolicy, compositeIndexes)) {
+            await containerResponse.Container.ReplaceContainerAsync(existing, cancellationToken: cancellationToken);
+        }
+    }
+
+    private static bool AddMissingCompositeIndexes(IndexingPolicy indexingPolicy, IReadOnlyCollection<IReadOnlyList<CompositePath>> compositeIndexes)
+    {
+        var added = false;
+        foreach (var compositeIndex in compositeIndexes) {
+            var exists = indexingPolicy.CompositeIndexes.Any(current => current.Count == compositeIndex.Count
+                && current.Zip(compositeIndex).All(pair => pair.First.Path == pair.Second.Path && pair.First.Order == pair.Second.Order));
+            if (exists) continue;
+
+            indexingPolicy.CompositeIndexes.Add([.. compositeIndex.Select(path => new CompositePath { Path = path.Path, Order = path.Order })]);
+            added = true;
+        }
+
+        return added;
     }
 
     public async Task<TDocument?> GetAsync<TDocument>(string containerName, string id, string partitionKey, CancellationToken cancellationToken = default)
