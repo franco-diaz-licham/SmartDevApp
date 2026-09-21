@@ -61,7 +61,7 @@ export const JournalMainContent = ({
             name="journalSearch"
             type="search"
             value={searchTerm}
-            placeholder="Search title, body, company, outcome, or tags"
+            placeholder="Search title, body, company, or tags"
             className="w-full lg:flex-1"
             onChange={(event: ChangeEvent<HTMLInputElement>) => onSearchTermChange(event.target.value)}
           />
@@ -105,10 +105,8 @@ export const JournalMainContent = ({
               <span className="ml-2 text-xs font-extrabold uppercase text-muted-foreground">{entry.status}</span>
               <span className="ml-2 text-xs font-extrabold uppercase text-muted-foreground">{formatJournalDate(entry.occurredOn)}</span>
               <span className="mt-2 block text-lg font-extrabold">{entry.title}</span>
-              {entry.impact ? <span className="mt-2 block border-t border-border pt-3 text-sm leading-6 text-muted-foreground">{entry.impact}</span> : null}
               <div className="mt-4 flex flex-wrap gap-2">
                 {entry.company?.name ? <span className="rounded bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">{entry.company.name}</span> : null}
-                {entry.workplaceContext ? <span className="rounded bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">{entry.workplaceContext}</span> : null}
                 {entry.tags.map((tag) => (
                   <span key={tag.slug} className="rounded bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
                     {tag.displayName}

@@ -3,17 +3,26 @@ import type { JournalEntryFormModel } from './journal.types';
 
 const todayIsoDate = () => new Date().toISOString().slice(0, 10);
 
+export const journalEntryBodyTemplate = `## What I did
+
+## Outcome
+
+## Impact
+
+## Decisions
+
+## Blockers
+
+## Next actions
+`;
+
 export const journalEntryFormLimits = {
   title: 160,
   tags: 500,
   bodyMarkdown: 200_000,
   companyName: 160,
   companyRoleTitle: 160,
-  workplaceContext: 160,
-  outcome: 160,
-  impact: 500,
-  collaborators: 500,
-  notes: 1_500
+  collaborators: 500
 } as const;
 
 export const journalEntryTypeOptions = ['Note', 'DailyNote', 'ImplementationPlan', 'Decision', 'DebuggingLog', 'LearningNote', 'Retrospective', 'ReleaseNote'] as const;
@@ -30,33 +39,23 @@ export const journalEntryFormSchema = z.object({
   tags: z.string().trim().max(journalEntryFormLimits.tags, `Tags must be ${journalEntryFormLimits.tags} characters or less.`),
   companyName: z.string().trim().max(journalEntryFormLimits.companyName, `Company must be ${journalEntryFormLimits.companyName} characters or less.`),
   companyRoleTitle: z.string().trim().max(journalEntryFormLimits.companyRoleTitle, `Role title must be ${journalEntryFormLimits.companyRoleTitle} characters or less.`),
-  workplaceContext: z.string().trim().max(journalEntryFormLimits.workplaceContext, `Workplace context must be ${journalEntryFormLimits.workplaceContext} characters or less.`),
-  outcome: z.string().trim().max(journalEntryFormLimits.outcome, `Outcome must be ${journalEntryFormLimits.outcome} characters or less.`),
-  impact: z.string().trim().max(journalEntryFormLimits.impact, `Impact must be ${journalEntryFormLimits.impact} characters or less.`),
   collaborators: z.string().trim().max(journalEntryFormLimits.collaborators, `Collaborators must be ${journalEntryFormLimits.collaborators} characters or less.`),
   confidence: z.enum(journalConfidenceOptions),
-  decisions: z.string().trim().max(journalEntryFormLimits.notes, `Decisions must be ${journalEntryFormLimits.notes} characters or less.`),
-  blockers: z.string().trim().max(journalEntryFormLimits.notes, `Blockers must be ${journalEntryFormLimits.notes} characters or less.`),
-  nextActions: z.string().trim().max(journalEntryFormLimits.notes, `Next actions must be ${journalEntryFormLimits.notes} characters or less.`),
+  relatedArticles: z.array(z.object({ articleId: z.string().trim().min(1), title: z.string().trim().min(1) })),
   occurredOn: z.string().trim().min(1, 'Date is required.')
 }) satisfies z.ZodType<JournalEntryFormModel>;
 
 export const defaultJournalEntryFormValues: JournalEntryFormModel = {
   title: '',
-  bodyMarkdown: '',
+  bodyMarkdown: journalEntryBodyTemplate,
   entryType: 'Note',
   status: 'Active',
   tags: '',
   companyName: '',
   companyRoleTitle: '',
-  workplaceContext: '',
-  outcome: '',
-  impact: '',
   collaborators: '',
   confidence: 'Confirmed',
-  decisions: '',
-  blockers: '',
-  nextActions: '',
+  relatedArticles: [],
   occurredOn: todayIsoDate()
 };
 

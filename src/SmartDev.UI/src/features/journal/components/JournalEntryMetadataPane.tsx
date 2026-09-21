@@ -6,6 +6,7 @@ import type { JournalEntryFormController } from '../hooks/useJournalEntryForm';
 import type { JournalConfidenceModel, JournalEntryStatusModel, JournalEntryTypeModel } from '../types/journal.types';
 import { journalConfidenceOptions, journalEntryTypeOptions, journalStatusOptions } from '../types/journalEntryForm.schema';
 import { getJournalConfidenceLabel, getJournalStatusLabel, getJournalTypeLabel } from '../utils/journalContent';
+import { JournalRelatedArticlesField } from './JournalRelatedArticlesField';
 
 const typeOptions = journalEntryTypeOptions.map((entryType) => ({ label: getJournalTypeLabel(entryType), value: entryType }));
 const statusOptions = journalStatusOptions.map((status) => ({ label: getJournalStatusLabel(status), value: status }));
@@ -138,6 +139,7 @@ export const JournalEntryMetadataPane = ({ form, mutationError = '', onCancel }:
         onChange={(event: ChangeEvent<HTMLInputElement>) => form.updateField('collaborators', event.target.value)}
         onInlineEdit={() => form.editField('collaborators')}
       />
+      <JournalRelatedArticlesField form={form} />
     </div>
   </aside>
 );

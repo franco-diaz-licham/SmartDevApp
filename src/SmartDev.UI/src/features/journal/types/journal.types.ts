@@ -21,9 +21,6 @@ export interface JournalListItemModel {
   status: JournalEntryStatusModel;
   tags: JournalTagModel[];
   company: JournalCompanyModel | null;
-  workplaceContext: string | null;
-  outcome: string | null;
-  impact: string | null;
   confidence: JournalConfidenceModel;
   occurredOn: string;
   createdAt: Date;
@@ -34,9 +31,6 @@ export interface JournalDetailModel extends JournalListItemModel {
   bodyMarkdown: string;
   collaborators: string[];
   relatedArticles: JournalRelatedArticleModel[];
-  decisions: string[];
-  blockers: string[];
-  nextActions: string[];
   archivedAt: Date | null;
 }
 
@@ -53,14 +47,9 @@ export interface JournalEntryFormModel {
   tags: string;
   companyName: string;
   companyRoleTitle: string;
-  workplaceContext: string;
-  outcome: string;
-  impact: string;
   collaborators: string;
   confidence: JournalConfidenceModel;
-  decisions: string;
-  blockers: string;
-  nextActions: string;
+  relatedArticles: JournalRelatedArticleModel[];
   occurredOn: string;
 }
 

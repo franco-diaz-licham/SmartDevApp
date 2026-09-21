@@ -43,9 +43,6 @@ export const mapJournalDetailResponseToModel = (entry: JournalDetailResponse): J
   bodyMarkdown: entry.bodyMarkdown,
   collaborators: entry.collaborators,
   relatedArticles: entry.relatedArticles,
-  decisions: entry.decisions,
-  blockers: entry.blockers,
-  nextActions: entry.nextActions,
   archivedAt: toNullableDate(entry.archivedAt)
 });
 
@@ -57,14 +54,9 @@ export const mapJournalDetailResponseToEntryFormModel = (entry: JournalDetailRes
   tags: entry.tags.map((tag) => tag.displayName).join(', '),
   companyName: entry.company?.name ?? '',
   companyRoleTitle: entry.company?.roleTitle ?? '',
-  workplaceContext: entry.workplaceContext ?? '',
-  outcome: entry.outcome ?? '',
-  impact: entry.impact ?? '',
   collaborators: entry.collaborators.join(', '),
   confidence: entry.confidence,
-  decisions: entry.decisions.join('\n'),
-  blockers: entry.blockers.join('\n'),
-  nextActions: entry.nextActions.join('\n'),
+  relatedArticles: entry.relatedArticles,
   occurredOn: entry.occurredOn
 });
 
@@ -80,15 +72,9 @@ export const mapJournalEntryFormModelToRequestDto = (entry: JournalEntryFormMode
         roleTitle: trimOrNull(entry.companyRoleTitle)
       }
     : null,
-  workplaceContext: trimOrNull(entry.workplaceContext),
-  outcome: trimOrNull(entry.outcome),
-  impact: trimOrNull(entry.impact),
   collaborators: splitTextList(entry.collaborators),
   confidence: entry.confidence,
-  relatedArticles: [],
-  decisions: splitTextList(entry.decisions),
-  blockers: splitTextList(entry.blockers),
-  nextActions: splitTextList(entry.nextActions),
+  relatedArticles: entry.relatedArticles,
   occurredOn: entry.occurredOn
 });
 

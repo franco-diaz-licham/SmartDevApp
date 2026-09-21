@@ -66,68 +66,6 @@ export const JournalEntryContent = ({ form }: JournalEntryContentProps) => {
           </AppInlineEditSurface>
         )}
       </div>
-
-      <section className="mt-6">
-        <h2 className="text-lg font-extrabold">Optional details</h2>
-        <div className="mt-5 grid gap-4">
-          <AppInputTextArea
-            id="journal-workplace-context"
-            label="Workplace context"
-            error={form.errors.workplaceContext}
-            name="workplaceContext"
-            value={form.values.workplaceContext}
-            placeholder="Payments platform"
-            className="min-h-24"
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => form.updateField('workplaceContext', getInputValue(event))}
-          />
-          <AppInputTextArea
-            id="journal-outcome"
-            label="Outcome"
-            error={form.errors.outcome}
-            name="outcome"
-            value={form.values.outcome}
-            placeholder="Fixed retry timeout"
-            className="min-h-24"
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => form.updateField('outcome', getInputValue(event))}
-          />
-          <AppInputTextArea
-            id="journal-impact"
-            label="Impact"
-            error={form.errors.impact}
-            name="impact"
-            value={form.values.impact}
-            className="min-h-24"
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => form.updateField('impact', getInputValue(event))}
-          />
-          <AppInputTextArea
-            id="journal-decisions"
-            label="Decisions"
-            error={form.errors.decisions}
-            name="decisions"
-            value={form.values.decisions}
-            className="min-h-24"
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => form.updateField('decisions', getInputValue(event))}
-          />
-          <AppInputTextArea
-            id="journal-blockers"
-            label="Blockers"
-            error={form.errors.blockers}
-            name="blockers"
-            value={form.values.blockers}
-            className="min-h-24"
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => form.updateField('blockers', getInputValue(event))}
-          />
-          <AppInputTextArea
-            id="journal-next-actions"
-            label="Next actions"
-            error={form.errors.nextActions}
-            name="nextActions"
-            value={form.values.nextActions}
-            className="min-h-24"
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => form.updateField('nextActions', getInputValue(event))}
-          />
-        </div>
-      </section>
     </main>
   );
 };

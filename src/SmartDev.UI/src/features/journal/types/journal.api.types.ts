@@ -17,9 +17,6 @@ export interface JournalListItemResponse {
   status: JournalEntryStatusModel;
   tags: JournalTagResponse[];
   company: JournalCompanyResponse | null;
-  workplaceContext: string | null;
-  outcome: string | null;
-  impact: string | null;
   confidence: JournalConfidenceModel;
   occurredOn: string;
   createdAt: string;
@@ -35,9 +32,6 @@ export interface JournalDetailResponse extends JournalListItemResponse {
   bodyMarkdown: string;
   collaborators: string[];
   relatedArticles: JournalRelatedArticleResponse[];
-  decisions: string[];
-  blockers: string[];
-  nextActions: string[];
   archivedAt: string | null;
 }
 
@@ -63,15 +57,9 @@ export interface JournalEntryRequestDto {
   status: JournalEntryStatusModel;
   tags: JournalTagRequestDto[];
   company: JournalCompanyRequestDto | null;
-  workplaceContext: string | null;
-  outcome: string | null;
-  impact: string | null;
   collaborators: string[];
   confidence: JournalConfidenceModel;
   relatedArticles: JournalRelatedArticleRequestDto[];
-  decisions: string[];
-  blockers: string[];
-  nextActions: string[];
   occurredOn: string;
 }
 
