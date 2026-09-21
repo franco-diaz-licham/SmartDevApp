@@ -10,6 +10,7 @@ try {
     builder
         .AddHostServices()
         .UseMiddleware<HttpCorsMiddleware>()
+        .UseMiddleware<HttpExceptionHandlingMiddleware>()
         .UseMiddleware<HttpRateLimitingMiddleware>()
         .UseMiddleware<HttpAdminAuthorizationMiddleware>();
 
